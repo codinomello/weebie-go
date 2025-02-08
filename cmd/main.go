@@ -1,30 +1,17 @@
 package main
 
 import (
-	"os"
-	"project/controllers"
-	"project/db"
+	"net/http"
 
-	"github.com/gin-gonic/gin"
+	"github.com/codinomello/webjetos-go/db"
 )
 
 func main() {
-	database := db.Init()
-	projectCollection := &controllers.GameController{
-		Collection: &db.MongoCollection{Collection: database.Collection("games")},
-	}
+	db.DBConnection()
+	server := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Hello, World!"))
+	})
 
-	r := gin.Default()
-
-	// Configurar templates
-	r.LoadHTMLGlob("views/templates/*")
-
-	// Rotas
-	//r.GET("/submit", gameCollection.SubmitFormHandler)
-	r.POST("/submit", projectCollection.SubmitGameHandler)
-
-	// Servir arquivos estáticos
-	r.Static("/static", "./views/static")
-
-	r.Run(":" + os.Getenv("8080"))
+	http.HandleFunc("/hello", server)
+	http.ListenAndServe(":8080", server)
 }
