@@ -1,6 +1,11 @@
 package handlers
 
 import (
-	"github.com/codinomello/webjetos-go/views/templates"
+	"net/http"
 
-func HandleIndex (w http.ResponseWriter, r *http.Request) {
+	index "github.com/codinomello/webjetos-go/views/templates"
+)
+
+func HandleIndex(w http.ResponseWriter, r *http.Request) error {
+	return index.Index().Render(r.Context(), w)
+}

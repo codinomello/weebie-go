@@ -24,5 +24,5 @@ func HandleProjects(w http.ResponseWriter, r *http.Request) {
 
 	// TODO: Renderiza o template views/post-projeto.html
 	template := template.Must(template.ParseFiles("index.html"))
-	template.ExecuteTemplate(w, "film-list-element", Project{Title: title, Group: group, Year: year, ODS: ods, Course: course})
+	template.ExecuteTemplate(w, "project-list-element", Project{Title: title, Group: group, Year: year, ODS: ods, Course: course})
 }
