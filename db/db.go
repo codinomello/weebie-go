@@ -10,38 +10,38 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func DBConnection() {
+func Connection() {
 	// Configuração do cliente MongoDB
-	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+	opts := options.Client().ApplyURI("mongodb://localhost:27017")
 
 	// Conectando ao MongoDB
-	client, err := mongo.Connect(context.TODO(), clientOptions)
+	client, err := mongo.Connect(context.TODO(), opts)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Erro ao conectar ao MongoDB: %v", err)
 	}
 
 	// Verificando a conexão
 	err = client.Ping(context.TODO(), nil)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Erro ao verificar conexão com o MongoDB: %v", err)
 	}
 
 	fmt.Println("Conexão com o MongoDB estabelecida com sucesso!")
 
 	// Selecionando o banco de dados e a coleção
-	collection := client.Database("testdb").Collection("users")
+	collection := client.Database("projetodb").Collection("users")
 
 	// Inserindo um documento
-	user := bson.D{{"name", "John Doe"}, {"age", 30}}
+	user := bson.D{{Key: "name", Value: "Gabriel"}, {Key: "age", Value: 15}}
 	insertResult, err := collection.InsertOne(context.TODO(), user)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Documento inserido com ID:", insertResult.InsertedID)
+	fmt.Printf("Documento inserido com o ID: %v", insertResult.InsertedID)
 
 	// Buscando um documento
 	var result bson.M
-	err = collection.FindOne(context.TODO(), bson.D{{"name", "John Doe"}}).Decode(&result)
+	err = collection.FindOne(context.TODO(), bson.D{{Key: "name", Value: "Gabriel"}}).Decode(&result)
 	if err != nil {
 		log.Fatal(err)
 	}
