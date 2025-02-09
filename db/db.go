@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -29,28 +28,29 @@ func Connection() {
 	fmt.Println("Conexão com o MongoDB estabelecida com sucesso!")
 
 	// Selecionando o banco de dados e a coleção
-	collection := client.Database("projetodb").Collection("users")
+	//collection := client.Database("projetodb").Collection("users")
 
-	// Inserindo um documento
-	user := bson.D{{Key: "name", Value: "Gabriel"}, {Key: "age", Value: 15}}
-	insertResult, err := collection.InsertOne(context.TODO(), user)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("Documento inserido com o ID: %v", insertResult.InsertedID)
+	// // Inserindo um documento
+	// user := bson.D{{Key: "name", Value: "Gabriel"}, {Key: "age", Value: 15}}
+	// insertResult, err := collection.InsertOne(context.TODO(), user)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// fmt.Printf("Documento inserido com o ID: %v\n", insertResult.InsertedID)
 
-	// Buscando um documento
-	var result bson.M
-	err = collection.FindOne(context.TODO(), bson.D{{Key: "name", Value: "Gabriel"}}).Decode(&result)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Documento encontrado:", result)
+	// // Buscando um documento
+	// var result bson.M
+	// err = collection.FindOne(context.TODO(), bson.D{{Key: "name", Value: "Gabriel"}}).Decode(&result)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// fmt.Println("Documento encontrado:", result)
 
 	// Fechando a conexão
-	err = client.Disconnect(context.TODO())
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Conexão com o MongoDB fechada.")
+	defer func() {
+		if err := client.Disconnect(context.TODO()); err != nil {
+			panic(err)
+		}
+		fmt.Println("Conexão com o MongoDB fechada.")
+	}()
 }
