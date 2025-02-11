@@ -4,53 +4,54 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"log/slog"
+	"os"
+	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func Connection() {
-	// Configuração do cliente MongoDB
-	opts := options.Client().ApplyURI("mongodb://localhost:27017")
+var (
+	client *mongo.Client
+	db     *mongo.Database
+)
 
-	// Conectando ao MongoDB
-	client, err := mongo.Connect(context.TODO(), opts)
+func Connect() {
+	// Configurações do MongoDB
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// Conexão ao MongoDB
+	opts := options.Client().ApplyURI(os.Getenv("MONGODB_URI"))
+	// Configuração do cliente MongoDB
+	client, err := mongo.Connect(ctx, opts)
 	if err != nil {
-		log.Fatalf("Erro ao conectar ao MongoDB: %v", err)
+		log.Fatal(err)
 	}
+
+	// Selecionar banco de dados e coleção
+	// db := client.Database("weebiedb")     // Nome do banco
+	// projects := db.Collection("projects") // Nome da coleção
 
 	// Verificando a conexão
 	err = client.Ping(context.TODO(), nil)
 	if err != nil {
 		log.Fatalf("Erro ao verificar conexão com o MongoDB: %v", err)
 	}
+	slog.Info(fmt.Sprintf("Conexão com o MongoDB estabelecida com sucesso!"))
+}
 
-	fmt.Println("Conexão com o MongoDB estabelecida com sucesso!")
+// Encerra a conexão com o MongoDB
+func Disconnect() error {
+	if err := client.Disconnect(context.Background()); err != nil {
+		return fmt.Errorf("Erro ao desconectar do MongoDB: %v", err)
+	}
+	fmt.Println("Conexão com o MongoDB encerrada.")
+	return nil
+}
 
-	// Selecionando o banco de dados e a coleção
-	//collection := client.Database("projetodb").Collection("users")
-
-	// // Inserindo um documento
-	// user := bson.D{{Key: "name", Value: "Gabriel"}, {Key: "age", Value: 15}}
-	// insertResult, err := collection.InsertOne(context.TODO(), user)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Printf("Documento inserido com o ID: %v\n", insertResult.InsertedID)
-
-	// // Buscando um documento
-	// var result bson.M
-	// err = collection.FindOne(context.TODO(), bson.D{{Key: "name", Value: "Gabriel"}}).Decode(&result)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Println("Documento encontrado:", result)
-
-	// Fechando a conexão
-	defer func() {
-		if err := client.Disconnect(context.TODO()); err != nil {
-			panic(err)
-		}
-		fmt.Println("Conexão com o MongoDB fechada.")
-	}()
+// Retorna a conexão com o MongoDB
+func GetConnection() *mongo.Client {
+	return client
 }
