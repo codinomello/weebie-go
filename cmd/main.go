@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/codinomello/webjetos-go/db"
-	"github.com/codinomello/webjetos-go/handlers"
+	db "github.com/codinomello/webjetos-go/services/db"
+	"github.com/codinomello/webjetos-go/services/handlers"
 	"github.com/joho/godotenv"
 	"golang.org/x/exp/slog"
 )
@@ -19,8 +19,12 @@ func main() {
 
 	// Conexão com o MongoDB
 	db.Connect()
+
 	// Fecha a conexão com o banco de dados ao final da execução do programa
 	defer db.Disconnect()
+
+	// Salva os projetos
+	db.SaveProject()
 
 	// Criação do roteador
 	router := http.NewServeMux()

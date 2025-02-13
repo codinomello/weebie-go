@@ -32,7 +32,8 @@ func Connect() {
 
 	// Selecionar banco de dados e coleção
 	// db := client.Database("weebiedb")     // Nome do banco
-	// projects := db.Collection("projects") // Nome da coleção
+	// projects := db.Collection("projects") // Nome da coleção de projetos
+	// users := db.Collection("users")		 // Nome da coleção de usuários
 
 	// Verificando a conexão
 	err = client.Ping(context.TODO(), nil)
