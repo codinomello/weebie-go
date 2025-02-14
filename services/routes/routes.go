@@ -1,4 +1,4 @@
-package server
+package routes
 
 import (
 	"net/http"
@@ -6,9 +6,7 @@ import (
 	"github.com/codinomello/webjetos-go/services/handlers"
 )
 
-func HandleAllRoutes() {
-	router := http.NewServeMux()
-
+func HandleAllRoutes(router *http.ServeMux) {
 	// Rota principal (index.templ)
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if err := handlers.HandleTemplIndex(w, r); err != nil {
@@ -17,12 +15,12 @@ func HandleAllRoutes() {
 	})
 
 	// Rota projetos (projects.templ)
-	router.HandleFunc("/projetos", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/projects", func(w http.ResponseWriter, r *http.Request) {
 		if err := handlers.HandleTemplProjects(w, r); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	})
 
 	// Rota para postar um projeto
-	router.HandleFunc("/post-projeto", handlers.HandlePostProjects)
+	router.HandleFunc("/post-projects", handlers.HandlePostProjects)
 }

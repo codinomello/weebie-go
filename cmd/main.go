@@ -7,6 +7,7 @@ import (
 
 	"github.com/codinomello/webjetos-go/services/api"
 	"github.com/codinomello/webjetos-go/services/db"
+	"github.com/codinomello/webjetos-go/services/routes"
 
 	"golang.org/x/exp/slog"
 )
@@ -26,6 +27,8 @@ func main() {
 
 	// Porta principal do servidor HTTP
 	port := os.Getenv("LISTEN_ADDRESS")
+
+	routes.HandleAllRoutes(router)
 
 	server := &http.Server{
 		Addr:    port,
