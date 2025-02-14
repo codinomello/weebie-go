@@ -30,11 +30,6 @@ func Connect() {
 		log.Fatal(err)
 	}
 
-	// Selecionar banco de dados e coleção
-	// db := client.Database("weebiedb")     // Nome do banco
-	// projects := db.Collection("projects") // Nome da coleção de projetos
-	// users := db.Collection("users")		 // Nome da coleção de usuários
-
 	// Verificando a conexão
 	err = client.Ping(context.TODO(), nil)
 	if err != nil {
@@ -53,6 +48,11 @@ func Disconnect() error {
 }
 
 // Retorna a conexão com o MongoDB
-func GetConnection() *mongo.Client {
+func GetMongoConnection() *mongo.Client {
 	return client
+}
+
+// Retorna a coleção MongoDB
+func GetMongoCollection(collection string) *mongo.Collection {
+	return client.Database("projectdb").Collection(collection)
 }

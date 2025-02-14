@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  	<meta charset="UTF-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  	<title>Sistema de Cadastro de Projetos Comunitários</title>
+  	<!-- Tailwind CSS -->
+  	<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  	<!-- Flowbite CSS -->
+  	<link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.css" rel="stylesheet">
+  	<!-- HTMX -->
+  	<script src="https://unpkg.com/htmx.org@1.9.4"></script>
+  	<style>
+   	 	@import url('https://fonts.cdnfonts.com/css/euclid-circular-a');
+    	* {
+      		font-family: "Euclid Circular A";
+    	}
+    	.bg-gradient-primary {
+      		background: linear-gradient(135deg, #C3B1E1, #10B981);
+    	}
+    	.hover-scale {
+      		transition: transform 0.3s ease;
+    	}
+    	.hover-scale:hover {
+      		transform: scale(1.05);
+    	}
+    	.text-green {
+      		color: #10B981;
+    	}
+    	.bg-green {
+      		background-color: #10B981;
+    	}
+    	.hover-bg-green:hover {
+      		background-color: #059669;
+    	}
+    	.dark-mode {
+      		background-color: #1a202c;
+      		color: #f7fafc;
+    	}
+    	.dark-mode .bg-white {
+      		background-color: #2d3748;
+    	}
+    	.dark-mode .text-gray-700 {
+      		color: #cbd5e0;
+    	}
+    	.dark-mode .text-gray-600 {
+      		color: #a0aec0;
+   		}
+  	</style>
+</head>
+<body class="bg-gray-50 transition duration-300" id="body">
+
+  	<!-- Botão de alternância do modo escuro -->
+  	<div class="absolute top-4 right-4">
+    	<button id="dark-mode-toggle" class="px-4 py-2 bg-gray-800 text-white rounded-lg"> 🌙 Modo Escuro </button>
+  	</div>
+
+  	<!-- Cabeçalho -->
+  	<header class="bg-gradient-primary text-white py-12">
+    	<div class="container mx-auto px-4 text-center">
+      		<h1 class="text-4xl font-bold mb-4">Sistema de Cadastro de Projetos Comunitários</h1>
+      		<p class="text-lg">Cadastre e gerencie projetos que transformam comunidades!</p>
+    	</div>
+  	</header>
+
+  	<!-- Seção de Destaque -->
+  	<section class="container mx-auto px-4 py-12">
+    	<div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-2xl hover-scale">
+      		<h2 class="text-2xl font-bold text-green mb-6 animated-text">Cadastre seu projeto comunitário</h2>
+      	<style>
+        	.animated-text {
+          		background-image: linear-gradient(90deg, #C3B1E1, #10B981);
+          		background-size: 200% 100%;
+          		background-clip: text;
+          		-webkit-background-clip: text;
+          		color: transparent;
+          		animation: colorShift 3s infinite alternate;
+        	}
+
+        	@keyframes colorShift {
+          		0% {
+            		background-position: 0% 50%;
+         		}
+          		100% {
+            		background-position: 100% 50%;
+          		}
+        	}
+      	</style>
+      	<p class="text-gray-600 mb-8">Preencha o formulário abaixo para cadastrar seu projeto e contribuir para o desenvolvimento da comunidade.</p>
+
+      	<!-- Formulário de Cadastro -->
+      	<form id="project-form" hx-post="/cadastrar-projeto" hx-swap="none">
+        	<div class="mb-6">
+          		<label for="project-name" class="block text-gray-700 font-bold mb-2">Nome do Projeto</label>
+          		<input type="text" id="project-name" name="project-name" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green" required>
+        	</div>
+        	<div class="mb-6">
+          		<label for="project-description" class="block text-gray-700 font-bold mb-2">Descrição do Projeto</label>
+          		<textarea id="project-description" name="project-description" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green" rows="4" required></textarea>
+        	</div>
+        	<div class="mb-6">
+          		<label for="project-location" class="block text-gray-700 font-bold mb-2">Localização</label>
+          		<input type="text" id="project-location" name="project-location" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green" required>
+        	</div>
+        	<div class="mb-6">
+          		<label for="project-contact" class="block text-gray-700 font-bold mb-2">Contato</label>
+          		<input type="email" id="project-contact" name="project-contact" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green" required>
+        	</div>
+        	<button type="submit" class="w-full bg-green text-white px-6 py-3 rounded-lg hover-bg-green transition duration-300 font-bold">Cadastrar Projeto</button>
+      	</form>
+    	</div>
+  	</section>
+
+  	<!-- Rodapé -->
+  	<footer class="bg-gradient-primary text-white py-8 mt-12">
+    	<div class="container mx-auto px-4 text-center">
+      		<p class="mb-2">&copy; 2025 Sistema de Cadastro de Projetos Comunitários.</p>
+      		<p>Todos os direitos reservados.</p>
+    	</div>
+  	</footer>
+
+  	<!-- Flowbite JS -->
+  	<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.js"></script>
+
+  	<script>
+    	const toggleButton = document.getElementById("dark-mode-toggle");
+    	const body = document.getElementById("body");
+
+    	toggleButton.addEventListener("click", () => {
+      		body.classList.toggle("dark-mode");
+      		if (body.classList.contains("dark-mode")) {
+        		toggleButton.textContent = "☀️ Modo Claro";
+      		} else {
+        		toggleButton.textContent = "🌙 Modo Escuro";
+      		}
+    	});
+  </script>
+</body>
+</html>

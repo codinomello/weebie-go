@@ -4,6 +4,7 @@ go 1.23.4
 
 require (
 	github.com/a-h/templ v0.3.833
+	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
 	go.mongodb.org/mongo-driver v1.17.2
 	golang.org/x/exp v0.0.0-20250210185358-939b2ce775ac
