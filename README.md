@@ -7,7 +7,7 @@ Esta plataforma web permite a criação, gestão e compartilhamento de iniciativ
 
 ## 🛠️ Tecnologias Utilizadas
 
-- **Backend**: [Go (Golang)](https://golang.org/) 🐹
+- **Backend**: [Go](https://golang.org/) 🐹
 - **Frontend**: [Templ](https://github.com/arschles/templ) 🖼️ (para templates HTML)
 - **Banco de Dados**: [MongoDB](https://www.mongodb.com/) �
 - **UI Framework**: [Flowbite](https://flowbite.com/) 🎨 (baseado em Tailwind CSS)
