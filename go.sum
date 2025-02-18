@@ -1,7 +1,5 @@
 github.com/a-h/templ v0.3.833 h1:L/KOk/0VvVTBegtE0fp2RJQiBm7/52Zxv5fqlEHiQUU=
 github.com/a-h/templ v0.3.833/go.mod h1:cAu4AiZhtJfBjMY0HASlyzvkrtjnHWPeEsyGK2YYmfk=
-github.com/codinomello/webjetos-go v0.0.0-20250218173436-498368b7c495 h1:E8HB7xyW2uIA4KKjq6yFEXH7QgoUMPKbHCsnQHfapzo=
-github.com/codinomello/webjetos-go v0.0.0-20250218173436-498368b7c495/go.mod h1:nOai6/neLsR2k4bg234YQKYK7oazPvTLebvh0hndRuI=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/golang/snappy v0.0.4 h1:yAGX7huGHXlcLOEtBnF4w7FQwA26wojNCwOYAEhLjQM=
