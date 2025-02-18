@@ -3,7 +3,7 @@ package routes
 import (
 	"net/http"
 
-	"github.com/codinomello/webjetos-go/services/handlers"
+	"github.com/codinomello/weebie-go/services/handlers"
 )
 
 func HandleAllRoutes(router *http.ServeMux) {
