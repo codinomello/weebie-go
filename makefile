@@ -22,5 +22,8 @@ run:
 clean:
 	del $(BINARY_NAME)
 
+templ:
+	templ generate
+
 # Comando padrão (executado ao rodar apenas 'make')
 default: build

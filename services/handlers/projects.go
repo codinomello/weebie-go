@@ -11,8 +11,8 @@ import (
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 
-	db "github.com/codinomello/webjetos-go/services/db"
-	components "github.com/codinomello/webjetos-go/views/components"
+	"github.com/codinomello/weebie-go/services/db"
+	"github.com/codinomello/weebie-go/views/templates"
 )
 
 type Project struct {
@@ -25,7 +25,7 @@ type Project struct {
 }
 
 func HandleTemplProjects(w http.ResponseWriter, r *http.Request) error {
-	return components.Projects().Render(r.Context(), w)
+	return templates.Projects().Render(r.Context(), w)
 }
 
 func HandleGetProjects(w http.ResponseWriter, r *http.Request) {

@@ -3,7 +3,7 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/codinomello/webjetos-go/views/templates"
+	"github.com/codinomello/weebie-go/views/templates"
 )
 
 func HandleTemplIndex(w http.ResponseWriter, r *http.Request) error {

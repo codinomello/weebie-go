@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/codinomello/webjetos-go/services/api"
-	"github.com/codinomello/webjetos-go/services/db"
-	"github.com/codinomello/webjetos-go/services/routes"
+	"github.com/codinomello/weebie-go/services/api"
+	"github.com/codinomello/weebie-go/services/db"
+	"github.com/codinomello/weebie-go/services/routes"
 
 	"golang.org/x/exp/slog"
 )

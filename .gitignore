@@ -1,3 +1,2 @@
-.env
-bin
-views/html
+#.env
+views/static
