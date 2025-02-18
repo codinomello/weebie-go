@@ -1,4 +1,4 @@
-package templates
+package components
 
 templ Projects() {
     <!doctype html>
@@ -111,7 +111,7 @@ templ Projects() {
                 <label for="project-contact" class="block text-gray-700 font-bold mb-2">Contato</label>
                 <input type="email" id="project-contact" name="project-contact" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green" required>
             </div>
-            <button type="submit" class="w-full bg-green text-white px-6 py-3 rounded-lg hover-bg-green transition duration-300 font-bold">Cadastrar Projeto</button>
+            <button type="submit" class="w-full bg-green text-white px-6 py-3 rounded-lg hover-bg-green transition duration-300 font-bold" hx-get="/projetos">Cadastrar Projeto</button>
         </form>
         </div>
     </section>

@@ -12,7 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 
 	db "github.com/codinomello/webjetos-go/services/db"
-	templates "github.com/codinomello/webjetos-go/views/templates"
+	components "github.com/codinomello/webjetos-go/views/components"
 )
 
 type Project struct {
@@ -25,7 +25,7 @@ type Project struct {
 }
 
 func HandleTemplProjects(w http.ResponseWriter, r *http.Request) error {
-	return templates.Projects().Render(r.Context(), w)
+	return components.Projects().Render(r.Context(), w)
 }
 
 func HandleGetProjects(w http.ResponseWriter, r *http.Request) {
