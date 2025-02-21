@@ -4,6 +4,7 @@ Bem-vindo ao **Sistema de Iniciativas Sustentáveis**! 🌱
 Esta plataforma web permite a criação, gestão e compartilhamento de iniciativas de projetos com foco em sustentabilidade. Nosso objetivo é promover práticas sustentáveis e facilitar a colaboração entre indivíduos e organizações comprometidas com um futuro mais verde. 💚
 
 [![Go Version](https://img.shields.io/badge/Go-1.20%2B-blue?logo=go)](https://golang.org/)
+[![Firebase](https://img.shields.io/badge/Firebase-Auth-orange?logo=firebase)](https://firebase.google.com/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-5.0%2B-green?logo=mongodb)](https://www.mongodb.com/)
 [![License](https://img.shields.io/badge/License-MIT-green)](https://github.com/codinomello/weebie-go/blob/main/LICENSE)
 
