@@ -2,14 +2,13 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
 	"github.com/codinomello/weebie-go/services/api"
 	"github.com/codinomello/weebie-go/services/db"
 	"github.com/codinomello/weebie-go/services/routes"
-
-	"golang.org/x/exp/slog"
 )
 
 func main() {
@@ -20,7 +19,7 @@ func main() {
 	db.Connect()
 
 	// Fecha a conexão com o banco de dados ao final da execução do programa
-	defer db.Disconnect()
+	// defer db.Disconnect()
 
 	// Criação do roteador de servidores HTTP
 	router := http.NewServeMux()
@@ -35,8 +34,8 @@ func main() {
 		Handler: router,
 	}
 
-	slog.Info(fmt.Sprintf("Servidor rodando na porta %v", server.Addr))
+	log.Println(fmt.Sprintf("Servidor rodando na porta %v", server.Addr))
 	if err := server.ListenAndServe(); err != nil {
-		slog.Error(fmt.Sprintf("Erro ao inicializar o servidor: %v\n", err))
+		log.Fatal(fmt.Sprintf("Erro ao inicializar o servidor: %v\n", err))
 	}
 }

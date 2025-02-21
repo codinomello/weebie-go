@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"log/slog"
 	"os"
 	"time"
 
@@ -25,7 +24,8 @@ func Connect() {
 	// Conexão ao MongoDB
 	opts := options.Client().ApplyURI(os.Getenv("MONGODB_URI"))
 	// Configuração do cliente MongoDB
-	client, err := mongo.Connect(ctx, opts)
+	var err error
+	client, err = mongo.Connect(ctx, opts)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -35,7 +35,7 @@ func Connect() {
 	if err != nil {
 		log.Fatalf("Erro ao verificar conexão com o MongoDB: %v", err)
 	}
-	slog.Info(fmt.Sprintf("Conexão com o MongoDB estabelecida com sucesso!"))
+	log.Println(fmt.Sprintf("Conexão com o MongoDB estabelecida com sucesso!"))
 }
 
 // Encerra a conexão com o MongoDB
@@ -48,11 +48,11 @@ func Disconnect() error {
 }
 
 // Retorna a conexão com o MongoDB
-func GetMongoConnection() *mongo.Client {
+func GetMongoClient() *mongo.Client {
 	return client
 }
 
 // Retorna a coleção MongoDB
 func GetMongoCollection(collection string) *mongo.Collection {
-	return client.Database("projectdb").Collection(collection)
+	return client.Database("weebiedb").Collection(collection)
 }
