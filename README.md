@@ -11,12 +11,12 @@ Esta plataforma web permite a criação, gestão e compartilhamento de iniciativ
 
 ## 🛠️ Tecnologias Utilizadas
 
-- **Backend**: [Go](https://golang.org/) 🐹
-- **Frontend**: [Templ](https://github.com/arschles/templ) 🖼️ (para templates HTML)
-- **Banco de Dados**: [MongoDB](https://www.mongodb.com/) 🌿
-- **UI Framework**: [Flowbite](https://flowbite.com/) 🎨 (baseado em Tailwind CSS)
-- **CSS Framework**: [Tailwind CSS](https://tailwindcss.com/) 🎯
-- **Interatividade**: [HTMX](https://htmx.org/) </>
+- **Backend**: [Go](https://golang.org/) 🐹 (Rápido e eficiente)
+- **Frontend**: [Templ](https://github.com/arschles/templ) 🖼️ (Templates HTML modernos)
+- **Banco de Dados**: [MongoDB](https://www.mongodb.com/) � (Flexível para dados não estruturados)
+- **UI Framework**: [Flowbite](https://flowbite.com/) 🎨 + [Tailwind CSS](https://tailwindcss.com/) 🎯 (Design consistente e responsivo)
+- **Interatividade**: [HTMX](https://htmx.org/) ⚡ (SPA-like sem JavaScript complexo)
+- **Autenticação**: [Firebase](https://firebase.google.com/products/auth) 🔐 (Segurança e facilidade de integração)
 
 ---
 
