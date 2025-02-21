@@ -47,4 +47,4 @@ Esta plataforma web permite a criação, gestão e compartilhamento de iniciativ
 1. **Clone o repositório**:
    ```bash
    git clone https://github.com/codinomello/web-go.git
-   cd web-go
+   cd weebie-go
