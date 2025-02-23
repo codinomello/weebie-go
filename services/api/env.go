@@ -1,8 +1,7 @@
 package api
 
 import (
-	"fmt"
-	"log/slog"
+	"log"
 
 	"github.com/joho/godotenv"
 )
@@ -10,6 +9,6 @@ import (
 func GetEnviromentVariables() {
 	// Carrega as variáveis do ambiente
 	if err := godotenv.Load("../.env"); err != nil {
-		slog.Error(fmt.Sprintf("Erro ao carregar o arquivo .env: %v", err))
+		log.Fatalf("Erro ao carregar o arquivo .env: %v", err)
 	}
 }

@@ -12,8 +12,8 @@ import (
 )
 
 var (
-	client *mongo.Client
 	db     *mongo.Database
+	client *mongo.Client
 )
 
 func Connect() {

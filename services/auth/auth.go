@@ -3,30 +3,34 @@ package auth
 import (
 	"context"
 	"log"
-	"os"
 
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/auth"
 	"google.golang.org/api/option"
 )
 
-func FirebaseApp() *auth.Client {
-	creds := os.Getenv("FIREBASE_CREDENTIALS")
-	if creds == "" {
-		log.Fatal("Variável de ambiente FIREBASE_CREDENTIALS não encontrada")
-	}
+var (
+	app    *firebase.App
+	client *auth.Client
+)
 
-	opt := option.WithCredentialsJSON([]byte(creds))
+func FirebaseApp() (*firebase.App, *auth.Client) {
+	opt := option.WithCredentialsFile("../services/auth/firebase-key.json") // Arquivo JSON do Firebase
+
+	// Inicializa o Firebase
+	var err error
 	app, err := firebase.NewApp(context.Background(), nil, opt)
 	if err != nil {
-		log.Fatalf("Erro ao inicializar o Firebase: %v", err)
+		log.Fatalf("Erro ao inicializar Firebase: %v", err)
 	}
 
-	authClient, err := app.Auth(context.Background())
+	// Inicializa o cliente de autenticação
+	client, err := app.Auth(context.Background())
 	if err != nil {
 		log.Fatalf("Erro de autenticacação do Firebase: %v", err)
 	}
-	log.Println("Firebase inicializado com sucesso")
 
-	return authClient
+	log.Println("Firebase inicializado com sucesso!")
+
+	return app, client
 }

@@ -11,7 +11,7 @@ import (
 
 func HandleAllRoutes(router *http.ServeMux) {
 	// Firebase
-	firebaseAuth := auth.FirebaseApp()
+	_, firebaseAuth := auth.FirebaseApp()
 
 	// MongoDB
 	mongoClient := db.GetMongoClient()
@@ -24,8 +24,15 @@ func HandleAllRoutes(router *http.ServeMux) {
 		}
 	})
 
-	// Rota projetos (projects.templ)
-	router.HandleFunc("/projects", func(w http.ResponseWriter, r *http.Request) {
+	// Rota login (login.templ)
+	router.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+		if err := handlers.HandleTemplLogin(w, r); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	})
+
+	// Rota projetos (project.templ)
+	router.HandleFunc("/project", func(w http.ResponseWriter, r *http.Request) {
 		if err := handlers.HandleTemplProject(w, r); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
@@ -33,4 +40,7 @@ func HandleAllRoutes(router *http.ServeMux) {
 
 	// Rota para postar um projeto
 	router.HandleFunc("/post-projects", handlers.HandlePostProject(firebaseAuth, mongoClient))
+
+	// Rota para acessar os ícones
+	http.Handle("/icons/", http.StripPrefix("/icons/", http.FileServer(http.Dir("../../templates/icons"))))
 }

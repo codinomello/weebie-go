@@ -19,7 +19,7 @@ func main() {
 	db.Connect()
 
 	// Fecha a conexão com o banco de dados ao final da execução do programa
-	// defer db.Disconnect()
+	defer db.Disconnect()
 
 	// Criação do roteador de servidores HTTP
 	router := http.NewServeMux()
@@ -34,7 +34,7 @@ func main() {
 		Handler: router,
 	}
 
-	log.Println(fmt.Sprintf("Servidor rodando na porta %v", server.Addr))
+	log.Println(fmt.Sprintf("Servidor rodando no endereço: http://localhost%v", server.Addr))
 	if err := server.ListenAndServe(); err != nil {
 		log.Fatal(fmt.Sprintf("Erro ao inicializar o servidor: %v\n", err))
 	}

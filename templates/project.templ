@@ -1,0 +1,377 @@
+package templates
+
+templ Project() {
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Projetos - Weebie</title>
+    <link rel="icon" type="image/png" href="/icons/rocket.png">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Flowbite CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.css" rel="stylesheet">
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.5/"></script>
+    <style>
+        @import url('https://fonts.cdnfonts.com/css/euclid-circular-a');
+        * {
+            font-family: "Euclid Circular A";
+            transition: all 0.3s ease;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+          darkMode: 'class',
+          theme: {
+            extend: {
+              colors: {
+                red: '#FF0000',    // Vermelho
+                green: '#32CD32',  // Verde
+                blue: '#00BFFF',   // Azul
+                lilac: '#C8A2C8',  // Lilás
+                pink: '#FF1493',   // Rosa
+                orange: '#FF6F00', // Laranja
+                golden: '#FFD700'  // Ouro
+              }
+            }
+          }
+        }
+
+        // Lista de ODS
+        const odsList = [
+            { number: 1, emoji: '🍽️', name: 'Erradicação da Pobreza', description: 'Acabar com a pobreza em todas as suas formas, em todos os lugares.' },
+            { number: 2, emoji: '🌱', name: 'Fome Zero e Agricultura Sustentável', description: 'Acabar com a fome, alcançar a segurança alimentar e promover a agricultura sustentável.' },
+            { number: 3, emoji: '💊', name: 'Saúde e Bem-Estar', description: 'Assegurar uma vida saudável e promover o bem-estar para todos.' },
+            { number: 4, emoji: '📚', name: 'Educação de Qualidade', description: 'Garantir educação inclusiva e equitativa de qualidade.' },
+            { number: 5, emoji: '👩‍❤️‍👨', name: 'Igualdade de Gênero', description: 'Alcançar a igualdade de gênero e empoderar todas as mulheres e meninas.' },
+            { number: 6, emoji: '💧', name: 'Água Potável e Saneamento', description: 'Garantir disponibilidade e manejo sustentável da água.' },
+            { number: 7, emoji: '⚡', name: 'Energia Limpa e Acessível', description: 'Garantir acesso à energia acessível, confiável e sustentável.' },
+            { number: 8, emoji: '💼', name: 'Trabalho Decente e Crescimento Econômico', description: 'Promover o crescimento econômico sustentado e o trabalho decente.' },
+            { number: 9, emoji: '🏭', name: 'Indústria, Inovação e Infraestrutura', description: 'Construir infraestrutura resiliente e promover a industrialização sustentável.' },
+            { number: 10, emoji: '⚖️', name: 'Redução das Desigualdades', description: 'Reduzir a desigualdade dentro e entre os países.' },
+            { number: 11, emoji: '🌆', name: 'Cidades e Comunidades Sustentáveis', description: 'Tornar as cidades e os assentamentos humanos inclusivos, seguros e sustentáveis.' },
+            { number: 12, emoji: '♻️', name: 'Consumo e Produção Responsáveis', description: 'Garantir padrões de consumo e produção sustentáveis.' },
+            { number: 13, emoji: '🌡️', name: 'Ação Contra a Mudança Global do Clima', description: 'Tomar medidas urgentes para combater a mudança climática.' },
+            { number: 14, emoji: '🐟', name: 'Vida na Água', description: 'Conservar e usar de forma sustentável os oceanos e recursos marinhos.' },
+            { number: 15, emoji: '🌳', name: 'Vida Terrestre', description: 'Proteger, restaurar e promover o uso sustentável dos ecossistemas terrestres.' },
+            { number: 16, emoji: '🕊️', name: 'Paz, Justiça e Instituições Eficazes', description: 'Promover sociedades pacíficas e inclusivas para o desenvolvimento sustentável.' },
+            { number: 17, emoji: '🤝', name: 'Parcerias e Meios de Implementação', description: 'Fortalecer os meios de implementação e revitalizar a parceria global.' }
+        ];
+    </script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900">
+    <!-- Header -->
+    <nav class="bg-gradient-to-r from-orange to-golden dark:from-gray-800 dark:to-gray-700 px-4 py-4 shadow-xl">
+        <div class="container mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <span class="text-3xl text-white">🏘️</span>
+                <h1 class="text-2xl font-bold text-white">Cadastro de Projetos</h1>
+            </div>
+            
+            <!-- Botão de Tema e Menu Mobile -->
+            <div class="flex items-center space-x-4">
+                <!-- Botão de Tema Moderno -->
+                <button id="theme-toggle" class="theme-toggle">
+                    <span class="sr-only">Alternar Modo Escuro</span>
+                    <style>
+                        .theme-toggle {
+                            position: relative;
+                            width: 48px;
+                            height: 24px;
+                            border-radius: 9999px;
+                            background-color: rgba(255, 255, 255, 0.1);
+                            transition: background-color 0.3s;
+                        }
+                        .theme-toggle:hover {
+                            background-color: rgba(255, 255, 255, 0.2);
+                        }
+                        .theme-toggle::before {
+                            content: '';
+                            position: absolute;
+                            top: 2px;
+                            left: 2px;
+                            width: 20px;
+                            height: 20px;
+                            border-radius: 50%;
+                            background-color: white;
+                            transition: transform 0.3s, background-color 0.3s;
+                        }
+                        .dark .theme-toggle::before {
+                            transform: translateX(24px);
+                            background-color: #FFD700;
+                        }
+                    </style>
+                </button>
+
+                <!-- Menu Mobile -->
+                <button class="md:hidden text-white p-2 rounded-lg hover:bg-white/10 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Formulário -->
+    <main class="container mx-auto px-4 py-8 max-w-3xl">
+        <form class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-700">
+            <!-- Seção Azul -->
+            <div class="mb-8 p-4 rounded-xl bg-blue/10 dark:bg-blue/20">
+                <h2 class="text-2xl font-bold text-blue dark:text-blue/80 mb-4">Informações Básicas</h2>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">ID do Projeto</label>
+                        <input type="text" 
+                               class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-blue">
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data</label>
+                        <input type="date" 
+                               class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-blue">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção Rosa -->
+            <div class="mb-8 p-4 rounded-xl bg-pink/10 dark:bg-pink/20">
+                <h2 class="text-2xl font-bold text-pink dark:text-pink/80 mb-4">Detalhes do Projeto</h2>
+                
+                <div class="space-y-6">
+                    <!-- Campo de Título -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Título</label>
+                        <input type="text" 
+                            class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-pink">
+                    </div>
+
+                    <!-- Campo de Autores (e-mails) -->
+                    <div class="space-y-4">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Autores</label>
+                        <input id="new-author-input" 
+                            class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-pink">
+                        
+                        <!-- Div dos e-mails (inicialmente oculta) -->
+                        <div id="authors-container" class="hidden flex flex-wrap gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-gray-300 rounded-lg mb-4">
+                            <!-- E-mails serão adicionados aqui dinamicamente -->
+                        </div>
+
+                        <!-- Contêiner para os botões -->
+                        <div class="flex items-center gap-2">
+                            <!-- Botão Adicionar -->
+                            <button type="button" id="add-author-btn" class="mt-2 px-4 py-2 bg-pink text-gray-300 rounded-lg hover:bg-pink/80 transition">
+                                Adicionar
+                            </button>
+
+                            <!-- Botão de Informação -->
+                            <button data-tooltip-target="email-tooltip" data-tooltip-placement="right" type="button" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Tooltip -->
+                        <div id="email-tooltip" role="tooltip" class="inline-block absolute invisible z-10 py-2 px-3 text-sm font-medium dark:text-gray-300 bg-pink/10 rounded-lg shadow-sm opacity-0 transition-opacity duration-300">
+                            Insira e-mails separados por vírgula ou espaço.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    const authorsContainer = document.getElementById('authors-container');
+                    const newAuthorInput = document.getElementById('new-author-input');
+                    const addAuthorBtn = document.getElementById('add-author-btn');
+            
+                    // Função para validar e-mail
+                    const isValidEmail = (email) => {
+                        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                        return regex.test(email);
+                    };
+            
+                    // Função para adicionar e-mails
+                    const addEmails = () => {
+                        const input = newAuthorInput.value.trim();
+                        if (input) {
+                            // Separa os e-mails por vírgula ou espaço
+                            const emails = input.split(/[,\s]+/).filter(email => email.trim() !== '');
+            
+                            emails.forEach(email => {
+                                if (isValidEmail(email)) {
+                                    const emailTag = document.createElement('div');
+                                    emailTag.className = 'flex items-center bg-pink/10 dark:bg-pink/20 px-3 py-1 rounded-full';
+                                    emailTag.innerHTML = `
+                                        <span class="text-sm text-pink dark:text-pink/80">${email}</span>
+                                        <button type="button" class="ml-2 text-pink hover:text-pink" onclick="this.parentElement.classList.add('hidden');">×</button>
+                                    `;
+                                    authorsContainer.appendChild(emailTag);
+            
+                                    // Mostra a div de autores se estiver oculta
+                                    const checkIfEmpty = () => { 
+                                        if (authorsContainer.children.length === 0) { // Verifica se não há elementos filhos
+                                            authorsContainer.classList.add('hidden');
+                                        } else {
+                                            authorsContainer.classList.remove('hidden'); // Garante que a classe seja removida se não estiver vazio
+                                        }
+                                    };
+                                    checkIfEmpty()
+
+                                } else {
+                                    alert(`E-mail inválido: ${email}`);
+                                }
+                            });
+            
+                            newAuthorInput.value = ''; // Limpa o campo de entrada
+                        }
+                    };
+            
+                    // Adicionar e-mails ao clicar no botão
+                    addAuthorBtn.addEventListener('click', addEmails);
+            
+                    // Adicionar e-mails ao pressionar Enter
+                    newAuthorInput.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault(); // Evita o comportamento padrão do Enter
+                            addEmails();
+                        }
+                    });
+                });
+            </script>
+
+            <!-- Seção Verde -->
+            <div class="mb-8 p-4 rounded-xl bg-green/10 dark:bg-green/20">
+                <h2 class="text-2xl font-bold text-green dark:text-green/80 mb-4">Classificação</h2>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Grupo</label>
+                        <input type="text" 
+                               class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:text-gray-300 dark:bg-gray-700 focus:ring-2 focus:ring-green">
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Curso</label>
+                        <select class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:text-gray-300 dark:bg-gray-700 focus:ring-2 focus:ring-green">
+                            <option> </option>
+                            <option>Administração</option>
+                            <option>Edificações</option>
+                            <option>Enfermagem</option>
+                            <option>Informática</option>
+                            <option>Mecatrônica</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção ODS -->
+            <div class="mb-8 p-4 rounded-xl bg-golden/10 dark:bg-golden/20">
+                <h2 class="text-2xl font-bold text-golden dark:text-golden/80 mb-4">ODS Relacionados</h2>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="ods-container">
+                    <!-- ODS são inseridos aqui via JavaScript -->
+                </div>
+
+                <div id="ods-popover" class="hidden absolute z-50 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg ods-popover">
+                    <h3 class="font-bold text-lg text-gray-900 dark:text-white mb-2" id="ods-title"></h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-300" id="ods-description"></p>
+                </div>
+            </div>
+
+            <!-- Botões -->
+            <div class="flex flex-col md:flex-row justify-end gap-4 mt-8">
+                <!-- Botão limpar (vermelho) -->
+                <button type="button" id="clear-btn" class="px-6 py-2 bg-red text-white rounded-lg hover:bg-red-600 active:bg-red-700 transition">
+                    Limpar Campos
+                </button>
+
+                <!-- Botão salvar (verde) -->
+                <button type="submit" class="px-6 py-2 bg-green text-white rounded-lg hover:bg-green-600 active:bg-green-700 transition">
+                    Salvar Projeto
+                </button>
+            </div>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    const clearBtn = document.getElementById('clear-btn');
+                    const form = document.querySelector('form');
+
+                    // Função para limpar todos os campos do formulário
+                    clearBtn.addEventListener('click', () => {
+                        form.reset(); // Limpa todos os campos do formulário
+                    });
+                });
+            </script>
+        </form>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeToggle = document.getElementById('theme-toggle');
+            const html = document.documentElement;
+            const odsContainer = document.getElementById('ods-container');
+            const odsPopover = document.getElementById('ods-popover');
+            const odsTitle = document.getElementById('ods-title');
+            const odsDescription = document.getElementById('ods-description');
+
+            // Tema
+            themeToggle.addEventListener('click', () => {
+                html.classList.toggle('dark');
+                localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+            });
+
+            if (localStorage.getItem('theme') === 'dark') html.classList.add('dark');
+
+            // Gerar ODS
+            odsList.forEach(ods => {
+                const odsItem = document.createElement('div');
+                odsItem.className = 'flex items-center justify-between p-2 rounded-lg bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600';
+                odsItem.innerHTML = `
+                    <label class="flex items-center gap-2 flex-1">
+                        <input type="checkbox" name="ods" value="${ods.number}" 
+                               class="w-4 h-4 border-golden rounded focus:ring-golden dark:bg-gray-900">
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            ${ods.emoji} ODS ${ods.number}
+                        </span>
+                    </label>
+                    <button type="button" class="text-golden hover:text-golden/80 px-2 ods-info" 
+                            data-number="${ods.number}">+</button>
+                `;
+                odsContainer.appendChild(odsItem);
+            });
+
+            // Popover ODS
+            document.querySelectorAll('.ods-info').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const odsNumber = parseInt(e.target.dataset.number);
+                    const ods = odsList.find(o => o.number === odsNumber);
+                    
+                    // Posicionar popover
+                    const rect = e.target.getBoundingClientRect();
+                    odsPopover.style.top = `${rect.top + window.scrollY}px`;
+                    odsPopover.style.left = `${rect.left + rect.width + 10}px`;
+                    
+                    // Atualizar conteúdo
+                    odsTitle.textContent = ods.name;
+                    odsDescription.textContent = ods.description;
+                    odsPopover.classList.remove('hidden');
+                });
+            });
+
+            // Fechar popover
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.ods-info') && !e.target.closest('#ods-popover')) {
+                    odsPopover.classList.add('hidden');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+}
