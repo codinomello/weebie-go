@@ -1,7 +1,7 @@
 # 🌍 Weebie - Iniciativas Comunitárias
 
 Bem-vindo ao **Sistema de Iniciativas Sustentáveis**! 🌱  
-Esta plataforma web permite a criação, gestão e compartilhamento de iniciativas de projetos com foco em sustentabilidade. Nosso objetivo é promover práticas sustentáveis e facilitar a colaboração entre indivíduos e organizações comprometidas com um futuro mais verde. 💚
+Esta plataforma web permite a criação, gestão e compartilhamento de iniciativas de projetos com foco em sustentabilidade. Nosso objetivo é promover práticas sustentáveis e facilitar a colaboração entre indivíduos e organizações comprometidas com um futuro mais colaborativo.
 
 [![Go Version](https://img.shields.io/badge/Go-1.20%2B-blue?logo=go)](https://golang.org/)
 [![Firebase](https://img.shields.io/badge/Firebase-Auth-orange?logo=firebase)](https://firebase.google.com/)
@@ -12,12 +12,12 @@ Esta plataforma web permite a criação, gestão e compartilhamento de iniciativ
 
 ## 🛠️ Tecnologias Utilizadas
 
-- **Backend**: [Go](https://golang.org/) 🐹 (Rápido e eficiente)
-- **Frontend**: [Templ](https://github.com/arschles/templ) 🖼️ (Templates HTML modernos)
-- **Banco de Dados**: [MongoDB](https://www.mongodb.com/) � (Flexível para dados não estruturados)
-- **UI Framework**: [Flowbite](https://flowbite.com/) 🎨 + [Tailwind CSS](https://tailwindcss.com/) 🎯 (Design consistente e responsivo)
-- **Interatividade**: [HTMX](https://htmx.org/) ⚡ (SPA-like sem JavaScript complexo)
-- **Autenticação**: [Firebase](https://firebase.google.com/products/auth) 🔐 (Segurança e facilidade de integração)
+- **Backend**: [Go](https://golang.org/) 🐹
+- **Banco de Dados**: [MongoDB](https://www.mongodb.com/) �
+- **Autenticação**: [Firebase](https://firebase.google.com/products/auth) 🔐
+- **Frontend**: [Templ](https://github.com/arschles/templ) 🖼️ (templates HTML)
+- **UI Framework**: [Flowbite](https://flowbite.com/) 🎨 + [Tailwind CSS](https://tailwindcss.com/) 🎯
+- **Interatividade**: [HTMX](https://htmx.org/) ⚡
 
 ---
 
