@@ -43,7 +43,6 @@ Esta plataforma web permite a criação, gestão e compartilhamento de iniciativ
 
 - **Go** 1.20 ou superior 🐹
 - **MongoDB** 5.0 ou superior 🍃
-- **Node.js** 16.x ou superior (para compilar assets do Tailwind CSS) 🟢
 
 ---
 
