@@ -16,10 +16,10 @@ func main() {
 	api.GetEnviromentVariables()
 
 	// Conexão com o MongoDB
-	db.Connect()
+	db.ConnectMongoDB()
 
 	// Fecha a conexão com o banco de dados ao final da execução do programa
-	defer db.Disconnect()
+	defer db.DisconnectMongoDB()
 
 	// Criação do roteador de servidores HTTP
 	router := http.NewServeMux()

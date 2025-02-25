@@ -1,22 +1,27 @@
 package routes
 
 import (
-	"context"
 	"net/http"
 
-	"github.com/codinomello/weebie-go/services/auth"
-	"github.com/codinomello/weebie-go/services/db"
 	"github.com/codinomello/weebie-go/services/handlers"
+	"github.com/codinomello/weebie-go/services/middleware"
 )
 
 func HandleAllRoutes(router *http.ServeMux) {
-	// Firebase
-	_, firebaseAuth := auth.FirebaseApp()
+	// Servir arquivos estáticos (html, css, js, imagens, etc.)
+	HandleAllStaticRoutes(router)
 
-	// MongoDB
-	mongoClient := db.GetMongoClient()
-	defer mongoClient.Disconnect(context.Background())
+	// Rota de inscrição de usuário
+	http.Handle("/signup", middleware.JSONMiddleware(http.HandlerFunc(handlers.HandleSignUpUser)))
 
+	// Rota de login de usuário
+	// http.Handle("/login", middleware.JSONMiddleware(http.HandlerFunc(handlers.HandleLoginUser(firebaseAuth))))
+
+	http.Handle("/profile", middleware.JSONMiddleware(middleware.AuthMiddleware(http.HandlerFunc(handlers.HandleProtectedArea))))
+
+}
+
+func HandleAllStaticRoutes(router *http.ServeMux) {
 	// Rota principal (index.templ)
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if err := handlers.HandleTemplIndex(w, r); err != nil {
@@ -37,9 +42,6 @@ func HandleAllRoutes(router *http.ServeMux) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	})
-
-	// Rota para postar um projeto
-	router.HandleFunc("/post-projects", handlers.HandlePostProject(firebaseAuth, mongoClient))
 
 	// Rota para acessar os ícones
 	http.Handle("/icons/", http.StripPrefix("/icons/", http.FileServer(http.Dir("../../templates/icons"))))

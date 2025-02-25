@@ -16,7 +16,7 @@ import (
 )
 
 func HandleGetProject(w http.ResponseWriter, r *http.Request) {
-	collection := db.GetMongoCollection("projects")
+	collection := db.GetMongoDBCollection("projects")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 

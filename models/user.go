@@ -1,11 +1,9 @@
 package models
 
-import "time"
-
 type User struct {
-	UID       string    `bson:"uid"`
-	Name      string    `json:"name"`
-	Email     string    `json:"email"`
-	Password  string    `json:"password"`
-	CreatedAt time.Time `bson:"created_at"`
+	Name      string `json:"name"`
+	Email     string `json:"email"`
+	Password  string `json:"password"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at_at"`
 }

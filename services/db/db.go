@@ -16,7 +16,7 @@ var (
 	client *mongo.Client
 )
 
-func Connect() {
+func ConnectMongoDB() {
 	// Configurações do MongoDB
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -33,26 +33,26 @@ func Connect() {
 	// Verificando a conexão
 	err = client.Ping(context.TODO(), nil)
 	if err != nil {
-		log.Fatalf("Erro ao verificar conexão com o MongoDB: %v", err)
+		log.Fatalf("Erro ao verificar conexão com o MongoDB: %v\n", err)
 	}
-	log.Println(fmt.Sprintf("Conexão com o MongoDB estabelecida com sucesso!"))
+	log.Println("Conexão com o MongoDB estabelecida com sucesso!")
 }
 
 // Encerra a conexão com o MongoDB
-func Disconnect() error {
+func DisconnectMongoDB() error {
 	if err := client.Disconnect(context.Background()); err != nil {
 		return fmt.Errorf("Erro ao desconectar do MongoDB: %v", err)
 	}
-	fmt.Println("Conexão com o MongoDB encerrada.")
+	log.Println("Conexão com o MongoDB encerrada.")
 	return nil
 }
 
 // Retorna a conexão com o MongoDB
-func GetMongoClient() *mongo.Client {
+func GetMongoDBClient() *mongo.Client {
 	return client
 }
 
 // Retorna a coleção MongoDB
-func GetMongoCollection(collection string) *mongo.Collection {
+func GetMongoDBCollection(collection string) *mongo.Collection {
 	return client.Database("weebiedb").Collection(collection)
 }

@@ -1,2 +1,3 @@
 .env
+views/js/firebase.js
 firebase-key.json
