@@ -46,7 +46,7 @@ Esta plataforma web permite a criação, gestão e compartilhamento de iniciativ
 
 ---
 
-### 🚀 Instalação
+## 📩 Instalação
 
 1. **Clone o repositório**:
    ```bash
