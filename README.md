@@ -1,6 +1,6 @@
 # 🌍 Weebie - Iniciativas Comunitárias
 
-Bem-vindo ao **Sistema de Iniciativas Sustentáveis**! 🌱  
+Bem-vindo ao **Weebie** - Sistema de Iniciativas Comunitárias 🏘️
 Esta plataforma web permite a criação, gestão e compartilhamento de iniciativas de projetos com foco em sustentabilidade. Nosso objetivo é promover práticas sustentáveis e facilitar a colaboração entre indivíduos e organizações comprometidas com um futuro mais colaborativo.
 
 [![Go Version](https://img.shields.io/badge/Go-1.20%2B-blue?logo=go)](https://golang.org/)
