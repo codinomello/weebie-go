@@ -53,3 +53,4 @@ Este sistema web permite a criação, gestão e compartilhamento de iniciativas 
    ```bash
    git clone https://github.com/codinomello/weebie-go.git
    cd weebie-go
+   make run
