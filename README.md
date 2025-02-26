@@ -1,6 +1,6 @@
 # 🌍 Weebie - Iniciativas Comunitárias
 
-Bem-vindo ao Weebie - Sistema de Iniciativas Comunitárias 🏘️ -
+Bem-vindo ao Weebie - Sistema de Iniciativas Comunitárias 🏘️
 
 Este sistema web permite a criação, gestão e compartilhamento de iniciativas de projetos com foco no desenvolvimento de comunidades locais. Nosso objetivo é promover práticas sustentáveis e facilitar a colaboração entre indivíduos e organizações comprometidas com um futuro mais colaborativo.
 
