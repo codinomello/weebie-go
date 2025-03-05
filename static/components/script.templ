@@ -1,0 +1,214 @@
+package components
+
+templ ScriptHead() {
+    @ScriptHeadSource()
+    @ScriptHeadTailwindConfig()
+}
+
+templ ScriptBody() {
+    @ScriptBodyFirebase()
+    @ScriptBodyDarkMode()
+    @ScriptBodySource()
+}
+
+templ ScriptHeadSource() {
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+}
+
+templ ScriptHeadTailwindConfig() {
+    <script>
+        tailwind.config = {
+          darkMode: 'class',
+          theme: {
+            extend: {
+              colors: {
+                // Cores primárias
+                red: '#FF0000',    // Vermelho
+                green: '#32CD32',  // Verde
+                blue: '#00BFFF',   // Azul
+                lilac: '#C8A2C8',  // Lilás
+                pink: '#FF1493',   // Rosa
+                orange: '#FF6F00', // Laranja
+                golden: '#FFD700', // Ouro
+
+                // Cores sucundárias
+                brown: '#8B4513',  // Marrom
+                teal: '#40E0D0',   // Turquesa
+                silver: '#C0C0C0', // Prata
+                copper: '#B87333', // Cobre
+              }
+            }
+          }
+        }
+    </script>
+}
+
+templ ScriptBodyFirebase() {
+    <script>
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAI0Tc7GssKwWwtVdrz6OaK6KFACx58N5U",
+            authDomain: "weebie-go.firebaseapp.com",
+            projectId: "weebie-go",
+            storageBucket: "weebie-go.firebasestorage.app",
+            messagingSenderId: "321509944065",
+            appId: "1:321509944065:web:199a546b7055f461ec4900",
+            measurementId: "G-S5CG0CLRVS"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        // Referencias DOM
+        const loginButton = document.getElementById('login-button');
+        const logoutButton = document.getElementById('logout-button');
+        const userInfo = document.getElementById('user-info');
+        const loading = document.getElementById('loading');
+        const profilePic = document.getElementById('profile-picture');
+        const userName = document.getElementById('user-name');
+        const userEmail = document.getElementById('user-email');
+        const userId = document.getElementById('user-id');
+        
+        // Evento de login
+        loginButton.addEventListener('click', async () => {
+            try {
+                loading.style.display = 'block';
+                
+                const provider = new firebase.auth.GoogleAuthProvider();
+                const result = await firebase.auth().signInWithPopup(provider);
+                
+                // Usuário logado com sucesso
+                const user = result.user;
+                console.log("Usuário autenticado:", user);
+                
+                // Obter token
+                const idToken = await user.getIdToken();
+                
+                // Enviar token para backend
+                await verifyWithBackend(idToken);
+            } catch (error) {
+                console.error("Erro de autenticação:", error);
+                alert(`Erro ao fazer login: ${error.message}`);
+                loading.style.display = 'none';
+            }
+        });
+        
+        // Evento de logout
+        logoutButton.addEventListener('click', () => {
+            firebase.auth().signOut();
+            hideUserInfo();
+        });
+        
+        // Enviar token para o backend Go
+        async function verifyWithBackend(idToken) {
+            try {
+                const response = await fetch('/api/auth', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${idToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Falha na autenticação com o backend');
+                }
+                
+                console.log("Autenticação verificada pelo backend:", data);
+                
+                // Exibir informações do usuário
+                displayUserInfo(data);
+            } catch (error) {
+                console.error("Erro na verificação com backend:", error);
+                alert(`Erro na verificação: ${error.message}`);
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+        
+        // Exibir informações do usuário
+        function displayUserInfo(userData) {
+            profilePic.src = userData.picture || '';
+            userName.textContent = userData.name || 'Usuário';
+            userEmail.textContent = userData.email || '';
+            userId.textContent = userData.uid || '';
+            
+            userInfo.style.display = 'block';
+            loginButton.style.display = 'none';
+        }
+        
+        // Esconder informações do usuário
+        function hideUserInfo() {
+            userInfo.style.display = 'none';
+            loginButton.style.display = 'block';
+        }
+        
+        // Verificar estado da autenticação quando a página carrega
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (user) {
+                try {
+                    loading.style.display = 'block';
+                    const idToken = await user.getIdToken();
+                    await verifyWithBackend(idToken);
+                } catch (error) {
+                    console.error("Erro ao verificar token:", error);
+                    loading.style.display = 'none';
+                }
+            } else {
+                hideUserInfo();
+            }
+        });
+    </script>
+}
+
+templ ScriptBodyDarkMode() {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          const themeToggle = document.getElementById('theme-toggle');
+          const html = document.documentElement;
+          
+          // Verificar preferência salva
+          const savedTheme = localStorage.getItem('theme') || 'light';
+          html.classList.toggle('dark', savedTheme === 'dark');
+        
+          themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+            updateThemeIcon();
+          });
+        
+          function updateThemeIcon() {
+            const isDark = html.classList.contains('dark');
+            themeToggle.querySelectorAll('svg').forEach(icon => {
+              icon.classList.toggle('hidden', isDark ? icon.getAttribute('fill') === '#fff' : icon.getAttribute('fill') !== '#fff');
+            });
+          }
+          updateThemeIcon();
+        });
+    </script>
+}
+
+templ ScriptBodySource() {
+    <!-- Import do Firebase via CDN -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+    <!-- Importação do Flowbite.js via CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
+}
+
+templ ScriptGetCurrentYear() {
+    <script>
+        // Ano atual
+        var years = document.getElementsByClassName("current-year");
+        Array.from(years).forEach(year => {
+            year.innerHTML = new Date().getFullYear();
+        });
+    </script>
+}

@@ -1,4 +1,4 @@
-package firebase
+package authentication
 
 import (
 	"context"
@@ -14,8 +14,9 @@ var (
 	client *auth.Client
 )
 
-func FirebaseInitApp() (*firebase.App, *auth.Client) {
-	opt := option.WithCredentialsFile("../services/firebase/firebase-key.json") // Arquivo JSON do Firebase
+func FirebaseInitApp() *firebase.App {
+	// Credenciais do Firebase
+	opt := option.WithCredentialsFile("../firebase.json") // Arquivo JSON do Firebase
 
 	// Inicializa o Firebase
 	var err error
@@ -23,14 +24,17 @@ func FirebaseInitApp() (*firebase.App, *auth.Client) {
 	if err != nil {
 		log.Fatalf("Erro ao inicializar Firebase: %v", err)
 	}
+	log.Println("Firebase inicializado com sucesso!")
 
+	return app
+}
+
+func FirebaseInitClient() *auth.Client {
 	// Inicializa o cliente de autenticação
 	client, err := app.Auth(context.Background())
 	if err != nil {
 		log.Fatalf("Erro de autenticacação do Firebase: %v", err)
 	}
 
-	log.Println("Firebase inicializado com sucesso!")
-
-	return app, client
+	return client
 }

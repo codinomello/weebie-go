@@ -1,0 +1,41 @@
+package components
+
+templ StyleFont() {
+    <style>
+        @import url('https://fonts.cdnfonts.com/css/euclid-circular-a');
+        * {
+            font-family: "Euclid Circular A";
+        }
+    </style>
+}
+
+templ StyleToggleTheme() {
+    <style>
+        .theme-toggle {
+            position: relative;
+            width: 48px;
+            height: 24px;
+            border-radius: 9999px;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: background-color 0.3s;
+        }
+        .theme-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .theme-toggle::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: white;
+            transition: transform 0.3s, background-color 0.3s;
+        }
+        .dark .theme-toggle::before {
+            transform: translateX(24px);
+            background-color: #FFD700;
+        }
+    </style>
+}

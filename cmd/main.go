@@ -6,14 +6,14 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/codinomello/weebie-go/services/api"
 	"github.com/codinomello/weebie-go/services/db"
+	"github.com/codinomello/weebie-go/services/env"
 	"github.com/codinomello/weebie-go/services/routes"
 )
 
 func main() {
 	// Carrega as variáveis do ambiente
-	api.GetEnviromentVariables()
+	env.GetEnviromentVariables()
 
 	// Conexão com o MongoDB
 	db.ConnectMongoDB()

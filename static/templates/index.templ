@@ -1,50 +1,23 @@
 package templates
 
+import components "github.com/codinomello/weebie-go/static/components"
+
 templ Index() {
 <!doctype html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weebie - Projetos Comunitários</title>
-    <link rel="icon" type="image/png" href="../images/houses.png">
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Flowbite CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.css" rel="stylesheet">
-    <!-- HTMX -->
-    <script src="https://unpkg.com/htmx.org@1.9.5"></script>
-    <style>
-        @import url('https://fonts.cdnfonts.com/css/euclid-circular-a');
-        * {
-            font-family: "Euclid Circular A";
-        }
-    </style>
-    <script>
-        tailwind.config = {
-          darkMode: 'class',
-          theme: {
-            extend: {
-              colors: {
-                // Cores primárias
-                red: '#FF0000',    // Vermelho
-                green: '#32CD32',  // Verde
-                blue: '#00BFFF',   // Azul
-                lilac: '#C8A2C8',  // Lilás
-                pink: '#FF1493',   // Rosa
-                orange: '#FF6F00', // Laranja
-                golden: '#FFD700', // Ouro
-
-                // Cores sucundárias
-                brown: '#8B4513',  // Marrom
-                teal: '#40E0D0',   // Turquesa
-                silver: '#C0C0C0', // Prata
-                copper: '#B87333', // Cobre
-              }
-            }
-          }
-        }
-    </script>
+    <!-- Meta Tags -->
+    @components.Meta()
+    <!-- Título -->
+    @components.Title("Weebie - Projetos Comunitários")
+    <!-- Ícone -->
+    <link rel="icon" type="image/x-icon" href="../../icons/house.png">
+    <!-- HTMX e Tailwind CSS -->
+    @components.ScriptHead()
+    <!-- Flowbite CSS e Ícone -->
+    @components.Link()
+    <!-- Fonte -->
+    @components.StyleFont()
 </head>
 <body class="dark:bg-gray-900">
     <!-- Header Moderno -->
@@ -52,7 +25,7 @@ templ Index() {
         <div class="container mx-auto flex items-center justify-between">
             <!-- Logo e Nome -->
             <div class="flex items-center space-x-3">
-                <span class="text-3xl">🏘️</span>
+                <span class="text-3xl">🏡</span>
                 <h1 class="text-2xl font-bold text-white dark:text-gray-100">Weebie</h1>
             </div>
     
@@ -69,42 +42,16 @@ templ Index() {
                 <!-- Botão de Tema -->
                 <button id="theme-toggle" class="theme-toggle">
                     <span class="sr-only">Alternar Modo Escuro</span>
-                    <style>
-                        .theme-toggle {
-                            position: relative;
-                            width: 48px;
-                            height: 24px;
-                            border-radius: 9999px;
-                            background-color: rgba(255, 255, 255, 0.1);
-                            transition: background-color 0.3s;
-                        }
-                        .theme-toggle:hover {
-                            background-color: rgba(255, 255, 255, 0.2);
-                        }
-                        .theme-toggle::before {
-                            content: '';
-                            position: absolute;
-                            top: 2px;
-                            left: 2px;
-                            width: 20px;
-                            height: 20px;
-                            border-radius: 50%;
-                            background-color: white;
-                            transition: transform 0.3s, background-color 0.3s;
-                        }
-                        .dark .theme-toggle::before {
-                            transform: translateX(24px);
-                            background-color: #FFD700;
-                        }
-                    </style>
+                    @components.StyleToggleTheme()
                 </button>
 
                 <!-- Ícone de Conta -->
                 <button class="p-2 rounded-full text-white hover:35 transition-colors duration-300">
-                    <svg class="w-7 h-7 text-golden" viewBox="0 0 24 24" fill="white">
+                    <svg class="w-7 h-7 text-white dark:golden" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 4a4 4 0 014 4 4 4 0 01-4 4 4 4 0 01-4-4 4 4 0 014-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4z"/>
                     </svg>
                 </button>
+
     
                 <!-- Menu Mobile -->
                 <button class="md:hidden text-white p-2 rounded-lg hover:10 transition-colors">
@@ -120,7 +67,7 @@ templ Index() {
     <section class="container mx-auto px-4 py-16 text-center">
         <div class="max-w-2xl mx-auto">
             <h2 class="text-4xl md:text-5xl font-bold text-orange dark:text-golden mb-6">
-                <span class="text-blue">👋</span> Construindo Comunidades Melhores Juntos
+                <span class="text-blue">👋</span> Comunidades que Inspiram e Transformam!
             </h2>
             <p class="text-lg text-gray-600 dark:text-gray-300 mb-8">Conectando boas ideias a pessoas que fazem acontecer</p>
             <div class="flex flex-col sm:flex-row justify-center gap-4">
@@ -361,100 +308,8 @@ templ Index() {
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-gradient-to-r from-orange to-golden dark:from-gray-800 dark:to-gray-700 text-white">
-        <div class="container mx-auto px-4 py-10">
-            <!-- Flex container com 3 colunas de tamanho igual -->
-            <div class="flex flex-col md:flex-row gap-8 max-w-6xl mx-auto">
-                <!-- Weebie (Esquerda) -->
-                <div class="flex-1 text-center md:text-left">
-                    <div class="flex items-center justify-center md:justify-start gap-2 mb-4">
-                        <span class="text-3xl">🌍</span>
-                        <h5 class="text-2xl font-bold">Weebie</h5>
-                    </div>
-                    <p class="text-sm opacity-90 max-w-xs mx-auto md:mx-0">
-                        Transformando ideias em ações comunitárias desde <span class="current-year"></span>.
-                    </p>
-                </div>
-    
-                <!-- Links Rápidos (Meio) -->
-                <div class="flex-1 text-center">
-                    <h6 class="text-xl font-semibold mb-4">Links Rápidos</h6>
-                    <ul class="space-y-3">
-                        <li>📘 <a href="#" class="hover:text-red hover:underline transition-colors">Sobre Nós</a></li>
-                        <li>📩 <a href="#" class="hover:text-green hover:underline transition-colors">Contato</a></li>
-                        <li>📜 <a href="#" class="hover:text-blue hover:underline transition-colors">Termos</a></li>
-                    </ul>
-                </div>
-    
-                <!-- Conectar (Direita) -->
-                <div class="flex-1 text-center md:text-left">
-                    <h6 class="text-xl font-semibold mb-4">Conectar</h6>
-                    <div class="flex justify-center md:justify-start gap-4">
-                        <!-- Ícone do Instagram -->
-                        <a href="#" class="p-3 10 rounded-full hover:20 hover:scale-110 transition-all">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                            </svg>
-                        </a>
-    
-                        <!-- Ícone do GitHub -->
-                        <a href="#" class="p-3 10 rounded-full hover:20 hover:scale-110 transition-all">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                            </svg>
-                        </a>
-    
-                        <!-- Ícone de E-mail -->
-                        <a href="#" class="p-3 10 rounded-full hover:20 hover:scale-110 transition-all">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 12.713l-11.985-9.713h23.97l-11.985 9.713zm0 2.574l-12-9.725v15.438h24v-15.438l-12 9.725z"/>
-                            </svg>
-                        </a>
-                    </div>
-                </div>
-            </div>
-    
-            <!-- Direitos Autorais -->
-            <div class="border-t-2 border-white/20 mt-6 pt-6 text-center">
-                <p class="text-md opacity-90">
-                    © <span class="current-year"></span> Weebie - Feito com ❤️ para comunidades
-                </p>
-            </div>
-        </div>
-    </footer>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-          const themeToggle = document.getElementById('theme-toggle');
-          const html = document.documentElement;
-          
-          // Verificar preferência salva
-          const savedTheme = localStorage.getItem('theme') || 'light';
-          html.classList.toggle('dark', savedTheme === 'dark');
-        
-          themeToggle.addEventListener('click', () => {
-            html.classList.toggle('dark');
-            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
-            updateThemeIcon();
-          });
-        
-          function updateThemeIcon() {
-            const isDark = html.classList.contains('dark');
-            themeToggle.querySelectorAll('svg').forEach(icon => {
-              icon.classList.toggle('hidden', isDark ? icon.getAttribute('fill') === '#fff' : icon.getAttribute('fill') !== '#fff');
-            });
-          }
-          updateThemeIcon();
-        });
-
-        // Ano atual
-        var years = document.getElementsByClassName("current-year");
-        Array.from(years).forEach(year => {
-            year.innerHTML = new Date().getFullYear();
-        });
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
+    @components.FooterIndex()
+    @components.ScriptBody()
 </body>
 </html>
 }

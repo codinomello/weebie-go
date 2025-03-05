@@ -3,20 +3,26 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/codinomello/weebie-go/templates"
+	"github.com/a-h/templ"
+	"github.com/codinomello/weebie-go/static/templates"
 )
+
+// Renderiza o template
+func HandleTemplTemplate(template templ.Component, w http.ResponseWriter, r *http.Request) error {
+	return template.Render(r.Context(), w)
+}
 
 // Serve o template (index.templ)
 func HandleTemplIndex(w http.ResponseWriter, r *http.Request) error {
-	return templates.Index().Render(r.Context(), w)
+	return HandleTemplTemplate(templates.Index(), w, r)
 }
 
 // Serve o template (project.templ)
 func HandleTemplProject(w http.ResponseWriter, r *http.Request) error {
-	return templates.Project().Render(r.Context(), w)
+	return HandleTemplTemplate(templates.Project(), w, r)
 }
 
 // Serve o template (project.templ)
 func HandleTemplLogin(w http.ResponseWriter, r *http.Request) error {
-	return templates.Login().Render(r.Context(), w)
+	return HandleTemplTemplate(templates.Login(), w, r)
 }

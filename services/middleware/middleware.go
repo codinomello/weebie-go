@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/codinomello/weebie-go/services/firebase"
+	"github.com/codinomello/weebie-go/services/authentication"
 )
 
 func JSONMiddleware(next http.Handler) http.Handler {
@@ -22,7 +22,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		_, firebaseClient := firebase.FirebaseInitApp()
+		firebaseClient := authentication.FirebaseInitClient()
 
 		token, err := firebaseClient.VerifyIDToken(context.Background(), authHeader)
 		if err != nil {

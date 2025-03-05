@@ -7,8 +7,8 @@ import (
 
 	"firebase.google.com/go/auth"
 	"github.com/codinomello/weebie-go/models"
+	"github.com/codinomello/weebie-go/services/authentication"
 	"github.com/codinomello/weebie-go/services/db"
-	"github.com/codinomello/weebie-go/services/firebase"
 )
 
 var user models.User
@@ -19,7 +19,7 @@ func HandleSignUpUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, firebaseClient := firebase.FirebaseInitApp()
+	firebaseClient := authentication.FirebaseInitClient()
 
 	// Criar usuário no Firebase
 	firebaseUser, err := firebaseClient.CreateUser(context.Background(), (&auth.UserToCreate{}).

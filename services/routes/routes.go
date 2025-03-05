@@ -23,26 +23,25 @@ func HandleAllRoutes(router *http.ServeMux) {
 
 func HandleAllStaticRoutes(router *http.ServeMux) {
 	// Rota principal (index.templ)
-	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if err := handlers.HandleTemplIndex(w, r); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-	})
+	HandleRoutesTemplate(router, "/", handlers.HandleTemplIndex)
 
 	// Rota login (login.templ)
-	router.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-		if err := handlers.HandleTemplLogin(w, r); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-	})
+	HandleRoutesTemplate(router, "/login", handlers.HandleTemplLogin)
 
 	// Rota projetos (project.templ)
-	router.HandleFunc("/project", func(w http.ResponseWriter, r *http.Request) {
-		if err := handlers.HandleTemplProject(w, r); err != nil {
+	HandleRoutesTemplate(router, "/project", handlers.HandleTemplProject)
+
+	// Serve os ícones
+	HandleIcons()
+
+	// Serve as imagens
+	HandleImages()
+}
+
+func HandleRoutesTemplate(router *http.ServeMux, path string, handler func(w http.ResponseWriter, r *http.Request) error) {
+	router.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
+		if err := handler(w, r); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	})
-
-	// Rota para acessar os ícones
-	http.Handle("/icons/", http.StripPrefix("/icons/", http.FileServer(http.Dir("../../templates/icons"))))
 }

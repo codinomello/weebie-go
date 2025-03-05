@@ -22,7 +22,7 @@ func ConnectMongoDB() {
 	defer cancel()
 
 	// Conexão ao MongoDB
-	opts := options.Client().ApplyURI(os.Getenv("MONGODB_URI"))
+	opts := options.Client().ApplyURI(os.Getenv("MONGODB_URL"))
 	// Configuração do cliente MongoDB
 	var err error
 	client, err = mongo.Connect(ctx, opts)
