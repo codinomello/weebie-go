@@ -9,8 +9,6 @@ Este sistema web permite a criação, gestão e compartilhamento de iniciativas 
 [![MongoDB](https://img.shields.io/badge/MongoDB-8.0%2B-green?logo=mongodb)](https://www.mongodb.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow)](https://github.com/codinomello/weebie-go/blob/main/LICENSE)
 
---
-
 ## 🛠️ Tecnologias Utilizadas
 
 - **Back-end**: [Go](https://golang.org/) 🐹
@@ -19,8 +17,6 @@ Este sistema web permite a criação, gestão e compartilhamento de iniciativas 
 - **Autenticação**: [Firebase](https://firebase.google.com/products/auth) 🔐
 - **Interatividade**: [HTMX](https://htmx.org/) ⚡
 - **UI e UX**: [Flowbite](https://flowbite.com/) 🎨 + [Tailwind CSS](https://tailwindcss.com/) 🖌
-
----
 
 ## 🚀 Funcionalidades Principais
 
@@ -36,16 +32,12 @@ Este sistema web permite a criação, gestão e compartilhamento de iniciativas 
 - **📈 Relatórios e Análises**:  
   Gere relatórios sobre o impacto das iniciativas e visualize métricas de sucesso.
 
----
-
 ## 🛠️ Como Executar o Projeto
 
 ### 📋 Pré-requisitos
 
 - **Go** 1.24 ou superior 🐹
 - **MongoDB (Atlas)** 8.0 ou superior 🍃
-
----
 
 ## 📩 Instalação
 
