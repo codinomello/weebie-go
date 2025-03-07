@@ -42,8 +42,8 @@ Este sistema web permite a criação, gestão e compartilhamento de iniciativas 
 
 ### 📋 Pré-requisitos
 
-- **Go** 1.20 ou superior 🐹
-- **MongoDB** 5.0 ou superior 🍃
+- **Go** 1.24 ou superior 🐹
+- **MongoDB (Atlas)** 8.0 ou superior 🍃
 
 ---
 
@@ -53,4 +53,12 @@ Este sistema web permite a criação, gestão e compartilhamento de iniciativas 
    ```bash
    git clone https://github.com/codinomello/weebie-go.git
    cd weebie-go
+
+2. **Adicione o .env**:
+   ```bash
+   touch .env
+
+3. **Execute o projeto**:
+   ```bash
    make run
+   
