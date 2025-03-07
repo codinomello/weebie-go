@@ -13,12 +13,12 @@ Este sistema web permite a criação, gestão e compartilhamento de iniciativas 
 
 ## 🛠️ Tecnologias Utilizadas
 
-- **Backend**: [Go](https://golang.org/) 🐹
-- **Banco de Dados**: [MongoDB](https://www.mongodb.com/) �
+- **Back-end**: [Go](https://golang.org/) 🐹
+- **Front-end**: [Templ](https://github.com/arschles/templ) 🖼️
+- **Banco de Dados**: [MongoDB](https://www.mongodb.com/)🍃
 - **Autenticação**: [Firebase](https://firebase.google.com/products/auth) 🔐
-- **Frontend**: [Templ](https://github.com/arschles/templ) 🖼️ (templates HTML)
-- **UI Framework**: [Flowbite](https://flowbite.com/) 🎨 + [Tailwind CSS](https://tailwindcss.com/) 🎯
 - **Interatividade**: [HTMX](https://htmx.org/) ⚡
+- **UI e UX**: [Flowbite](https://flowbite.com/) 🎨 + [Tailwind CSS](https://tailwindcss.com/) 🖌
 
 ---
 
