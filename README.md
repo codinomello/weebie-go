@@ -9,7 +9,7 @@ Este sistema web permite a criação, gestão e compartilhamento de iniciativas 
 [![MongoDB](https://img.shields.io/badge/MongoDB-8.0%2B-green?logo=mongodb)](https://www.mongodb.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow)](https://github.com/codinomello/weebie-go/blob/main/LICENSE)
 
--
+--
 
 ## 🛠️ Tecnologias Utilizadas
 
