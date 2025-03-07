@@ -4,7 +4,7 @@ Bem-vindo ao Weebie - Sistema de Iniciativas Comunitárias 🏘️
 
 Este sistema web permite a criação, gestão e compartilhamento de iniciativas de projetos com foco no desenvolvimento de comunidades locais. Nosso objetivo é promover práticas sustentáveis e facilitar a colaboração entre indivíduos e organizações comprometidas com um futuro mais colaborativo.
 
-[![Go Version](https://img.shields.io/badge/Go-1.20%2B-blue?logo=go)](https://golang.org/)
+[![Go Version](https://img.shields.io/badge/Go-1.24%2B-blue?logo=go)](https://golang.org/)
 [![Firebase](https://img.shields.io/badge/Firebase-Auth-orange?logo=firebase)](https://firebase.google.com/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-8.0%2B-green?logo=mongodb)](https://www.mongodb.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow)](https://github.com/codinomello/weebie-go/blob/main/LICENSE)
