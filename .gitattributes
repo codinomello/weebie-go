@@ -2,3 +2,4 @@
 *.css linguist-detectable=false
 *.js linguist-detectable=false
 *.templ linguist-detectable=false
+*.ts linguist-detectable=false

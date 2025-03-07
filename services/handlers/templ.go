@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/a-h/templ"
-	"github.com/codinomello/weebie-go/static/templates"
+	"github.com/codinomello/weebie-go/templates/static"
 )
 
 // Renderiza o template
@@ -14,15 +14,15 @@ func HandleTemplTemplate(template templ.Component, w http.ResponseWriter, r *htt
 
 // Serve o template (index.templ)
 func HandleTemplIndex(w http.ResponseWriter, r *http.Request) error {
-	return HandleTemplTemplate(templates.Index(), w, r)
+	return HandleTemplTemplate(static.Index(), w, r)
 }
 
 // Serve o template (project.templ)
 func HandleTemplProject(w http.ResponseWriter, r *http.Request) error {
-	return HandleTemplTemplate(templates.Project(), w, r)
+	return HandleTemplTemplate(static.Project(), w, r)
 }
 
 // Serve o template (project.templ)
 func HandleTemplLogin(w http.ResponseWriter, r *http.Request) error {
-	return HandleTemplTemplate(templates.Login(), w, r)
+	return HandleTemplTemplate(static.Login(), w, r)
 }

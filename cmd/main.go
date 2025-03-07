@@ -14,7 +14,7 @@ import (
 func main() {
 	// Carrega as variáveis do ambiente
 	env.GetEnviromentVariables()
-
+	
 	// Conexão com o MongoDB
 	db.ConnectMongoDB()
 

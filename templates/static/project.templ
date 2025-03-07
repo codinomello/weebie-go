@@ -1,65 +1,25 @@
-package templates
+package static
+
+import components "github.com/codinomello/weebie-go/templates/components"
 
 templ Project() {
 <!doctype html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro de Projetos - Weebie</title>
-    <link rel="icon" type="image/png" href="/icons/rocket.png">
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Flowbite CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.css" rel="stylesheet">
-    <!-- HTMX -->
-    <script src="https://unpkg.com/htmx.org@1.9.5/"></script>
-    <style>
-        @import url('https://fonts.cdnfonts.com/css/euclid-circular-a');
-        * {
-            font-family: "Euclid Circular A";
-            transition: all 0.3s ease;
-        }
-    </style>
-    <script>
-        tailwind.config = {
-          darkMode: 'class',
-          theme: {
-            extend: {
-              colors: {
-                red: '#FF0000',    // Vermelho
-                green: '#32CD32',  // Verde
-                blue: '#00BFFF',   // Azul
-                lilac: '#C8A2C8',  // Lilás
-                pink: '#FF1493',   // Rosa
-                orange: '#FF6F00', // Laranja
-                golden: '#FFD700'  // Ouro
-              }
-            }
-          }
-        }
-
-        // Lista de ODS
-        const odsList = [
-            { number: 1, emoji: '🍽️', name: 'Erradicação da Pobreza', description: 'Acabar com a pobreza em todas as suas formas, em todos os lugares.' },
-            { number: 2, emoji: '🌱', name: 'Fome Zero e Agricultura Sustentável', description: 'Acabar com a fome, alcançar a segurança alimentar e promover a agricultura sustentável.' },
-            { number: 3, emoji: '💊', name: 'Saúde e Bem-Estar', description: 'Assegurar uma vida saudável e promover o bem-estar para todos.' },
-            { number: 4, emoji: '📚', name: 'Educação de Qualidade', description: 'Garantir educação inclusiva e equitativa de qualidade.' },
-            { number: 5, emoji: '👩‍❤️‍👨', name: 'Igualdade de Gênero', description: 'Alcançar a igualdade de gênero e empoderar todas as mulheres e meninas.' },
-            { number: 6, emoji: '💧', name: 'Água Potável e Saneamento', description: 'Garantir disponibilidade e manejo sustentável da água.' },
-            { number: 7, emoji: '⚡', name: 'Energia Limpa e Acessível', description: 'Garantir acesso à energia acessível, confiável e sustentável.' },
-            { number: 8, emoji: '💼', name: 'Trabalho Decente e Crescimento Econômico', description: 'Promover o crescimento econômico sustentado e o trabalho decente.' },
-            { number: 9, emoji: '🏭', name: 'Indústria, Inovação e Infraestrutura', description: 'Construir infraestrutura resiliente e promover a industrialização sustentável.' },
-            { number: 10, emoji: '⚖️', name: 'Redução das Desigualdades', description: 'Reduzir a desigualdade dentro e entre os países.' },
-            { number: 11, emoji: '🌆', name: 'Cidades e Comunidades Sustentáveis', description: 'Tornar as cidades e os assentamentos humanos inclusivos, seguros e sustentáveis.' },
-            { number: 12, emoji: '♻️', name: 'Consumo e Produção Responsáveis', description: 'Garantir padrões de consumo e produção sustentáveis.' },
-            { number: 13, emoji: '🌡️', name: 'Ação Contra a Mudança Global do Clima', description: 'Tomar medidas urgentes para combater a mudança climática.' },
-            { number: 14, emoji: '🐟', name: 'Vida na Água', description: 'Conservar e usar de forma sustentável os oceanos e recursos marinhos.' },
-            { number: 15, emoji: '🌳', name: 'Vida Terrestre', description: 'Proteger, restaurar e promover o uso sustentável dos ecossistemas terrestres.' },
-            { number: 16, emoji: '🕊️', name: 'Paz, Justiça e Instituições Eficazes', description: 'Promover sociedades pacíficas e inclusivas para o desenvolvimento sustentável.' },
-            { number: 17, emoji: '🤝', name: 'Parcerias e Meios de Implementação', description: 'Fortalecer os meios de implementação e revitalizar a parceria global.' }
-        ];
-    </script>
+    <!-- Meta Tags -->
+    @components.Meta()
+    <!-- Título -->
+    @components.Title("Weebie - Projetos Comunitários")
+    <!-- Ícone -->
+    <link rel="icon" type="image/x-icon" href="../../icons/house.png">
+    <!-- HTMX e Tailwind CSS -->
+    @components.ScriptHead()
+    <!-- Flowbite CSS e Ícone -->
+    @components.Link()
+    <!-- Fonte -->
+    @components.StyleFont()
+    <!-- Lista de ODS -->
+    @components.ScriptHeadODSList()
 </head>
 <body class="bg-gray-50 dark:bg-gray-900">
     <!-- Header -->
