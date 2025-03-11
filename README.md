@@ -13,7 +13,7 @@ Este sistema web permite a criação, gestão e compartilhamento de iniciativas 
 
 - **Back-end**: [Go](https://golang.org/) 🐹
 - **Front-end**: [Templ](https://github.com/arschles/templ) 🖼️
-- **Banco de Dados**: [MongoDB](https://www.mongodb.com/)🍃
+- **Banco de Dados**: [MongoDB](https://www.mongodb.com/) 🍃
 - **Autenticação**: [Firebase](https://firebase.google.com/products/auth) 🔐
 - **Interatividade**: [HTMX](https://htmx.org/) ⚡
 - **UI e UX**: [Flowbite](https://flowbite.com/) 🎨 + [Tailwind CSS](https://tailwindcss.com/) 🖌
