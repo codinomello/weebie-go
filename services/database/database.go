@@ -12,44 +12,53 @@ import (
 )
 
 var (
-	db     *mongo.Database
 	client *mongo.Client
 )
 
-func ConnectMongoDB() {
+func ConnectMongoDB() error {
+	// Possíveis erros
+	var err error
+
 	// Configurações do MongoDB
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	// Conexão ao MongoDB
-	opts := options.Client().ApplyURI(os.Getenv("MONGODB_URL"))
+	opts := options.Client().ApplyURI(os.Getenv("MONGODB_URI"))
 	// Configuração do cliente MongoDB
-	var err error
+
 	client, err = mongo.Connect(ctx, opts)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	// Verificando a conexão
 	err = client.Ping(context.TODO(), nil)
 	if err != nil {
-		log.Fatalf("Erro ao verificar conexão com o MongoDB: %v\n", err)
+		return fmt.Errorf("erro ao verificar conexão com o mongodb: %v", err)
 	}
-	log.Println("Conexão com o MongoDB estabelecida com sucesso!")
+	log.Println("conexão com o mongodb estabelecida com sucesso!")
+
+	return nil
 }
 
 // Encerra a conexão com o MongoDB
 func DisconnectMongoDB() error {
 	if err := client.Disconnect(context.Background()); err != nil {
-		return fmt.Errorf("Erro ao desconectar do MongoDB: %v", err)
+		return fmt.Errorf("erro ao desconectar do mongodb: %v", err)
 	}
-	log.Println("Conexão com o MongoDB encerrada.")
+	log.Println("conexão com o mongodb encerrada.")
 	return nil
 }
 
 // Retorna a conexão com o MongoDB
 func GetMongoDBClient() *mongo.Client {
 	return client
+}
+
+// Retorna a base de dados MongoDB
+func GetMongoDBDatabase(database string) *mongo.Database {
+	return client.Database(database)
 }
 
 // Retorna a coleção MongoDB

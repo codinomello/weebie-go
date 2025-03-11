@@ -1,4 +1,4 @@
-package static
+package public
 
 import components "github.com/codinomello/weebie-go/templates/components"
 
@@ -6,17 +6,18 @@ templ Login() {
 <!doctype html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Weebie</title>
-    <link rel="icon" type="image/png" href="../icons/lock.png">
-    <style>
-        @import url('https://fonts.cdnfonts.com/css/euclid-circular-a');
-        * {
-            font-family: "Euclid Circular A";
-        }
-    </style>
+    <!-- Meta Tags -->
+    @components.Meta()
+    <!-- Título -->
+    @components.Title("Weebie - Projetos Comunitários")
+    <!-- Ícone -->
+    <link rel="icon" type="image/x-icon" href="/hou">
+    <!-- HTMX e Tailwind CSS -->
     @components.ScriptHead()
+    <!-- Flowbite CSS e Ícone -->
+    @components.Link()
+    <!-- Fonte -->
+    @components.StyleFont()
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center min-h-screen">
     <!-- Header -->
@@ -50,7 +51,7 @@ templ Login() {
         <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-700">
             <h2 id="form-title" class="text-2xl font-bold text-orange dark:text-golden mb-6 text-center">Login</h2>
 
-            <!-- Formulário -->
+            <!-- Formulário de Autenticação-->
             <form id="auth-form" class="space-y-6">
                 <!-- Nome (apenas para cadastro) -->
                 <div id="name-field" class="space-y-2 hidden">
@@ -123,6 +124,127 @@ templ Login() {
 
     <!-- Scripts -->
     @components.ScriptBody()
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAI0Tc7GssKwWwtVdrz6OaK6KFACx58N5U",
+            authDomain: "weebie-go.firebaseapp.com",
+            projectId: "weebie-go",
+            storageBucket: "weebie-go.firebasestorage.app",
+            messagingSenderId: "321509944065",
+            appId: "1:321509944065:web:199a546b7055f461ec4900",
+            measurementId: "G-S5CG0CLRVS"
+        };
+
+        // Inicialize o Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // Funções de Login e Cadastro
+        document.getElementById("auth-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const email = document.querySelector("#auth-form input[type='email']").value;
+            const password = document.querySelector("#auth-form input[type='password']").value;
+
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                alert("Login realizado com sucesso!");
+                // Redirecione o usuário ou faça algo com o objeto `user`
+            } catch (error) {
+                alert("Erro ao fazer login: " + error.message);
+            }
+        });
+
+        document.getElementById("toggle-auth").addEventListener("click", () => {
+            const formTitle = document.getElementById("form-title");
+            const formAction = document.getElementById("form-action");
+            const nameField = document.getElementById("name-field");
+            const phoneField = document.getElementById("phone-field");
+
+            if (formTitle.textContent === "Login") {
+                formTitle.textContent = "Cadastro";
+                formAction.textContent = "Cadastrar";
+                nameField.classList.remove("hidden");
+                phoneField.classList.remove("hidden");
+            } else {
+                formTitle.textContent = "Login";
+                formAction.textContent = "Entrar";
+                nameField.classList.add("hidden");
+                phoneField.classList.add("hidden");
+            }
+        });
+
+        document.getElementById("auth-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const email = document.querySelector("#auth-form input[type='email']").value;
+            const password = document.querySelector("#auth-form input[type='password']").value;
+            const name = document.querySelector("#auth-form input[type='text']").value;
+
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                await user.updateProfile({ displayName: name });
+                alert("Cadastro realizado com sucesso!");
+                // Redirecione o usuário ou faça algo com o objeto `user`
+            } catch (error) {
+                alert("Erro ao cadastrar: " + error.message);
+            }
+        });
+
+        // Login com Google
+        const googleProvider = new firebase.auth.GoogleAuthProvider();
+        document.getElementById("google-signin").addEventListener("click", () => {
+            auth.signInWithPopup(googleProvider)
+                .then((result) => {
+                    const user = result.user;
+                    alert("Login com Google realizado com sucesso!");
+                    // Redirecione o usuário ou faça algo com o objeto `user`
+                })
+                .catch((error) => {
+                    alert("Erro ao fazer login com Google: " + error.message);
+                });
+        });
+
+        // Login com Facebook
+        const facebookProvider = new firebase.auth.FacebookAuthProvider();
+        document.getElementById("facebook-signin").addEventListener("click", () => {
+            auth.signInWithPopup(facebookProvider)
+                .then((result) => {
+                    const user = result.user;
+                    alert("Login com Facebook realizado com sucesso!");
+                    // Redirecione o usuário ou faça algo com o objeto `user`
+                })
+                .catch((error) => {
+                    alert("Erro ao fazer login com Facebook: " + error.message);
+                });
+        });
+
+        // Login com GitHub
+        const githubProvider = new firebase.auth.GithubAuthProvider();
+        document.getElementById("github-signin").addEventListener("click", () => {
+            auth.signInWithPopup(githubProvider)
+                .then((result) => {
+                    const user = result.user;
+                    alert("Login com GitHub realizado com sucesso!");
+                    // Redirecione o usuário ou faça algo com o objeto `user`
+                })
+                .catch((error) => {
+                    alert("Erro ao fazer login com GitHub: " + error.message);
+                });
+        });
+
+        // Observador de Autenticação
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                console.log("Usuário logado:", user);
+                // Redirecione para a página principal ou faça algo com o objeto `user`
+            } else {
+                console.log("Usuário não logado");
+            }
+        });
+    </script>
 </body>
 </html>
 }

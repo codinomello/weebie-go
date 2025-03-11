@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"log"
 	"net/http"
 
 	"github.com/codinomello/weebie-go/services/authentication"
@@ -22,7 +23,10 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		firebaseClient := authentication.FirebaseInitClient()
+		firebaseClient, err := authentication.FirebaseInitClient()
+		if err != nil {
+			log.Fatalf("erro ao inicializar autenticação com o firebase: %v", err)
+		}
 
 		token, err := firebaseClient.VerifyIDToken(context.Background(), authHeader)
 		if err != nil {

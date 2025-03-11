@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+      "target": "ES2024",
+      "module": "ES6",
+      "strict": true,
+      "outDir": "./pkg/dist",
+      "rootDir": "./pkg/scripts",
+      "lib": ["es2024", "dom"]
+    },
+    "include": ["pkg/scripts/**/*"]
+  }

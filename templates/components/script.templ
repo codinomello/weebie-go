@@ -85,7 +85,8 @@ templ ScriptBodyFirebase() {
         };
 
         // Inicializar Firebase
-        firebase.initializeApp(firebaseConfig);
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
         
         // Referencias DOM
         const loginButton = document.getElementById('login-button');
@@ -194,26 +195,26 @@ templ ScriptBodyFirebase() {
 templ ScriptBodyDarkMode() {
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-          const themeToggle = document.getElementById('theme-toggle');
-          const html = document.documentElement;
+            const themeToggle = document.getElementById('theme-toggle');
+            const html = document.documentElement;
           
-          // Verificar preferência salva
-          const savedTheme = localStorage.getItem('theme') || 'light';
-          html.classList.toggle('dark', savedTheme === 'dark');
+            // Verificar preferência salva
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            html.classList.toggle('dark', savedTheme === 'dark');
         
-          themeToggle.addEventListener('click', () => {
-            html.classList.toggle('dark');
-            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
-            updateThemeIcon();
-          });
-        
-          function updateThemeIcon() {
-            const isDark = html.classList.contains('dark');
-            themeToggle.querySelectorAll('svg').forEach(icon => {
-              icon.classList.toggle('hidden', isDark ? icon.getAttribute('fill') === '#fff' : icon.getAttribute('fill') !== '#fff');
+            themeToggle.addEventListener('click', () => {
+                html.classList.toggle('dark');
+                localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+                updateThemeIcon();
             });
-          }
-          updateThemeIcon();
+        
+            function updateThemeIcon() {
+                const isDark = html.classList.contains('dark');
+                themeToggle.querySelectorAll('svg').forEach(icon => {
+                    icon.classList.toggle('hidden', isDark ? icon.getAttribute('fill') === '#fff' : icon.getAttribute('fill') !== '#fff');
+                 });
+            }
+            updateThemeIcon();
         });
     </script>
 }

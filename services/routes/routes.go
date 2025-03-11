@@ -15,8 +15,9 @@ func HandleAllRoutes(router *http.ServeMux) {
 	http.Handle("/signup", middleware.JSONMiddleware(http.HandlerFunc(handlers.HandleSignUpUser)))
 
 	// Rota de login de usuário
-	// http.Handle("/login", middleware.JSONMiddleware(http.HandlerFunc(handlers.HandleLoginUser(firebaseAuth))))
+	http.Handle("/signin", middleware.JSONMiddleware(http.HandlerFunc(handlers.HandleSignInUser)))
 
+	// Rota de perfil de usuário
 	http.Handle("/profile", middleware.JSONMiddleware(middleware.AuthMiddleware(http.HandlerFunc(handlers.HandleProtectedArea))))
 
 }
@@ -24,6 +25,7 @@ func HandleAllRoutes(router *http.ServeMux) {
 func HandleAllStaticRoutes(router *http.ServeMux) {
 	// Rota principal (index.templ)
 	HandleRoutesTemplate(router, "/", handlers.HandleTemplIndex)
+	http.Handle("/house.png", http.FileServer(http.Dir("../../../images")))
 
 	// Rota login (login.templ)
 	HandleRoutesTemplate(router, "/login", handlers.HandleTemplLogin)
@@ -31,11 +33,6 @@ func HandleAllStaticRoutes(router *http.ServeMux) {
 	// Rota projetos (project.templ)
 	HandleRoutesTemplate(router, "/project", handlers.HandleTemplProject)
 
-	// Serve os ícones
-	HandleIcons()
-
-	// Serve as imagens
-	HandleImages()
 }
 
 func HandleRoutesTemplate(router *http.ServeMux, path string, handler func(w http.ResponseWriter, r *http.Request) error) {
