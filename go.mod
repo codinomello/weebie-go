@@ -1,6 +1,6 @@
 module github.com/codinomello/weebie-go
 
-go 1.23.4
+go 1.24.1
 
 require (
 	firebase.google.com/go v3.13.0+incompatible

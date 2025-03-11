@@ -12,11 +12,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/codinomello/weebie-go/models"
-	"github.com/codinomello/weebie-go/services/db"
+	"github.com/codinomello/weebie-go/services/database"
 )
 
 func HandleGetProject(w http.ResponseWriter, r *http.Request) {
-	collection := db.GetMongoDBCollection("projects")
+	collection := database.GetMongoDBCollection("projects")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 

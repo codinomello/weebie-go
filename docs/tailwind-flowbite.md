@@ -1,4 +1,4 @@
-# Flowbite 🎨  e Tailwind CSS 🖌
+# Flowbite 🎨
 
 ## Introdução
 Flowbite é uma biblioteca de componentes de interface que utiliza o Tailwind CSS, facilitando a criação de interfaces modernas, responsivas e personalizáveis.
@@ -20,5 +20,5 @@ Flowbite é uma biblioteca de componentes de interface que utiliza o Tailwind CS
 ```html
 <!-- Exemplo de botão estilizado com Tailwind CSS e Flowbite -->
 <button class="text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
-  Botão
+    Botão
 </button>

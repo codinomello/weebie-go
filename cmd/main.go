@@ -1,12 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
 
-	"github.com/codinomello/weebie-go/services/db"
+	"github.com/codinomello/weebie-go/services/authentication"
+	"github.com/codinomello/weebie-go/services/database"
 	"github.com/codinomello/weebie-go/services/env"
 	"github.com/codinomello/weebie-go/services/routes"
 )
@@ -14,12 +14,14 @@ import (
 func main() {
 	// Carrega as variáveis do ambiente
 	env.GetEnviromentVariables()
-	
+
 	// Conexão com o MongoDB
-	db.ConnectMongoDB()
+	database.ConnectMongoDB()
 
 	// Fecha a conexão com o banco de dados ao final da execução do programa
-	defer db.DisconnectMongoDB()
+	defer database.DisconnectMongoDB()
+
+	authentication.FirebaseInitApp()
 
 	// Criação do roteador de servidores HTTP
 	router := http.NewServeMux()
@@ -34,8 +36,8 @@ func main() {
 		Handler: router,
 	}
 
-	log.Println(fmt.Sprintf("Servidor rodando no endereço: http://localhost%v", server.Addr))
+	log.Printf("Servidor rodando no endereço: http://localhost%v\n", server.Addr)
 	if err := server.ListenAndServe(); err != nil {
-		log.Fatal(fmt.Sprintf("Erro ao inicializar o servidor: %v\n", err))
+		log.Fatalf("Erro ao inicializar o servidor: %v\n", err)
 	}
 }

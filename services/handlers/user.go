@@ -8,7 +8,7 @@ import (
 	"firebase.google.com/go/auth"
 	"github.com/codinomello/weebie-go/models"
 	"github.com/codinomello/weebie-go/services/authentication"
-	"github.com/codinomello/weebie-go/services/db"
+	"github.com/codinomello/weebie-go/services/database"
 )
 
 var user models.User
@@ -31,7 +31,7 @@ func HandleSignUpUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Salvar no MongoDB
-	collection := db.GetMongoDBCollection("users")
+	collection := database.GetMongoDBCollection("users")
 	_, err = collection.InsertOne(context.Background(), map[string]string{
 		"uid":        firebaseUser.UID,
 		"email":      user.Email,
