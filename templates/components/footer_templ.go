@@ -37,7 +37,7 @@ func FooterIndex() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</span> Weebie - Feito com ❤️ para comunidades</p></div></div></footer>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</span> Todos os direitos reservados.</p></div></div></footer>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -66,7 +66,7 @@ func FooterLogin() templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<footer class=\"mt-8 text-center text-sm text-gray-500 dark:text-gray-400\"><p>&copy; <span id=\"current-year\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<footer class=\"mt-8 text-center text-sm text-gray-500 dark:text-gray-400\"><p>© <span class=\"current-year\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -2,7 +2,7 @@ package public
 
 import components "github.com/codinomello/weebie-go/templates/components"
 
-templ Login() {
+templ Form() {
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -124,127 +124,6 @@ templ Login() {
 
     <!-- Scripts -->
     @components.ScriptBody()
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyAI0Tc7GssKwWwtVdrz6OaK6KFACx58N5U",
-            authDomain: "weebie-go.firebaseapp.com",
-            projectId: "weebie-go",
-            storageBucket: "weebie-go.firebasestorage.app",
-            messagingSenderId: "321509944065",
-            appId: "1:321509944065:web:199a546b7055f461ec4900",
-            measurementId: "G-S5CG0CLRVS"
-        };
-
-        // Inicialize o Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-
-        // Funções de Login e Cadastro
-        document.getElementById("auth-form").addEventListener("submit", async (e) => {
-            e.preventDefault();
-
-            const email = document.querySelector("#auth-form input[type='email']").value;
-            const password = document.querySelector("#auth-form input[type='password']").value;
-
-            try {
-                const userCredential = await auth.signInWithEmailAndPassword(email, password);
-                const user = userCredential.user;
-                alert("Login realizado com sucesso!");
-                // Redirecione o usuário ou faça algo com o objeto `user`
-            } catch (error) {
-                alert("Erro ao fazer login: " + error.message);
-            }
-        });
-
-        document.getElementById("toggle-auth").addEventListener("click", () => {
-            const formTitle = document.getElementById("form-title");
-            const formAction = document.getElementById("form-action");
-            const nameField = document.getElementById("name-field");
-            const phoneField = document.getElementById("phone-field");
-
-            if (formTitle.textContent === "Login") {
-                formTitle.textContent = "Cadastro";
-                formAction.textContent = "Cadastrar";
-                nameField.classList.remove("hidden");
-                phoneField.classList.remove("hidden");
-            } else {
-                formTitle.textContent = "Login";
-                formAction.textContent = "Entrar";
-                nameField.classList.add("hidden");
-                phoneField.classList.add("hidden");
-            }
-        });
-
-        document.getElementById("auth-form").addEventListener("submit", async (e) => {
-            e.preventDefault();
-
-            const email = document.querySelector("#auth-form input[type='email']").value;
-            const password = document.querySelector("#auth-form input[type='password']").value;
-            const name = document.querySelector("#auth-form input[type='text']").value;
-
-            try {
-                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                const user = userCredential.user;
-                await user.updateProfile({ displayName: name });
-                alert("Cadastro realizado com sucesso!");
-                // Redirecione o usuário ou faça algo com o objeto `user`
-            } catch (error) {
-                alert("Erro ao cadastrar: " + error.message);
-            }
-        });
-
-        // Login com Google
-        const googleProvider = new firebase.auth.GoogleAuthProvider();
-        document.getElementById("google-signin").addEventListener("click", () => {
-            auth.signInWithPopup(googleProvider)
-                .then((result) => {
-                    const user = result.user;
-                    alert("Login com Google realizado com sucesso!");
-                    // Redirecione o usuário ou faça algo com o objeto `user`
-                })
-                .catch((error) => {
-                    alert("Erro ao fazer login com Google: " + error.message);
-                });
-        });
-
-        // Login com Facebook
-        const facebookProvider = new firebase.auth.FacebookAuthProvider();
-        document.getElementById("facebook-signin").addEventListener("click", () => {
-            auth.signInWithPopup(facebookProvider)
-                .then((result) => {
-                    const user = result.user;
-                    alert("Login com Facebook realizado com sucesso!");
-                    // Redirecione o usuário ou faça algo com o objeto `user`
-                })
-                .catch((error) => {
-                    alert("Erro ao fazer login com Facebook: " + error.message);
-                });
-        });
-
-        // Login com GitHub
-        const githubProvider = new firebase.auth.GithubAuthProvider();
-        document.getElementById("github-signin").addEventListener("click", () => {
-            auth.signInWithPopup(githubProvider)
-                .then((result) => {
-                    const user = result.user;
-                    alert("Login com GitHub realizado com sucesso!");
-                    // Redirecione o usuário ou faça algo com o objeto `user`
-                })
-                .catch((error) => {
-                    alert("Erro ao fazer login com GitHub: " + error.message);
-                });
-        });
-
-        // Observador de Autenticação
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                console.log("Usuário logado:", user);
-                // Redirecione para a página principal ou faça algo com o objeto `user`
-            } else {
-                console.log("Usuário não logado");
-            }
-        });
-    </script>
 </body>
 </html>
 }

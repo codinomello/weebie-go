@@ -23,6 +23,6 @@ func HandleTemplProject(w http.ResponseWriter, r *http.Request) error {
 }
 
 // Serve o template (login.templ)
-func HandleTemplLogin(w http.ResponseWriter, r *http.Request) error {
-	return HandleTemplTemplate(public.Login(), w, r)
+func HandleTemplForm(w http.ResponseWriter, r *http.Request) error {
+	return HandleTemplTemplate(public.Form(), w, r)
 }

@@ -4,6 +4,7 @@ import (
 	"net/http"
 )
 
+// TODO: Arrumar tudo :(
 func HandleImages() {
 	// Diretório onde as imagens estão armazenadas
 	imagesDir := http.Dir("../../../images")

@@ -25,10 +25,9 @@ func HandleAllRoutes(router *http.ServeMux) {
 func HandleAllStaticRoutes(router *http.ServeMux) {
 	// Rota principal (index.templ)
 	HandleRoutesTemplate(router, "/", handlers.HandleTemplIndex)
-	http.Handle("/house.png", http.FileServer(http.Dir("../../../images")))
 
-	// Rota login (login.templ)
-	HandleRoutesTemplate(router, "/login", handlers.HandleTemplLogin)
+	// Rota formulário (form.templ)
+	HandleRoutesTemplate(router, "/form", handlers.HandleTemplForm)
 
 	// Rota projetos (project.templ)
 	HandleRoutesTemplate(router, "/project", handlers.HandleTemplProject)

@@ -8,7 +8,7 @@ templ ScriptHead() {
 templ ScriptBody() {
     @ScriptBodyFirebase()
     @ScriptBodyDarkMode()
-    @ScriptBodySource()
+    @ScriptBodyImports()
 }
 
 templ ScriptHeadSource() {
@@ -72,8 +72,9 @@ templ ScriptHeadODSList() {
 }
 
 templ ScriptBodyFirebase() {
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script>
-        // Configuração do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAI0Tc7GssKwWwtVdrz6OaK6KFACx58N5U",
             authDomain: "weebie-go.firebaseapp.com",
@@ -84,109 +85,113 @@ templ ScriptBodyFirebase() {
             measurementId: "G-S5CG0CLRVS"
         };
 
-        // Inicializar Firebase
+        // Inicialize o Firebase
         const app = firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-        
-        // Referencias DOM
-        const loginButton = document.getElementById('login-button');
-        const logoutButton = document.getElementById('logout-button');
-        const userInfo = document.getElementById('user-info');
-        const loading = document.getElementById('loading');
-        const profilePic = document.getElementById('profile-picture');
-        const userName = document.getElementById('user-name');
-        const userEmail = document.getElementById('user-email');
-        const userId = document.getElementById('user-id');
-        
-        // Evento de login
-        loginButton.addEventListener('click', async () => {
+
+        // Funções de Login e Cadastro
+        document.getElementById("auth-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const email = document.querySelector("#auth-form input[type='email']").value;
+            const password = document.querySelector("#auth-form input[type='password']").value;
+
             try {
-                loading.style.display = 'block';
-                
-                const provider = new firebase.auth.GoogleAuthProvider();
-                const result = await firebase.auth().signInWithPopup(provider);
-                
-                // Usuário logado com sucesso
-                const user = result.user;
-                console.log("Usuário autenticado:", user);
-                
-                // Obter token
-                const idToken = await user.getIdToken();
-                
-                // Enviar token para backend
-                await verifyWithBackend(idToken);
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                alert("Login realizado com sucesso!");
+                // Redirecione o usuário ou faça algo com o objeto `user`
             } catch (error) {
-                console.error("Erro de autenticação:", error);
-                alert(`Erro ao fazer login: ${error.message}`);
-                loading.style.display = 'none';
+                alert("Erro ao fazer login: " + error.message);
             }
         });
-        
-        // Evento de logout
-        logoutButton.addEventListener('click', () => {
-            firebase.auth().signOut();
-            hideUserInfo();
-        });
-        
-        // Enviar token para o backend Go
-        async function verifyWithBackend(idToken) {
-            try {
-                const response = await fetch('/api/auth', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${idToken}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                const data = await response.json();
-                
-                if (!response.ok) {
-                    throw new Error(data.error || 'Falha na autenticação com o backend');
-                }
-                
-                console.log("Autenticação verificada pelo backend:", data);
-                
-                // Exibir informações do usuário
-                displayUserInfo(data);
-            } catch (error) {
-                console.error("Erro na verificação com backend:", error);
-                alert(`Erro na verificação: ${error.message}`);
-            } finally {
-                loading.style.display = 'none';
-            }
-        }
-        
-        // Exibir informações do usuário
-        function displayUserInfo(userData) {
-            profilePic.src = userData.picture || '';
-            userName.textContent = userData.name || 'Usuário';
-            userEmail.textContent = userData.email || '';
-            userId.textContent = userData.uid || '';
-            
-            userInfo.style.display = 'block';
-            loginButton.style.display = 'none';
-        }
-        
-        // Esconder informações do usuário
-        function hideUserInfo() {
-            userInfo.style.display = 'none';
-            loginButton.style.display = 'block';
-        }
-        
-        // Verificar estado da autenticação quando a página carrega
-        firebase.auth().onAuthStateChanged(async (user) => {
-            if (user) {
-                try {
-                    loading.style.display = 'block';
-                    const idToken = await user.getIdToken();
-                    await verifyWithBackend(idToken);
-                } catch (error) {
-                    console.error("Erro ao verificar token:", error);
-                    loading.style.display = 'none';
-                }
+
+        document.getElementById("toggle-auth").addEventListener("click", () => {
+            const formTitle = document.getElementById("form-title");
+            const formAction = document.getElementById("form-action");
+            const nameField = document.getElementById("name-field");
+            const phoneField = document.getElementById("phone-field");
+
+            if (formTitle.textContent === "Login") {
+                formTitle.textContent = "Cadastro";
+                formAction.textContent = "Cadastrar";
+                nameField.classList.remove("hidden");
+                phoneField.classList.remove("hidden");
             } else {
-                hideUserInfo();
+                formTitle.textContent = "Login";
+                formAction.textContent = "Entrar";
+                nameField.classList.add("hidden");
+                phoneField.classList.add("hidden");
+            }
+        });
+
+        document.getElementById("auth-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const email = document.querySelector("#auth-form input[type='email']").value;
+            const password = document.querySelector("#auth-form input[type='password']").value;
+            const name = document.querySelector("#auth-form input[type='text']").value;
+
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                await user.updateProfile({ displayName: name });
+                alert("Cadastro realizado com sucesso!");
+                // Redirecione o usuário ou faça algo com o objeto `user`
+            } catch (error) {
+                alert("Erro ao cadastrar: " + error.message);
+            }
+        });
+
+        // Login com Google
+        const googleProvider = new firebase.auth.GoogleAuthProvider();
+        document.getElementById("google-signin").addEventListener("click", () => {
+            auth.signInWithPopup(googleProvider)
+                .then((result) => {
+                    const user = result.user;
+                    alert("Login com Google realizado com sucesso!");
+                    // Redirecione o usuário ou faça algo com o objeto `user`
+                })
+                .catch((error) => {
+                    alert("Erro ao fazer login com Google: " + error.message);
+                });
+        });
+
+        // Login com Facebook
+        const facebookProvider = new firebase.auth.FacebookAuthProvider();
+        document.getElementById("facebook-signin").addEventListener("click", () => {
+            auth.signInWithPopup(facebookProvider)
+                .then((result) => {
+                    const user = result.user;
+                    alert("Login com Facebook realizado com sucesso!");
+                    // Redirecione o usuário ou faça algo com o objeto `user`
+                })
+                .catch((error) => {
+                    alert("Erro ao fazer login com Facebook: " + error.message);
+                });
+        });
+
+        // Login com GitHub
+        const githubProvider = new firebase.auth.GithubAuthProvider();
+        document.getElementById("github-signin").addEventListener("click", () => {
+            auth.signInWithPopup(githubProvider)
+                .then((result) => {
+                    const user = result.user;
+                    alert("Login com GitHub realizado com sucesso!");
+                    // Redirecione o usuário ou faça algo com o objeto `user`
+                })
+                .catch((error) => {
+                    alert("Erro ao fazer login com GitHub: " + error.message);
+                });
+        });
+
+        // Observador de Autenticação
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                console.log("Usuário logado:", user);
+                // Redirecione para a página principal ou faça algo com o objeto `user`
+            } else {
+                console.log("Usuário não logado");
             }
         });
     </script>
@@ -218,15 +223,74 @@ templ ScriptBodyDarkMode() {
         });
     </script>
 }
+templ ScriptBodyODSList() {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeToggle = document.getElementById('theme-toggle');
+            const html = document.documentElement;
+            const odsContainer = document.getElementById('ods-container');
+            const odsPopover = document.getElementById('ods-popover');
+            const odsTitle = document.getElementById('ods-title');
+            const odsDescription = document.getElementById('ods-description');
 
-templ ScriptBodySource() {
-    <!-- Import do Firebase via CDN -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+            // Tema
+            themeToggle.addEventListener('click', () => {
+                html.classList.toggle('dark');
+                localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+            });
 
+            if (localStorage.getItem('theme') === 'dark') html.classList.add('dark');
+
+            // Gerar ODS
+            odsList.forEach(ods => {
+                const odsItem = document.createElement('div');
+                odsItem.className = 'flex items-center justify-between p-2 rounded-lg bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600';
+                odsItem.innerHTML = `
+                    <label class="flex items-center gap-2 flex-1">
+                        <input type="checkbox" name="ods" value="${ods.number}" 
+                                class="w-4 h-4 border-golden rounded focus:ring-golden dark:bg-gray-900">
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            ${ods.emoji} ODS ${ods.number}
+                        </span>
+                    </label>
+                    <button type="button" class="text-golden hover:text-golden/80 px-2 ods-info" 
+                            data-number="${ods.number}">+</button>`;
+                odsContainer.appendChild(odsItem);
+            });
+
+            // Popover ODS
+            document.querySelectorAll('.ods-info').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const odsNumber = parseInt(e.target.dataset.number);
+                    const ods = odsList.find(o => o.number === odsNumber);
+                    
+                    // Posicionar popover
+                    const rect = e.target.getBoundingClientRect();
+                    odsPopover.style.top = `${rect.top + window.scrollY}px`;
+                    odsPopover.style.left = `${rect.left + rect.width + 10}px`;
+                    
+                    // Atualizar conteúdo
+                    odsTitle.textContent = ods.name;
+                    odsDescription.textContent = ods.description;
+                    odsPopover.classList.remove('hidden');
+                });
+            });
+
+            // Fechar popover
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.ods-info') && !e.target.closest('#ods-popover')) {
+                    odsPopover.classList.add('hidden');
+                }
+            });
+        });
+    </script>
+}
+
+templ ScriptBodyImports() {
     <!-- Importação do Flowbite.js via CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
 }
+
 
 templ ScriptGetCurrentYear() {
     <script>
