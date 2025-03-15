@@ -32,38 +32,8 @@ templ Project() {
                 
                 <!-- Botão de Tema e Menu Mobile -->
                 <div class="flex items-center space-x-4">
-                    <!-- Botão de Tema Moderno -->
-                    <button id="theme-toggle" class="theme-toggle">
-                        <span class="sr-only">Alternar Modo Escuro</span>
-                        <style>
-                            .theme-toggle {
-                                position: relative;
-                                width: 48px;
-                                height: 24px;
-                                border-radius: 9999px;
-                                background-color: rgba(255, 255, 255, 0.1);
-                                transition: background-color 0.3s;
-                            }
-                            .theme-toggle:hover {
-                                background-color: rgba(255, 255, 255, 0.2);
-                            }
-                            .theme-toggle::before {
-                                content: '';
-                                position: absolute;
-                                top: 2px;
-                                left: 2px;
-                                width: 20px;
-                                height: 20px;
-                                border-radius: 50%;
-                                background-color: white;
-                                transition: transform 0.3s, background-color 0.3s;
-                            }
-                            .dark .theme-toggle::before {
-                                transform: translateX(24px);
-                                background-color: #FFD700;
-                            }
-                        </style>
-                    </button>
+                    <!-- Botão de Tema -->
+                    @components.ButtonToggleTheme()
 
                     <!-- Menu Mobile -->
                     <button class="md:hidden text-white p-2 rounded-lg hover:bg-white/10 transition-colors">

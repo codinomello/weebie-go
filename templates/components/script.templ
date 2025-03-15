@@ -2,13 +2,13 @@ package components
 
 templ ScriptHead() {
     @ScriptHeadSource()
+    @ScriptHeadTheme()
     @ScriptHeadTailwindConfig()
 }
 
 templ ScriptBody() {
+    @ScriptBodySource()
     @ScriptBodyFirebase()
-    @ScriptBodyDarkMode()
-    @ScriptBodyImports()
 }
 
 templ ScriptHeadSource() {
@@ -17,6 +17,45 @@ templ ScriptHeadSource() {
 
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+}
+
+templ ScriptHeadTheme() {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+            const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+            const themeToggleBtn = document.getElementById('theme-toggle');
+
+            // Verifica o tema salvo no localStorage ou a preferência do sistema
+            if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                // Se o tema escuro estiver ativo, exibe o ícone da lua e oculta o ícone do sol
+                document.documentElement.classList.add('dark');
+                themeToggleDarkIcon.classList.remove('hidden');
+                themeToggleLightIcon.classList.add('hidden');
+            } else {
+                // Se o tema claro estiver ativo, exibe o ícone do sol e oculta o ícone da lua
+                document.documentElement.classList.remove('dark');
+                themeToggleLightIcon.classList.remove('hidden');
+                themeToggleDarkIcon.classList.add('hidden');
+            }
+
+            // Adiciona o evento de clique ao botão de alternância de tema
+            themeToggleBtn.addEventListener('click', () => {
+                // Alterna os ícones
+                themeToggleDarkIcon.classList.toggle('hidden');
+                themeToggleLightIcon.classList.toggle('hidden');
+
+                // Alterna o tema
+                if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('color-theme', 'light');
+                } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('color-theme', 'dark');
+                }
+            });
+        });
+    </script>
 }
 
 templ ScriptHeadTailwindConfig() {
@@ -69,6 +108,11 @@ templ ScriptHeadODSList() {
             { number: 17, emoji: '🤝', name: 'Parcerias e Meios de Implementação', description: 'Fortalecer os meios de implementação e revitalizar a parceria global.' }
         ];
     </script>
+}
+
+templ ScriptBodySource() {
+    <!-- Importação do Flowbite.js via CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
 }
 
 templ ScriptBodyFirebase() {
@@ -197,32 +241,7 @@ templ ScriptBodyFirebase() {
     </script>
 }
 
-templ ScriptBodyDarkMode() {
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const themeToggle = document.getElementById('theme-toggle');
-            const html = document.documentElement;
-          
-            // Verificar preferência salva
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            html.classList.toggle('dark', savedTheme === 'dark');
-        
-            themeToggle.addEventListener('click', () => {
-                html.classList.toggle('dark');
-                localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
-                updateThemeIcon();
-            });
-        
-            function updateThemeIcon() {
-                const isDark = html.classList.contains('dark');
-                themeToggle.querySelectorAll('svg').forEach(icon => {
-                    icon.classList.toggle('hidden', isDark ? icon.getAttribute('fill') === '#fff' : icon.getAttribute('fill') !== '#fff');
-                 });
-            }
-            updateThemeIcon();
-        });
-    </script>
-}
+
 templ ScriptBodyODSList() {
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -286,10 +305,6 @@ templ ScriptBodyODSList() {
     </script>
 }
 
-templ ScriptBodyImports() {
-    <!-- Importação do Flowbite.js via CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
-}
 
 
 templ ScriptGetCurrentYear() {
