@@ -9,6 +9,22 @@ Este sistema web permite a criação, gestão e compartilhamento de iniciativas 
 [![MongoDB](https://img.shields.io/badge/MongoDB-8.0%2B-green?logo=mongodb)](https://www.mongodb.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow)](https://github.com/codinomello/weebie-go/blob/main/LICENSE)
 
+## 🎨 Visual da Página Web
+
+O Weebie foi projetado com um design moderno e responsivo, garantindo uma experiência de usuário agradável tanto em dispositivos desktop quanto móveis. Abaixo, você pode conferir o logo do projeto e algumas capturas de tela que ilustram o visual da página web.
+
+### Logo do Weebie
+![🏡](https://via.placeholder.com/150x150?text=Weebie+Logo)
+
+### Capturas de Tela
+
+#### Visual em Desktop
+![Desktop](https://via.placeholder.com/1920x1080?text=Desktop+View)
+
+#### Visual em Celular
+![Celular](https://via.placeholder.com/1080x1920?text=Mobile+View)
+
+
 ## 🛠️ Tecnologias Utilizadas
 
 - **Back-end**: [Go](https://golang.org/) 🐹
