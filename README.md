@@ -19,10 +19,10 @@ O Weebie foi projetado com um design moderno e responsivo, garantindo uma experi
 ### Capturas de Tela
 
 #### Visual em Desktop
-<img src="https://raw.githubusercontent.com/codinomello/weebie-go/main/repo/desktop.png" width="1080" height="607.50"/>
+<img src="https://raw.githubusercontent.com/codinomello/weebie-go/main/repo/desktop.png" width="800" height="450"/>
 
 #### Visual em Celular
-<img src="https://raw.githubusercontent.com/codinomello/weebie-go/main/repo/phone.png" width="50" height="50"/>
+<img src="https://raw.githubusercontent.com/codinomello/weebie-go/main/repo/phone.png" width="450" height="800"/>
 
 
 ## 🛠️ Tecnologias Utilizadas
