@@ -19,7 +19,7 @@ O Weebie foi projetado com um design moderno e responsivo, garantindo uma experi
 ### Capturas de Tela
 
 #### Visual em Desktop
-![Desktop](https://via.placeholder.com/1920x1080?text=Desktop+View)
+![Desktop]([https://raw.githubusercontent.com/codinomello/weebie-go/repo/desktop.png)
 
 #### Visual em Celular
 ![Celular](https://via.placeholder.com/1080x1920?text=Mobile+View)
