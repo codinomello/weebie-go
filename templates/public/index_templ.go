@@ -47,7 +47,7 @@ func Index() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<!-- Ícone --><link rel=\"icon\" type=\"image/x-icon\" href=\"/hou\"><!-- HTMX e Tailwind CSS -->")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<!-- Ícone --><link rel=\"icon\" type=\"image/x-icon\" href=\"\"><!-- HTMX e Tailwind CSS -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
