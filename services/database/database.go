@@ -35,9 +35,9 @@ func ConnectMongoDB() error {
 	// Verificando a conexão
 	err = client.Ping(context.TODO(), nil)
 	if err != nil {
-		return fmt.Errorf("erro ao verificar conexão com o mongodb: %v", err)
+		return fmt.Errorf("❌ erro ao verificar conexão com o mongodb: %v", err)
 	}
-	log.Println("conexão com o mongodb estabelecida com sucesso!")
+	log.Println("🍃 conexão com o mongodb estabelecida com sucesso!")
 
 	return nil
 }
@@ -45,9 +45,9 @@ func ConnectMongoDB() error {
 // Encerra a conexão com o MongoDB
 func DisconnectMongoDB() error {
 	if err := client.Disconnect(context.Background()); err != nil {
-		return fmt.Errorf("erro ao desconectar do mongodb: %v", err)
+		return fmt.Errorf("❌ erro ao desconectar do mongodb: %v", err)
 	}
-	log.Println("conexão com o mongodb encerrada.")
+	log.Println("🔐 conexão com o mongodb encerrada.")
 	return nil
 }
 

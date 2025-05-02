@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/a-h/templ"
-	"github.com/codinomello/weebie-go/templates/public"
+	"github.com/codinomello/weebie-go/pages/public"
 )
 
 // Renderiza o template

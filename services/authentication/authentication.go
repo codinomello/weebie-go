@@ -19,9 +19,9 @@ func FirebaseInitApp() (*firebase.App, error) {
 	// Inicializa o Firebase
 	app, err := firebase.NewApp(context.Background(), nil, opt)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao inicializar o firebase: %v", err)
+		return nil, fmt.Errorf("❌ erro ao inicializar o firebase: %v", err)
 	}
-	log.Println("autenticação com o firebase inicializada com sucesso!")
+	log.Println("🔥 autenticação com o firebase inicializada com sucesso!")
 
 	return app, nil
 }
@@ -30,7 +30,7 @@ func FirebaseInitClient() (*auth.Client, error) {
 	// Inicializa o cliente de autenticação
 	client, err := app.Auth(context.Background())
 	if err != nil {
-		return nil, fmt.Errorf("erro de autenticação com  o firebase: %v", err)
+		return nil, fmt.Errorf("❌ erro de autenticação com o firebase: %v", err)
 	}
 
 	return client, nil

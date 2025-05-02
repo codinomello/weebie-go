@@ -40,8 +40,8 @@ func main() {
 	}
 
 	// Inicialização do servidor
-	log.Printf("servidor inicializado no endereço: http://localhost%v\n", server.Addr)
+	log.Printf("🌐 servidor inicializado no endereço: http://localhost%v\n", server.Addr)
 	if err := server.ListenAndServe(); err != nil {
-		log.Fatalf("erro ao inicializar o servidor: %v\n", err)
+		log.Fatalf("❌ erro ao inicializar o servidor: %v\n", err)
 	}
 }
