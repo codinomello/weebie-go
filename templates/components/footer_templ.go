@@ -74,7 +74,7 @@ func FooterLogin() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</span> Weebie. Todos os direitos reservados.</p><p class=\"mt-2\"><a href=\"#\" class=\"text-blue hover:text-blue/80\">Política de Privacidade</a> |  <a href=\"#\" class=\"text-blue hover:text-blue/80\">Termos de Serviço</a></p></footer>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</span> Weebie. Todos os direitos reservados.</p><p class=\"mt-2\"><a href=\"#\" class=\"text-blue hover:text-blue/80\">Política de Privacidade</a> <a href=\"#\" class=\"text-blue hover:text-blue/80\">Termos de Serviço</a></p></footer>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
