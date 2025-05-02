@@ -1,4 +1,4 @@
-# 🌍 Weebie - Iniciativas Comunitárias
+# 🌍 Weebie
 
 Bem-vindo ao Weebie - Sistema de Iniciativas Comunitárias 🏘️
 
@@ -14,7 +14,7 @@ Este sistema web permite a criação, gestão e compartilhamento de iniciativas 
 O Weebie foi projetado com um design moderno e responsivo, garantindo uma experiência de usuário agradável tanto em dispositivos desktop quanto móveis. Abaixo, você pode conferir o logo do projeto e algumas capturas de tela que ilustram o visual da página web.
 
 ### Logo do Weebie
-<img src="https://raw.githubusercontent.com/codinomello/weebie-go/main/images/house.png" width="50" height="50"/>
+<img src="https://raw.githubusercontent.com/codinomello/weebie-go/main/images/icons/house.png" width="50" height="50"/>
 
 ### Capturas de Tela
 
@@ -22,7 +22,7 @@ O Weebie foi projetado com um design moderno e responsivo, garantindo uma experi
 <img src="https://raw.githubusercontent.com/codinomello/weebie-go/main/repo/desktop.png" width="800" height="450"/>-->
 
 #### Visual em Celular
-<img src="https://raw.githubusercontent.com/codinomello/weebie-go/main/repo/phone.png" width="380" height="800"/>
+<img src="https://raw.githubusercontent.com/codinomello/weebie-go/main/images/repo/phone.png" width="380" height="800"/>
 
 
 ## 🛠️ Tecnologias Utilizadas
