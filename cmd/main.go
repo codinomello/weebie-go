@@ -14,29 +14,29 @@ import (
 
 func main() {
 	// Carrega as variáveis do ambiente
-	environment.GetEnviromentVariables()
+	environment.LoadEnviromentVariables()
 
 	// Conexão com o MongoDB
-	database.ConnectMongoDB()
+	database.ConnectMongoDB(os.Getenv("MONGODB_URI"))
 
 	// Fecha a conexão com o banco de dados ao final da execução do programa
 	defer database.DisconnectMongoDB()
 
 	// Inicialização do Firebase
-	authentication.FirebaseInitApp()
+	authentication.InitFirebaseApp(os.Getenv("FIREBASE_CONFIG"))
 
 	// Criação do roteador de servidores HTTP
 	router := http.NewServeMux()
 
+	// Setando as rotas
+	routes.SetupRoutes(router)
+
 	// Porta principal do servidor HTTP
 	port := os.Getenv("LISTEN_ADDRESS")
 
-	// Setando as rotas
-	routes.HandleAllRoutes(router)
-
 	// Configuração do servidor HTTP
 	server := &http.Server{
-		Addr:         port,
+		Addr:         ":" + port,
 		Handler:      router,
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,

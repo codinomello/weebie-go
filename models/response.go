@@ -1,6 +1,8 @@
 package models
 
 type Response struct {
+	// O UID da resposta
+	UID string `bson:"_id,omitempty" json:"id,omitempty"`
 	// O código de status HTTP da resposta
 	StatusCode int `bson:"status_code" json:"status_code"`
 	// O status message da resposta

@@ -22,7 +22,7 @@ func HandleSignUpUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	firebaseClient, err := authentication.FirebaseInitClient()
+	firebaseClient, err := authentication.InitFirebaseClient()
 	if err != nil {
 		log.Fatalf("erro ao inicializar autenticação com o firebase: %v", err)
 	}
@@ -66,7 +66,7 @@ func HandleSignInUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	authClient, err := authentication.FirebaseInitClient()
+	authClient, err := authentication.InitFirebaseClient()
 	if err != nil {
 		log.Fatalf("erro ao inicializar autenticação com o firebase: %v", err)
 

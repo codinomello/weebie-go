@@ -7,9 +7,9 @@ import (
 	"github.com/codinomello/weebie-go/services/middleware"
 )
 
-func HandleAllRoutes(router *http.ServeMux) {
+func SetupRoutes(router *http.ServeMux) {
 	// Servir arquivos estáticos (html, css, js, imagens, etc.)
-	HandleAllStaticRoutes(router)
+	HandleStaticRoutes(router)
 
 	// Rota de inscrição de usuário
 	http.Handle("/signup", middleware.JSONMiddleware(http.HandlerFunc(handlers.HandleSignUpUser)))
@@ -22,7 +22,7 @@ func HandleAllRoutes(router *http.ServeMux) {
 
 }
 
-func HandleAllStaticRoutes(router *http.ServeMux) {
+func HandleStaticRoutes(router *http.ServeMux) {
 	// Rota principal (index.templ)
 	HandleRoutesTemplate(router, "/", handlers.HandleTemplIndex)
 

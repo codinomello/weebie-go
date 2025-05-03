@@ -23,7 +23,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		firebaseClient, err := authentication.FirebaseInitClient()
+		firebaseClient, err := authentication.InitFirebaseClient()
 		if err != nil {
 			log.Fatalf("erro ao inicializar autenticação com o firebase: %v", err)
 		}

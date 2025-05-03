@@ -12,9 +12,9 @@ import (
 
 var app *firebase.App
 
-func FirebaseInitApp() (*firebase.App, error) {
+func InitFirebaseApp(firebaseCofigPath string) (*firebase.App, error) {
 	// Credenciais do Firebase
-	opt := option.WithCredentialsFile("../../firebase.json") // Arquivo JSON do Firebase
+	opt := option.WithCredentialsFile(firebaseCofigPath) // Arquivo JSON do Firebase
 
 	// Inicializa o Firebase
 	app, err := firebase.NewApp(context.Background(), nil, opt)
@@ -26,7 +26,7 @@ func FirebaseInitApp() (*firebase.App, error) {
 	return app, nil
 }
 
-func FirebaseInitClient() (*auth.Client, error) {
+func InitFirebaseClient() (*auth.Client, error) {
 	// Inicializa o cliente de autenticação
 	client, err := app.Auth(context.Background())
 	if err != nil {
