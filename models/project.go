@@ -1,26 +1,30 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type Project struct {
 	// ID do projeto
-	ID string `json:"id"`
+	ID primitive.ObjectID `bson:"_id,omitempty" json:"id"`
 	// ID do dono do projeto
-	OwnerUID string `json:"owner_uid"`
+	OwnerID primitive.ObjectID `bson:"owner_id" json:"owner_id"`
+	// Membros do projeto
+	Members string `bson:"members" json:"members"`
 	// Título do projeto
-	Title string `json:"title"`
+	Title string `bson:"title" json:"title"`
 	// Descrição do projeto
-	Details string `json:"details"`
-	// Grupo do projeto
-	Group string `json:"group"`
+	Details string `bson:"details" json:"details"`
 	// Ano do projeto
-	Year int `json:"year"`
+	Year int `bson:"year" json:"year"`
 	// Curso do projeto
-	Course string `json:"course"`
+	Course string `bson:"course" json:"course"`
 	// ODS do projeto
-	ODS []int `json:"ods"`
+	ODS []string `bson:"ods" json:"ods"`
 	// Data de criação do projeto
-	CreatedAt time.Time `json:"created_at"`
+	CreatedAt time.Time `bson:"created_at" json:"created_at"`
 	// Data de atualização do projeto
-	UpdatedAt time.Time `json:"updated_at"`
+	UpdatedAt time.Time `bson:"updated_at" json:"updated_at"`
 }

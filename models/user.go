@@ -1,26 +1,30 @@
 package models
 
+import "go.mongodb.org/mongo-driver/bson/primitive"
+
 type User struct {
+	// ID do usuário
+	ID primitive.ObjectID `bson:"_id,omitempty" json:"id"`
 	// Nome do usuário
-	Name string `json:"name"`
+	Name string `bson:"name" json:"name"`
 	// E-mail do usuário
-	Email string `json:"email"`
+	Email string `bson:"email" json:"email"`
 	// Senha do usuário
-	Password string `json:"password"`
+	Password string `bson:"password" json:"password"`
 	// Telefone do usuário
-	Phone string `json:"phone"`
+	Phone string `bson:"phone" json:"phone"`
 	// Idade do usuário
-	Age int `json:"age"`
+	Age int `bson:"age" json:"age"`
 	// Endereço do usuário
-	Address string `json:"address"`
+	Address string `bson:"address" json:"address"`
 	// CPF do usuário
-	CPF string `json:"cpf"`
+	CPF string `bson:"cpf" json:"cpf"`
 	// RG do usuário
-	RG string `json:"rg"`
+	RG string `bson:"rg" json:"rg"`
 	// Sexo do usuário (M ou F)
-	Sex rune `json:"sex"`
+	Sex rune `bson:"sex" json:"sex"`
 	// Data de criação do usuário
-	CreatedAt string `json:"created_at"`
+	CreatedAt string `bson:"created_at" json:"created_at"`
 	// Data de atualização do usuário
-	UpdatedAt string `json:"updated_at"`
+	UpdatedAt string `bson:"updated_at" json:"updated_at"`
 }

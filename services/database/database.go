@@ -63,5 +63,5 @@ func GetMongoDBDatabase(database string) *mongo.Database {
 
 // Retorna a coleção MongoDB
 func GetMongoDBCollection(collection string) *mongo.Collection {
-	return client.Database("weebiedb").Collection(collection)
+	return client.Database(os.Getenv("MONGODB_DATABASE")).Collection(collection)
 }

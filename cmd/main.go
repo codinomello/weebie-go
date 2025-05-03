@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/codinomello/weebie-go/services/authentication"
 	"github.com/codinomello/weebie-go/services/database"
@@ -35,8 +36,11 @@ func main() {
 
 	// Configuração do servidor HTTP
 	server := &http.Server{
-		Addr:    port,
-		Handler: router,
+		Addr:         port,
+		Handler:      router,
+		ReadTimeout:  15 * time.Second,
+		WriteTimeout: 15 * time.Second,
+		IdleTimeout:  60 * time.Second,
 	}
 
 	// Inicialização do servidor
