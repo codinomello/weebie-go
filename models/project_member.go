@@ -7,10 +7,16 @@ import (
 )
 
 type ProjectMember struct {
-	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	// ID do membro do projeto
+	ID primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	// ID do projeto
 	ProjectID primitive.ObjectID `bson:"project_id" json:"project_id"`
-	UserID    primitive.ObjectID `bson:"user_id" json:"user_id"`
-	Role      string             `bson:"role" json:"role"` // "owner", "member", "contributor"
-	JoinedAt  time.Time          `bson:"joined_at" json:"joined_at"`
-	Status    string             `bson:"status" json:"status"` // "active", "pending", "inactive"
+	// ID do usuário
+	UserID primitive.ObjectID `bson:"user_id" json:"user_id"`
+	// Papel do membro no projeto
+	Role string `bson:"role" json:"role"` // "owner", "member", "contributor"
+	// Data de adesão ao projeto
+	JoinedAt time.Time `bson:"joined_at" json:"joined_at"`
+	// Status do membro no projeto
+	Status string `bson:"status" json:"status"` // "active", "pending", "inactive"
 }
