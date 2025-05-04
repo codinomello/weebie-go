@@ -2,7 +2,6 @@ package database
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -30,9 +29,8 @@ func ConnectMongoDB(mongoURI string) error {
 
 	// Verificando a conexão
 	if err := client.Ping(context.TODO(), readpref.Primary()); err != nil {
-		return fmt.Errorf("❌ erro ao verificar conexão com o mongodb: %v", err)
+		return err
 	}
-	log.Println("🍃 conexão com o mongodb estabelecida com sucesso!")
 
 	return nil
 }
@@ -40,7 +38,7 @@ func ConnectMongoDB(mongoURI string) error {
 // Encerra a conexão com o MongoDB
 func DisconnectMongoDB() error {
 	if err := client.Disconnect(context.Background()); err != nil {
-		return fmt.Errorf("❌ erro ao desconectar do mongodb: %v", err)
+		return err
 	}
 	log.Println("🔐 conexão com o mongodb encerrada.")
 
@@ -62,8 +60,8 @@ func GetMongoDBCollection(collection string) *mongo.Collection {
 	return client.Database(os.Getenv("MONGODB_DATABASE")).Collection(collection)
 }
 
-// InitDatabase inicializa o banco de dados com índices necessários
-func InitDatabase(ctx context.Context, db *mongo.Database) error {
+// Inicializa o banco de dados com índices necessários
+func InitMongoDBDatabase(ctx context.Context, db *mongo.Database) error {
 	// Cria índices na coleção de usuários
 	userIndexes := []mongo.IndexModel{
 		{
@@ -122,8 +120,8 @@ func InitDatabase(ctx context.Context, db *mongo.Database) error {
 	return nil
 }
 
-// CreateInitialUser cria um usuário inicial para testes se não existir nenhum
-func CreateInitialUser(ctx context.Context, db *mongo.Database, user bson.M) error {
+// Cria um usuário inicial para testes se não existir nenhum
+func CreateMongoDBInitialUser(ctx context.Context, db *mongo.Database, user bson.M) error {
 	// Verifica se já existe pelo menos um usuário
 	count, err := db.Collection("users").CountDocuments(ctx, bson.M{})
 	if err != nil {

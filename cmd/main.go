@@ -17,13 +17,22 @@ func main() {
 	environment.LoadEnviromentVariables()
 
 	// Conexão com o MongoDB
-	database.ConnectMongoDB(os.Getenv("MONGODB_URI"))
+	if err := database.ConnectMongoDB(os.Getenv("MONGODB_URI")); err != nil {
+		log.Fatalf("❌ erro ao verificar conexão com o mongodb: %v", err)
+	} else {
+		log.Println("🍃 banco de dados mongodb conectado com sucesso!")
+	}
 
 	// Fecha a conexão com o banco de dados ao final da execução do programa
 	defer database.DisconnectMongoDB()
 
 	// Inicialização do Firebase
-	authentication.InitFirebaseApp(os.Getenv("FIREBASE_CONFIG"))
+	_, err := authentication.InitFirebaseApp(os.Getenv("FIREBASE_CONFIG"))
+	if err != nil {
+		log.Fatalf("❌ erro ao inicializar o firebase: %s\n", err)
+	} else {
+		log.Println("🔥 autenticação com o firebase inicializada com sucesso!")
+	}
 
 	// Criação do roteador de servidores HTTP
 	router := http.NewServeMux()
@@ -44,8 +53,8 @@ func main() {
 	}
 
 	// Inicialização do servidor
-	log.Printf("🌐 servidor inicializado no endereço: http://localhost%v\n", server.Addr)
+	log.Printf("🌐 servidor inicializado no endereço: http://localhost%s\n", server.Addr)
 	if err := server.ListenAndServe(); err != nil {
-		log.Fatalf("❌ erro ao inicializar o servidor: %v\n", err)
+		log.Fatalf("❌ erro ao inicializar o servidor: %s\n", err)
 	}
 }

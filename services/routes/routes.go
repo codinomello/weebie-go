@@ -19,7 +19,6 @@ func SetupRoutes(router *http.ServeMux) {
 
 	// Rota de perfil de usuário
 	http.Handle("/profile", middleware.JSONMiddleware(middleware.AuthMiddleware(http.HandlerFunc(handlers.HandleProtectedArea))))
-
 }
 
 func HandleStaticRoutes(router *http.ServeMux) {
