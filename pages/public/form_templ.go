@@ -47,7 +47,7 @@ func Form() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<!-- Ícone --><link rel=\"icon\" type=\"image/x-icon\" href=\"/hou\"><!-- HTMX e Tailwind CSS -->")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<!-- HTMX e Tailwind CSS -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -55,23 +55,23 @@ func Form() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<!-- Flowbite CSS e Ícone -->")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<!-- Fonte -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = components.Link().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = components.StyleHead().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<!-- Fonte -->")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<!-- Flowbite CSS e Ícone -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = components.StyleFont().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = components.Link("house_with_garden.png").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</head><body class=\"bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center min-h-screen\"><!-- Header --><nav class=\"bg-gradient-to-r from-orange to-golden dark:from-gray-800 dark:to-gray-700 px-4 py-4 shadow-xl fixed top-0 w-full\"><div class=\"container mx-auto flex items-center justify-between\"><div class=\"flex items-center space-x-3\"><span class=\"text-3xl text-white\">🏡</span><h1 class=\"text-2xl font-bold text-white\">Weebie</h1></div><!-- Botão de Tema e Menu Mobile --><div class=\"flex items-center space-x-4\"><!-- Botão de Tema -->")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</head><body class=\"bg-gray-100 dark:bg-gray-900\"><!-- Header --><nav class=\"bg-gradient-to-r from-orange to-golden dark:from-gray-800 dark:to-gray-700 px-4 py-4 shadow-xl fixed top-0 w-full\"><div class=\"container mx-auto flex items-center justify-between\"><div class=\"flex items-center space-x-3\"><span class=\"text-3xl text-white\">🏡</span><h1 class=\"text-2xl font-bold text-white\">Weebie</h1></div><!-- Botão de Tema e Menu Mobile --><div class=\"flex items-center space-x-4\"><!-- Botão de Tema -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

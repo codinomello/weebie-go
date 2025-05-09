@@ -10,16 +10,14 @@ templ Form() {
         @components.Meta()
         <!-- Título -->
         @components.Title("Weebie - Projetos Comunitários")
-        <!-- Ícone -->
-        <link rel="icon" type="image/x-icon" href="/hou">
         <!-- HTMX e Tailwind CSS -->
         @components.ScriptHead()
-        <!-- Flowbite CSS e Ícone -->
-        @components.Link()
         <!-- Fonte -->
-        @components.StyleFont()
+        @components.StyleHead()
+        <!-- Flowbite CSS e Ícone -->
+        @components.Link("house_with_garden.png")
     </head>
-    <body class="bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center min-h-screen">
+    <body class="bg-gray-100 dark:bg-gray-900">
         <!-- Header -->
         <nav class="bg-gradient-to-r from-orange to-golden dark:from-gray-800 dark:to-gray-700 px-4 py-4 shadow-xl fixed top-0 w-full">
             <div class="container mx-auto flex items-center justify-between">

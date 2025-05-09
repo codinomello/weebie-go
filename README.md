@@ -69,4 +69,3 @@ O Weebie foi projetado com um design moderno e responsivo, garantindo uma experi
 3. **Execute o projeto**:
    ```bash
    make run
-   

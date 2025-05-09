@@ -7,33 +7,54 @@ import (
 	"github.com/codinomello/weebie-go/services/middleware"
 )
 
+// Define todas as rotas HTTP da aplicação
 func SetupRoutes(router *http.ServeMux) {
-	// Servir arquivos estáticos (html, css, js, imagens, etc.)
-	HandleStaticRoutes(router)
+	// Servir arquivos estáticos públicos (html, css, js, imagens, etc.)
+	SetupPublicRoutes(router)
+
+	// Servir arquivos estáticos privados (html, css, js, imagens, etc.)
+	SetupPrivateRoutes(router)
+
+	// Servir imagens
+	handlers.HandleImages(router)
 
 	// Rota de inscrição de usuário
-	http.Handle("/signup", middleware.JSONMiddleware(http.HandlerFunc(handlers.HandleSignUpUser)))
+	router.Handle("/signup", middleware.JSONMiddleware(http.HandlerFunc(handlers.HandleSignUpUser)))
 
 	// Rota de login de usuário
-	http.Handle("/signin", middleware.JSONMiddleware(http.HandlerFunc(handlers.HandleSignInUser)))
+	router.Handle("/signin", middleware.JSONMiddleware(http.HandlerFunc(handlers.HandleSignInUser)))
 
 	// Rota de perfil de usuário
-	http.Handle("/profile", middleware.JSONMiddleware(middleware.AuthMiddleware(http.HandlerFunc(handlers.HandleProtectedArea))))
+	router.Handle("/profile-info", middleware.JSONMiddleware(middleware.AuthMiddleware(http.HandlerFunc(handlers.HandleProtectedArea))))
 }
 
-func HandleStaticRoutes(router *http.ServeMux) {
+// Configura as rotas públicas da aplicação
+func SetupPublicRoutes(router *http.ServeMux) {
 	// Rota principal (index.templ)
-	HandleRoutesTemplate(router, "/", handlers.HandleTemplIndex)
+	SetupRoutesTemplate(router, "/", handlers.HandleTemplIndex)
 
 	// Rota formulário (form.templ)
-	HandleRoutesTemplate(router, "/form", handlers.HandleTemplForm)
+	SetupRoutesTemplate(router, "/form", handlers.HandleTemplForm)
 
 	// Rota projetos (project.templ)
-	HandleRoutesTemplate(router, "/project", handlers.HandleTemplProject)
+	SetupRoutesTemplate(router, "/project", handlers.HandleTemplProject)
+
+	// Rota explorar (explore.templ)
+	SetupRoutesTemplate(router, "/explore", handlers.HandleTemplExplore)
+
+	// Rota sobre (about.templ)
+	SetupRoutesTemplate(router, "/about", handlers.HandleTemplAbout)
+}
+
+// Configura as rotas privadas da aplicação
+func SetupPrivateRoutes(router *http.ServeMux) {
+	// Rota perfil (profile.templ)
+	SetupRoutesTemplate(router, "/profile", handlers.HandleTemplProfile)
 
 }
 
-func HandleRoutesTemplate(router *http.ServeMux, path string, handler func(w http.ResponseWriter, r *http.Request) error) {
+// Configura uma rota para servir um template HTML
+func SetupRoutesTemplate(router *http.ServeMux, path string, handler func(w http.ResponseWriter, r *http.Request) error) {
 	router.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
 		if err := handler(w, r); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)

@@ -1,4 +1,4 @@
-package handlers
+package controllers
 
 import (
 	"context"
@@ -7,33 +7,30 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/codinomello/weebie-go/models"
+	"github.com/codinomello/weebie-go/services/database"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-
-	"github.com/codinomello/weebie-go/models"
-	"github.com/codinomello/weebie-go/services/database"
 )
 
-type ProjectService struct {
-	projectCollection       *mongo.Collection
-	userCollection          *mongo.Collection
-	projectMemberCollection *mongo.Collection
-}
+// Estrutura que contém as coleções do MongoDB
+type ProjectService models.ProjectService
 
-// NewProjectService cria uma nova instância do serviço de projetos
+// Cria uma nova instância do serviço de projetos
 func NewProjectService(db *mongo.Database) *ProjectService {
 	return &ProjectService{
-		projectCollection:       db.Collection("projects"),
-		userCollection:          db.Collection("users"),
-		projectMemberCollection: db.Collection("project_members"),
+		ProjectCollection:       db.Collection("projects"),
+		UserCollection:          db.Collection("users"),
+		ProjectMemberCollection: db.Collection("project_member"),
 	}
 }
 
+// Cria um novo projeto
 func (s *ProjectService) CreateProject(ctx context.Context, project *models.Project, userID primitive.ObjectID) (*models.Project, error) {
 	// Verifica se o usuário existe
 	var user models.User
-	err := s.userCollection.FindOne(ctx, bson.M{"_id": userID}).Decode(&user)
+	err := s.UserCollection.FindOne(ctx, bson.M{"_id": userID}).Decode(&user)
 	if err != nil {
 		return nil, errors.New("usuário não encontrado")
 	}
@@ -50,7 +47,7 @@ func (s *ProjectService) CreateProject(ctx context.Context, project *models.Proj
 	project.UpdatedAt = now
 
 	// Salva o projeto no banco de dados
-	result, err := s.projectCollection.InsertOne(ctx, project)
+	result, err := s.ProjectCollection.InsertOne(ctx, project)
 	if err != nil {
 		return nil, err
 	}
@@ -67,34 +64,34 @@ func (s *ProjectService) CreateProject(ctx context.Context, project *models.Proj
 		Status:    "active",
 	}
 
-	_, err = s.projectMemberCollection.InsertOne(ctx, projectMember)
+	_, err = s.ProjectMemberCollection.InsertOne(ctx, projectMember)
 	if err != nil {
 		// Se falhar em criar a relação, tenta excluir o projeto criado
-		s.projectCollection.DeleteOne(ctx, bson.M{"_id": project.ID})
+		s.ProjectCollection.DeleteOne(ctx, bson.M{"_id": project.ID})
 		return nil, err
 	}
 
 	return project, nil
 }
 
-// AddMemberToProject adiciona um novo usuário ao projeto
+// Adiciona um novo usuário ao projeto
 func (s *ProjectService) AddMemberToProject(ctx context.Context, projectID, userID primitive.ObjectID, role string) error {
 	// Verifica se o projeto existe
 	var project models.Project
-	err := s.projectCollection.FindOne(ctx, bson.M{"_id": projectID}).Decode(&project)
+	err := s.ProjectCollection.FindOne(ctx, bson.M{"_id": projectID}).Decode(&project)
 	if err != nil {
 		return errors.New("projeto não encontrado")
 	}
 
 	// Verifica se o usuário existe
 	var user models.User
-	err = s.userCollection.FindOne(ctx, bson.M{"_id": userID}).Decode(&user)
+	err = s.UserCollection.FindOne(ctx, bson.M{"_id": userID}).Decode(&user)
 	if err != nil {
 		return errors.New("usuário não encontrado")
 	}
 
 	// Verifica se o usuário já é membro do projeto
-	count, err := s.projectMemberCollection.CountDocuments(ctx, bson.M{
+	count, err := s.ProjectMemberCollection.CountDocuments(ctx, bson.M{
 		"project_id": projectID,
 		"user_id":    userID,
 	})
@@ -114,13 +111,13 @@ func (s *ProjectService) AddMemberToProject(ctx context.Context, projectID, user
 		Status:    "active",
 	}
 
-	_, err = s.projectMemberCollection.InsertOne(ctx, projectMember)
+	_, err = s.ProjectMemberCollection.InsertOne(ctx, projectMember)
 	if err != nil {
 		return err
 	}
 
 	// Atualiza a lista de membros do projeto
-	_, err = s.projectCollection.UpdateOne(ctx,
+	_, err = s.ProjectCollection.UpdateOne(ctx,
 		bson.M{"_id": projectID},
 		bson.M{
 			"$addToSet": bson.M{"members": userID},
@@ -135,7 +132,7 @@ func (s *ProjectService) AddMemberToProject(ctx context.Context, projectID, user
 func (s *ProjectService) RemoveMemberFromProject(ctx context.Context, projectID, userID primitive.ObjectID) error {
 	// Verifica se o projeto existe
 	var project models.Project
-	err := s.projectCollection.FindOne(ctx, bson.M{"_id": projectID}).Decode(&project)
+	err := s.ProjectCollection.FindOne(ctx, bson.M{"_id": projectID}).Decode(&project)
 	if err != nil {
 		return errors.New("projeto não encontrado")
 	}
@@ -146,7 +143,7 @@ func (s *ProjectService) RemoveMemberFromProject(ctx context.Context, projectID,
 	}
 
 	// Remove relação de membro do projeto
-	_, err = s.projectMemberCollection.DeleteOne(ctx, bson.M{
+	_, err = s.ProjectMemberCollection.DeleteOne(ctx, bson.M{
 		"project_id": projectID,
 		"user_id":    userID,
 	})
@@ -155,7 +152,7 @@ func (s *ProjectService) RemoveMemberFromProject(ctx context.Context, projectID,
 	}
 
 	// Atualiza a lista de membros do projeto
-	_, err = s.projectCollection.UpdateOne(ctx,
+	_, err = s.ProjectCollection.UpdateOne(ctx,
 		bson.M{"_id": projectID},
 		bson.M{
 			"$pull": bson.M{"members": userID},
@@ -170,13 +167,13 @@ func (s *ProjectService) RemoveMemberFromProject(ctx context.Context, projectID,
 func (s *ProjectService) GetProjectMembers(ctx context.Context, projectID primitive.ObjectID) ([]models.User, error) {
 	// Verifica se o projeto existe
 	var project models.Project
-	err := s.projectCollection.FindOne(ctx, bson.M{"_id": projectID}).Decode(&project)
+	err := s.ProjectCollection.FindOne(ctx, bson.M{"_id": projectID}).Decode(&project)
 	if err != nil {
 		return nil, errors.New("projeto não encontrado")
 	}
 
 	// Busca a lista de membros
-	cursor, err := s.userCollection.Find(ctx, bson.M{
+	cursor, err := s.UserCollection.Find(ctx, bson.M{
 		"_id": bson.M{"$in": project.Members},
 	})
 	if err != nil {
@@ -196,7 +193,7 @@ func (s *ProjectService) GetProjectMembers(ctx context.Context, projectID primit
 func (s *ProjectService) UpdateMemberRole(ctx context.Context, projectID, userID primitive.ObjectID, newRole string) error {
 	// Verifica se o projeto existe
 	var project models.Project
-	err := s.projectCollection.FindOne(ctx, bson.M{"_id": projectID}).Decode(&project)
+	err := s.ProjectCollection.FindOne(ctx, bson.M{"_id": projectID}).Decode(&project)
 	if err != nil {
 		return errors.New("projeto não encontrado")
 	}
@@ -212,7 +209,7 @@ func (s *ProjectService) UpdateMemberRole(ctx context.Context, projectID, userID
 	}
 
 	// Atualiza o papel do membro
-	_, err = s.projectMemberCollection.UpdateOne(ctx,
+	_, err = s.ProjectMemberCollection.UpdateOne(ctx,
 		bson.M{
 			"project_id": projectID,
 			"user_id":    userID,
@@ -232,7 +229,7 @@ func (s *ProjectService) UpdateMemberRole(ctx context.Context, projectID, userID
 func (s *ProjectService) TransferProjectOwnership(ctx context.Context, projectID, currentOwnerID, newOwnerID primitive.ObjectID) error {
 	// Verifica se o projeto existe e se o currentOwnerID é realmente o dono
 	var project models.Project
-	err := s.projectCollection.FindOne(ctx, bson.M{
+	err := s.ProjectCollection.FindOne(ctx, bson.M{
 		"_id":      projectID,
 		"owner_id": currentOwnerID,
 	}).Decode(&project)
@@ -242,7 +239,7 @@ func (s *ProjectService) TransferProjectOwnership(ctx context.Context, projectID
 
 	// Verifica se o novo dono é um membro do projeto
 	var member models.ProjectMember
-	err = s.projectMemberCollection.FindOne(ctx, bson.M{
+	err = s.ProjectMemberCollection.FindOne(ctx, bson.M{
 		"project_id": projectID,
 		"user_id":    newOwnerID,
 	}).Decode(&member)
@@ -251,7 +248,7 @@ func (s *ProjectService) TransferProjectOwnership(ctx context.Context, projectID
 	}
 
 	// Inicia uma sessão para realizar a transação
-	session, err := s.projectCollection.Database().Client().StartSession()
+	session, err := s.ProjectCollection.Database().Client().StartSession()
 	if err != nil {
 		return err
 	}
@@ -260,7 +257,7 @@ func (s *ProjectService) TransferProjectOwnership(ctx context.Context, projectID
 	// Realiza as operações em uma transação
 	err = mongo.WithSession(ctx, session, func(sessCtx mongo.SessionContext) error {
 		// Atualiza o papel do antigo dono para "member"
-		_, err := s.projectMemberCollection.UpdateOne(sessCtx,
+		_, err := s.ProjectMemberCollection.UpdateOne(sessCtx,
 			bson.M{
 				"project_id": projectID,
 				"user_id":    currentOwnerID,
@@ -276,7 +273,7 @@ func (s *ProjectService) TransferProjectOwnership(ctx context.Context, projectID
 		}
 
 		// Atualiza o papel do novo dono para "owner"
-		_, err = s.projectMemberCollection.UpdateOne(sessCtx,
+		_, err = s.ProjectMemberCollection.UpdateOne(sessCtx,
 			bson.M{
 				"project_id": projectID,
 				"user_id":    newOwnerID,
@@ -292,7 +289,7 @@ func (s *ProjectService) TransferProjectOwnership(ctx context.Context, projectID
 		}
 
 		// Atualiza o dono no documento do projeto
-		_, err = s.projectCollection.UpdateOne(sessCtx,
+		_, err = s.ProjectCollection.UpdateOne(sessCtx,
 			bson.M{"_id": projectID},
 			bson.M{
 				"$set": bson.M{
@@ -311,14 +308,14 @@ func (s *ProjectService) TransferProjectOwnership(ctx context.Context, projectID
 func (s *ProjectService) GetProjectOwner(ctx context.Context, projectID primitive.ObjectID) (*models.User, error) {
 	// Busca o projeto para obter o ID do dono
 	var project models.Project
-	err := s.projectCollection.FindOne(ctx, bson.M{"_id": projectID}).Decode(&project)
+	err := s.ProjectCollection.FindOne(ctx, bson.M{"_id": projectID}).Decode(&project)
 	if err != nil {
 		return nil, errors.New("projeto não encontrado")
 	}
 
 	// Busca o usuário dono
 	var owner models.User
-	err = s.userCollection.FindOne(ctx, bson.M{"_id": project.OwnerID}).Decode(&owner)
+	err = s.UserCollection.FindOne(ctx, bson.M{"_id": project.OwnerID}).Decode(&owner)
 	if err != nil {
 		return nil, errors.New("dono do projeto não encontrado")
 	}
@@ -329,7 +326,7 @@ func (s *ProjectService) GetProjectOwner(ctx context.Context, projectID primitiv
 // GetUserProjects retorna todos os projetos associados a um usuário
 func (s *ProjectService) GetUserProjects(ctx context.Context, userID primitive.ObjectID) ([]models.Project, error) {
 	// Busca os IDs dos projetos dos quais o usuário é membro
-	cursor, err := s.projectMemberCollection.Find(ctx, bson.M{"user_id": userID})
+	cursor, err := s.ProjectMemberCollection.Find(ctx, bson.M{"user_id": userID})
 	if err != nil {
 		return nil, err
 	}
@@ -351,7 +348,7 @@ func (s *ProjectService) GetUserProjects(ctx context.Context, userID primitive.O
 	}
 
 	// Busca os projetos usando os IDs
-	cursor, err = s.projectCollection.Find(ctx, bson.M{
+	cursor, err = s.ProjectCollection.Find(ctx, bson.M{
 		"_id": bson.M{"$in": projectIDs},
 	})
 	if err != nil {
@@ -370,7 +367,7 @@ func (s *ProjectService) GetUserProjects(ctx context.Context, userID primitive.O
 // GetMemberRole retorna o papel de um usuário em um projeto
 func (s *ProjectService) GetMemberRole(ctx context.Context, projectID, userID primitive.ObjectID) (string, error) {
 	var member models.ProjectMember
-	err := s.projectMemberCollection.FindOne(ctx, bson.M{
+	err := s.ProjectMemberCollection.FindOne(ctx, bson.M{
 		"project_id": projectID,
 		"user_id":    userID,
 	}).Decode(&member)
@@ -387,7 +384,7 @@ func (s *ProjectService) GetMemberRole(ctx context.Context, projectID, userID pr
 
 // IsProjectMember verifica se um usuário é membro de um projeto
 func (s *ProjectService) IsProjectMember(ctx context.Context, projectID, userID primitive.ObjectID) (bool, error) {
-	count, err := s.projectMemberCollection.CountDocuments(ctx, bson.M{
+	count, err := s.ProjectMemberCollection.CountDocuments(ctx, bson.M{
 		"project_id": projectID,
 		"user_id":    userID,
 	})
