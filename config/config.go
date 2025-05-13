@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 	"path/filepath"
 
 	firebase "firebase.google.com/go/v4"
@@ -23,7 +24,7 @@ type ConfigFlags struct {
 func ParseFlags() (*ConfigFlags, error) {
 	// Definir flags
 	createUID := flag.Bool("create-uid", false, "Cria um novo UID no Firebase Authentication")
-	configPath := flag.String("config", "../../config/serviceAccountKey.json", "Caminho para o arquivo de credenciais do Firebase")
+	configPath := flag.String("config", os.Getenv("FIREBASE_CONFIG"), "Caminho para o arquivo de credenciais do Firebase")
 
 	// Parsear as flags
 	flag.Parse()

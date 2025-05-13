@@ -9,7 +9,7 @@ import (
 
 func LoadEnviromentVariables() error {
 	// Carrega as variáveis do ambiente
-	if err := godotenv.Load("../config/.env"); err != nil {
+	if err := godotenv.Load("../.env"); err != nil {
 		return fmt.Errorf("❌ erro ao carregar o arquivo .env: %v", err)
 	}
 	log.Println("🏡 variáveis de ambiente carregadas com sucesso!")

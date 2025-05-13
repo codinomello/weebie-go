@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/a-h/templ"
-	"github.com/codinomello/weebie-go/pages/private"
-	"github.com/codinomello/weebie-go/pages/public"
+	"github.com/codinomello/weebie-go/views/private"
+	"github.com/codinomello/weebie-go/views/public"
 )
 
 // Template para renderizar os templates
