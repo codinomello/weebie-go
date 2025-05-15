@@ -41,7 +41,7 @@ func SetupRoutes(userRepo *repository.MongoDBUserRepository, projectRepo *reposi
 	privateMux := http.NewServeMux()
 
 	// Serve imagens
-	fs := http.FileServer(http.Dir("../../images"))
+	fs := http.FileServer(http.Dir("../images"))
 	publicMux.Handle("/images/", http.StripPrefix("/images/", fs))
 
 	// Rotas públicas de usuário

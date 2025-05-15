@@ -27,9 +27,9 @@ func HandleTemplProject(w http.ResponseWriter, r *http.Request) error {
 	return HandleTemplTemplate(public.Project(), w, r)
 }
 
-// Serve o template (login.templ)
-func HandleTemplForm(w http.ResponseWriter, r *http.Request) error {
-	return HandleTemplTemplate(public.Form(), w, r)
+// Serve o template (signup.templ)
+func HandleTemplSignup(w http.ResponseWriter, r *http.Request) error {
+	return HandleTemplTemplate(public.SignUp(), w, r)
 }
 
 // Serve o template (explore.templ)

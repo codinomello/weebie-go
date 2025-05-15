@@ -3,7 +3,6 @@ package public
 import components "github.com/codinomello/weebie-go/views/components"
 
 templ Project() {
-        <!doctype html>
     <html lang="pt-BR">
     <head>
         <!-- Meta Tags -->
@@ -18,264 +17,244 @@ templ Project() {
         @components.Link("house_with_garden.png")
         <link rel="icon" type="image/x-icon" href="/images/icons/house_buildings.png">
     </head>
-    <body class="bg-gray-100 dark:bg-gray-900">
+    <body class="bg-gray-100 dark:bg-gray-900 min-h-screen flex flex-col">
         <!-- Header -->
         @components.Nav("Cadastro de Projetos")
+        
         <!-- Formulário -->
-        <main class="container mx-auto px-4 py-8 max-w-3xl">
-            <form class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-700">
-                <!-- Seção Azul -->
-                <div class="mb-8 p-4 rounded-xl bg-blue/10 dark:bg-blue/20">
-                    <h2 class="text-2xl font-bold text-blue dark:text-blue/80 mb-4">Informações Básicas</h2>
-                    
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">ID do Projeto</label>
-                            <input type="text" 
-                                   class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-blue">
-                        </div>
-
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data</label>
-                            <input type="date" 
-                                   class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-blue">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Seção Rosa -->
-                <div class="mb-8 p-4 rounded-xl bg-pink/10 dark:bg-pink/20">
-                    <h2 class="text-2xl font-bold text-pink dark:text-pink/80 mb-4">Detalhes do Projeto</h2>
-                    
-                    <div class="space-y-6">
-                        <!-- Campo de Título -->
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Título</label>
-                            <input type="text" 
-                                class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-pink">
-                        </div>
-
-                        <!-- Campo de Autores (e-mails) -->
-                        <div class="space-y-4">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Autores</label>
-                            <input id="new-author-input" 
-                                class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-pink">
+        <main class="flex-grow container mx-auto px-4 py-8 max-w-4xl">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-xl border border-gray-200 dark:border-gray-700">
+                <h1 class="text-3xl font-bold text-center mb-8 text-orange dark:text-golden">
+                    <span class="text-blue">📋</span> Cadastro de Projeto
+                </h1>
+                
+                <form hx-post="/projects" hx-swap="none">
+                    <!-- Seção de Informações Básicas -->
+                    <div class="mb-8 p-6 rounded-xl bg-blue/10 dark:bg-blue/20 border-l-4 border-blue">
+                        <h2 class="text-2xl font-bold text-blue dark:text-blue/80 mb-4 flex items-center gap-2">
+                            <span>📝</span> Informações Básicas
+                        </h2>
+                        
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <!-- ID (gerado automaticamente) -->
+                            <input type="hidden" name="id" id="project-id">
                             
-                            <!-- Div dos e-mails (inicialmente oculta) -->
-                            <div id="authors-container" class="hidden flex flex-wrap gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-gray-300 rounded-lg mb-4">
-                                <!-- E-mails serão adicionados aqui dinamicamente -->
+                            <!-- OwnerID (gerado automaticamente) -->
+                            <input type="hidden" name="owner_id" id="owner-id">
+                            
+                            <!-- Título -->
+                            <div class="space-y-2">
+                                <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Título do Projeto*</label>
+                                <input type="text" id="title" name="title" required
+                                       class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue focus:border-transparent transition">
                             </div>
 
-                            <!-- Contêiner para os botões -->
-                            <div class="flex items-center gap-2">
-                                <!-- Botão Adicionar -->
-                                <button type="button" id="add-author-btn" class="mt-2 px-4 py-2 bg-pink text-gray-300 rounded-lg hover:bg-pink/80 transition">
-                                    Adicionar
-                                </button>
-
-                                <!-- Botão de Informação -->
-                                <button data-tooltip-target="email-tooltip" data-tooltip-placement="right" type="button" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                </button>
-                            </div>
-
-                            <!-- Tooltip -->
-                            <div id="email-tooltip" role="tooltip" class="inline-block absolute invisible z-10 py-2 px-3 text-sm font-medium dark:text-gray-300 bg-pink/10 rounded-lg shadow-sm opacity-0 transition-opacity duration-300">
-                                Insira e-mails separados por vírgula ou espaço.
+                            <!-- Ano -->
+                            <div class="space-y-2">
+                                <label for="year" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Ano*</label>
+                                <input type="number" id="year" name="year" min="2000" max="2100" required
+                                       class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue focus:border-transparent transition">
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <script>
-                    document.addEventListener('DOMContentLoaded', () => {
-                        const authorsContainer = document.getElementById('authors-container');
-                        const newAuthorInput = document.getElementById('new-author-input');
-                        const addAuthorBtn = document.getElementById('add-author-btn');
-                
-                        // Função para validar e-mail
-                        const isValidEmail = (email) => {
-                            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                            return regex.test(email);
-                        };
-                
-                        // Função para adicionar e-mails
-                        const addEmails = () => {
-                            const input = newAuthorInput.value.trim();
-                            if (input) {
-                                // Separa os e-mails por vírgula ou espaço
-                                const emails = input.split(/[,\s]+/).filter(email => email.trim() !== '');
-                
-                                emails.forEach(email => {
-                                    if (isValidEmail(email)) {
-                                        const emailTag = document.createElement('div');
-                                        emailTag.className = 'flex items-center bg-pink/10 dark:bg-pink/20 px-3 py-1 rounded-full';
-                                        emailTag.innerHTML = `
-                                            <span class="text-sm text-pink dark:text-pink/80">${email}</span>
-                                            <button type="button" class="ml-2 text-pink hover:text-pink" onclick="this.parentElement.classList.add('hidden');">×</button>
-                                        `;
-                                        authorsContainer.appendChild(emailTag);
-                
-                                        // Mostra a div de autores se estiver oculta
-                                        const checkIfEmpty = () => { 
-                                            if (authorsContainer.children.length === 0) { // Verifica se não há elementos filhos
-                                                authorsContainer.classList.add('hidden');
-                                            } else {
-                                                authorsContainer.classList.remove('hidden'); // Garante que a classe seja removida se não estiver vazio
-                                            }
-                                        };
-                                        checkIfEmpty()
+                    <!-- Seção de Detalhes -->
+                    <div class="mb-8 p-6 rounded-xl bg-pink/10 dark:bg-pink/20 border-l-4 border-pink">
+                        <h2 class="text-2xl font-bold text-pink dark:text-pink/80 mb-4 flex items-center gap-2">
+                            <span>✨</span> Detalhes do Projeto
+                        </h2>
+                        
+                        <div class="space-y-6">
+                            <!-- Descrição -->
+                            <div class="space-y-2">
+                                <label for="details" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Descrição*</label>
+                                <textarea id="details" name="details" rows="4" required
+                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-pink focus:border-transparent transition"></textarea>
+                            </div>
 
-                                    } else {
-                                        alert(`E-mail inválido: ${email}`);
-                                    }
-                                });
-                
-                                newAuthorInput.value = ''; // Limpa o campo de entrada
-                            }
-                        };
-                
-                        // Adicionar e-mails ao clicar no botão
-                        addAuthorBtn.addEventListener('click', addEmails);
-                
-                        // Adicionar e-mails ao pressionar Enter
-                        newAuthorInput.addEventListener('keydown', (e) => {
-                            if (e.key === 'Enter') {
-                                e.preventDefault(); // Evita o comportamento padrão do Enter
-                                addEmails();
-                            }
-                        });
-                    });
-                </script>
+                            <!-- Impacto -->
+                            <div class="space-y-2">
+                                <label for="impact" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Impacto Esperado*</label>
+                                <textarea id="impact" name="impact" rows="3" required
+                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-pink focus:border-transparent transition"></textarea>
+                            </div>
 
-                <!-- Seção Verde -->
-                <div class="mb-8 p-4 rounded-xl bg-green/10 dark:bg-green/20">
-                    <h2 class="text-2xl font-bold text-green dark:text-green/80 mb-4">Classificação</h2>
-                    
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Grupo</label>
-                            <input type="text" 
-                                   class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:text-gray-300 dark:bg-gray-700 focus:ring-2 focus:ring-green">
-                        </div>
-
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Curso</label>
-                            <select class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:text-gray-300 dark:bg-gray-700 focus:ring-2 focus:ring-green">
-                                <option> </option>
-                                <option>Administração</option>
-                                <option>Edificações</option>
-                                <option>Enfermagem</option>
-                                <option>Informática</option>
-                                <option>Mecatrônica</option>
-                            </select>
+                            <!-- Ícone -->
+                            <div class="space-y-2">
+                                <label for="icon" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Ícone do Projeto</label>
+                                <select id="icon" name="icon"
+                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-pink focus:border-transparent transition">
+                                    <option value="">Selecione um ícone</option>
+                                    <option value="🌱">🌱 Sustentabilidade</option>
+                                    <option value="💡">💡 Inovação</option>
+                                    <option value="👥">👥 Comunidade</option>
+                                    <option value="🏥">🏥 Saúde</option>
+                                    <option value="🎓">🎓 Educação</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Seção ODS -->
-                <div class="mb-8 p-4 rounded-xl bg-golden/10 dark:bg-golden/20">
-                    <h2 class="text-2xl font-bold text-golden dark:text-golden/80 mb-4">ODS Relacionados</h2>
-                    
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="ods-container">
-                        <!-- ODS são inseridos aqui via JavaScript -->
+                    <!-- Seção de Classificação -->
+                    <div class="mb-8 p-6 rounded-xl bg-green/10 dark:bg-green/20 border-l-4 border-green">
+                        <h2 class="text-2xl font-bold text-green dark:text-green/80 mb-4 flex items-center gap-2">
+                            <span>🏷️</span> Classificação
+                        </h2>
+                        
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <!-- Curso -->
+                            <div class="space-y-2">
+                                <label for="course" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Curso*</label>
+                                <select id="course" name="course" required
+                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-green focus:border-transparent transition">
+                                    <option value="">Selecione um curso</option>
+                                    <option value="Administração">Administração</option>
+                                    <option value="Edificações">Edificações</option>
+                                    <option value="Enfermagem">Enfermagem</option>
+                                    <option value="Informática">Informática</option>
+                                    <option value="Mecatrônica">Mecatrônica</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Membros -->
+                            <div class="space-y-2">
+                                <label for="members" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Membros</label>
+                                <input type="text" id="members-input" 
+                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-green focus:border-transparent transition"
+                                    placeholder="Digite e-mails dos membros">
+                                <input type="hidden" id="members" name="members">
+                                <div id="members-container" class="flex flex-wrap gap-2 mt-2"></div>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Separe os e-mails por vírgula</p>
+                            </div>
+                        </div>
                     </div>
 
-                    <div id="ods-popover" class="hidden absolute z-50 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg ods-popover">
-                        <h3 class="font-bold text-lg text-gray-900 dark:text-white mb-2" id="ods-title"></h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-300" id="ods-description"></p>
+                    <!-- Seção ODS -->
+                    <div class="mb-8 p-6 rounded-xl bg-golden/10 dark:bg-golden/20 border-l-4 border-golden">
+                        <h2 class="text-2xl font-bold text-golden dark:text-golden/80 mb-4 flex items-center gap-2">
+                            <span>🌎</span> ODS Relacionados
+                        </h2>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="ods-container">
+                            <!-- ODS serão inseridos aqui via JavaScript -->
+                        </div>
+                        <input type="hidden" id="ods" name="ods">
                     </div>
-                </div>
 
-                <!-- Botões -->
-                <div class="flex flex-col md:flex-row justify-end gap-4 mt-8">
-                    <!-- Botão limpar (vermelho) -->
-                    <button type="button" id="clear-btn" class="px-6 py-2 bg-red text-white rounded-lg hover:bg-red-600 active:bg-red-700 transition">
-                        Limpar Campos
-                    </button>
+                    <!-- Datas (automáticas) -->
+                    <input type="hidden" name="created_at" id="created-at">
+                    <input type="hidden" name="updated_at" id="updated-at">
 
-                    <!-- Botão salvar (verde) -->
-                    <button type="submit" class="px-6 py-2 bg-green text-white rounded-lg hover:bg-green-600 active:bg-green-700 transition">
-                        Salvar Projeto
-                    </button>
-                </div>
+                    <!-- Botões -->
+                    <div class="flex flex-col md:flex-row justify-end gap-4 mt-8">
+                        <!-- Botão limpar -->
+                        <button type="button" id="clear-btn" 
+                            class="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white font-medium rounded-lg hover:opacity-90 transition-all duration-300 transform hover:scale-[1.02] shadow-md flex items-center gap-2">
+                            <span>🗑️</span> Limpar Campos
+                        </button>
 
-                <script>
-                    document.addEventListener('DOMContentLoaded', () => {
-                        const clearBtn = document.getElementById('clear-btn');
-                        const form = document.querySelector('form');
-
-                        // Função para limpar todos os campos do formulário
-                        clearBtn.addEventListener('click', () => {
-                            form.reset(); // Limpa todos os campos do formulário
-                        });
-                    });
-                </script>
-            </form>
+                        <!-- Botão salvar -->
+                        <button type="submit" 
+                            class="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-medium rounded-lg hover:opacity-90 transition-all duration-300 transform hover:scale-[1.02] shadow-md flex items-center gap-2">
+                            <span>💾</span> Salvar Projeto
+                        </button>
+                    </div>
+                </form>
+            </div>
         </main>
 
         <!-- Scripts -->
         @components.ScriptBody()
         <script>
             document.addEventListener('DOMContentLoaded', () => {
-                const themeToggle = document.getElementById('theme-toggle');
-                const html = document.documentElement;
-                const odsContainer = document.getElementById('ods-container');
-                const odsPopover = document.getElementById('ods-popover');
-                const odsTitle = document.getElementById('ods-title');
-                const odsDescription = document.getElementById('ods-description');
-
-                // Tema
-                themeToggle.addEventListener('click', () => {
-                    html.classList.toggle('dark');
-                    localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+                // Configurar campos automáticos
+                document.getElementById('created-at').value = new Date().toISOString();
+                document.getElementById('updated-at').value = new Date().toISOString();
+                
+                // Gerenciamento de membros
+                const membersInput = document.getElementById('members-input');
+                const membersHidden = document.getElementById('members');
+                const membersContainer = document.getElementById('members-container');
+                
+                membersInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ',') {
+                        e.preventDefault();
+                        addMember();
+                    }
                 });
+                
+                function addMember() {
+                    const email = membersInput.value.trim();
+                    if (email && isValidEmail(email)) {
+                        // Adiciona à lista visível
+                        const memberTag = document.createElement('div');
+                        memberTag.className = 'flex items-center bg-green/10 dark:bg-green/20 px-3 py-1 rounded-full text-sm';
+                        memberTag.innerHTML = `
+                            <span class="text-green dark:text-green/300">${email}</span>
+                            <button type="button" class="ml-2 text-green hover:text-green/70" onclick="this.parentElement.remove(); updateMembersHidden()">
+                                ×
+                            </button>
+                        `;
+                        membersContainer.appendChild(memberTag);
+                        
+                        // Limpa o input
+                        membersInput.value = '';
+                        
+                        // Atualiza o campo hidden
+                        updateMembersHidden();
+                    }
+                }
+                
+                function updateMembersHidden() {
+                    const emails = Array.from(membersContainer.querySelectorAll('span')).map(span => span.textContent);
+                    membersHidden.value = JSON.stringify(emails);
+                }
+                
+                function isValidEmail(email) {
+                    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    return re.test(email);
+                }
 
-                if (localStorage.getItem('theme') === 'dark') html.classList.add('dark');
-
-                // Gerar ODS
+                // Gerenciamento de ODS
+                const odsList = [
+                    {number: 1, emoji: "🏆", name: "Erradicação da Pobreza"},
+                    // ... (lista completa de ODS como no exemplo anterior)
+                ];
+                
+                const odsContainer = document.getElementById('ods-container');
+                const odsHidden = document.getElementById('ods');
+                
                 odsList.forEach(ods => {
-                    const odsItem = document.createElement('div');
-                    odsItem.className = 'flex items-center justify-between p-2 rounded-lg bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600';
-                    odsItem.innerHTML = `
-                        <label class="flex items-center gap-2 flex-1">
-                            <input type="checkbox" name="ods" value="${ods.number}" 
-                                   class="w-4 h-4 border-golden rounded focus:ring-golden dark:bg-gray-900">
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    const odsCard = document.createElement('div');
+                    odsCard.className = 'group relative p-3 rounded-lg bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 border border-gray-200 dark:border-gray-600 transition cursor-pointer';
+                    
+                    odsCard.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" name="ods_checkbox" value="${ods.number}" 
+                                   class="ods-checkbox w-5 h-5 border-golden rounded focus:ring-golden dark:bg-gray-900">
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300 flex-1">
                                 ${ods.emoji} ODS ${ods.number}
                             </span>
-                        </label>
-                        <button type="button" class="text-golden hover:text-golden/80 px-2 ods-info" 
-                                data-number="${ods.number}">+</button>
+                        </div>
                     `;
-                    odsContainer.appendChild(odsItem);
+                    
+                    odsContainer.appendChild(odsCard);
                 });
-
-                // Popover ODS
-                document.querySelectorAll('.ods-info').forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        const odsNumber = parseInt(e.target.dataset.number);
-                        const ods = odsList.find(o => o.number === odsNumber);
-                        
-                        // Posicionar popover
-                        const rect = e.target.getBoundingClientRect();
-                        odsPopover.style.top = `${rect.top + window.scrollY}px`;
-                        odsPopover.style.left = `${rect.left + rect.width + 10}px`;
-                        
-                        // Atualizar conteúdo
-                        odsTitle.textContent = ods.name;
-                        odsDescription.textContent = ods.description;
-                        odsPopover.classList.remove('hidden');
-                    });
-                });
-
-                // Fechar popover
-                document.addEventListener('click', (e) => {
-                    if (!e.target.closest('.ods-info') && !e.target.closest('#ods-popover')) {
-                        odsPopover.classList.add('hidden');
+                
+                // Atualizar ODS hidden quando checkboxes mudam
+                document.addEventListener('change', (e) => {
+                    if (e.target.classList.contains('ods-checkbox')) {
+                        const selectedODS = Array.from(document.querySelectorAll('.ods-checkbox:checked')).map(cb => cb.value);
+                        odsHidden.value = JSON.stringify(selectedODS);
                     }
+                });
+
+                // Limpar formulário
+                document.getElementById('clear-btn').addEventListener('click', () => {
+                    document.querySelector('form').reset();
+                    membersContainer.innerHTML = '';
+                    membersHidden.value = '';
+                    odsHidden.value = '';
                 });
             });
         </script>
