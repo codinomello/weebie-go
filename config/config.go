@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 
 	firebase "firebase.google.com/go/v4"
-	"github.com/codinomello/weebie-go/services/authentication"
+	"github.com/codinomello/weebie-go/api/authentication"
 )
 
 // TODO: Arrumar tudo :)

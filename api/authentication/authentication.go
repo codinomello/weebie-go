@@ -11,12 +11,11 @@ import (
 	"google.golang.org/api/option"
 )
 
-var app *firebase.App
-
-func InitFirebaseApp(firebaseCofigPath string) (*firebase.App, error) {
-	firebaseConfigPath := os.Getenv("FIREBASE_CONFIG")
+// Inicializa o Firebase App e o cliente de autenticação.
+func InitializeFirebaseAuth() (*auth.Client, error) {
+	firebaseConfigPath := os.Getenv("FIREBASE_CREDENTIALS")
 	if firebaseConfigPath == "" {
-		return nil, fmt.Errorf("variável de ambiente FIREBASE_CONFIG não encontrada")
+		return nil, fmt.Errorf("variável de ambiente 'FIREBASE_CREDENTIALS' não encontrada")
 	}
 
 	if _, err := os.Stat(firebaseConfigPath); os.IsNotExist(err) {
@@ -24,7 +23,7 @@ func InitFirebaseApp(firebaseCofigPath string) (*firebase.App, error) {
 	}
 
 	// Credenciais do Firebase
-	opt := option.WithCredentialsFile(firebaseCofigPath) // Arquivo JSON do Firebase
+	opt := option.WithCredentialsFile(firebaseConfigPath)
 
 	// Inicializa o Firebase
 	app, err := firebase.NewApp(context.Background(), nil, opt)
@@ -32,10 +31,6 @@ func InitFirebaseApp(firebaseCofigPath string) (*firebase.App, error) {
 		return nil, err
 	}
 
-	return app, nil
-}
-
-func InitFirebaseClient() (*auth.Client, error) {
 	// Inicializa o cliente de autenticação
 	client, err := app.Auth(context.Background())
 	if err != nil {
@@ -45,9 +40,10 @@ func InitFirebaseClient() (*auth.Client, error) {
 	return client, nil
 }
 
+// Gera um UID do Firebase
 func GenerateFirebaseUID(authClient *auth.Client) (string, error) {
 	// Gerar um email único baseado em timestamp
-	email := fmt.Sprintf("%d@example.com", time.Now().UnixNano())
+	email := fmt.Sprintf("%d@weebie.com", time.Now().UnixNano())
 
 	// Criar um novo usuário
 	user := (&auth.UserToCreate{}).

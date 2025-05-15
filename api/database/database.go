@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -12,9 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-var client *mongo.Client
-
-func ConnectMongoDB(mongoURI string) error {
+func ConnectMongoDB(mongoURI string) (*mongo.Database, error) {
 	// Configurações do MongoDB
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -24,40 +23,35 @@ func ConnectMongoDB(mongoURI string) error {
 	// Configuração do cliente MongoDB
 	client, err := mongo.Connect(ctx, opts)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Verificando a conexão
 	if err := client.Ping(context.TODO(), readpref.Primary()); err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	// Verifica conexão
+	if err := client.Ping(ctx, nil); err != nil {
+		return nil, err
+	}
+
+	// Seleciona e retorna o banco de dados
+	db := client.Database(os.Getenv("MONGODB_DATABASE"))
+	if db == nil {
+		return nil, fmt.Errorf("variável de ambiente 'MONGODB_DATABASE' não encontrada")
+	}
+	return db, nil
 }
 
 // Encerra a conexão com o MongoDB
-func DisconnectMongoDB() error {
+func DisconnectMongoDB(client *mongo.Client) error {
 	if err := client.Disconnect(context.Background()); err != nil {
 		return err
 	}
 	log.Println("🔐 conexão com o mongodb encerrada.")
 
 	return nil
-}
-
-// Retorna a conexão com o MongoDB
-func GetMongoDBClient() *mongo.Client {
-	return client
-}
-
-// Retorna a base de dados MongoDB
-func GetMongoDBDatabase(database string) *mongo.Database {
-	return client.Database(database)
-}
-
-// Retorna a coleção MongoDB
-func GetMongoDBCollection(collection string) *mongo.Collection {
-	return client.Database(os.Getenv("MONGODB_DATABASE")).Collection(collection)
 }
 
 // Inicializa o banco de dados com índices necessários
@@ -101,19 +95,19 @@ func InitMongoDBDatabase(ctx context.Context, db *mongo.Database) error {
 	// Aplica os índices às coleções
 	_, err := db.Collection("users").Indexes().CreateMany(ctx, userIndexes)
 	if err != nil {
-		log.Printf("Erro ao criar índices em users: %v", err)
+		log.Printf("erro ao criar índices em users: %v", err)
 		return err
 	}
 
 	_, err = db.Collection("projects").Indexes().CreateMany(ctx, projectIndexes)
 	if err != nil {
-		log.Printf("Erro ao criar índices em projects: %v", err)
+		log.Printf("erro ao criar índices em projects: %v", err)
 		return err
 	}
 
 	_, err = db.Collection("project_members").Indexes().CreateMany(ctx, projectMemberIndexes)
 	if err != nil {
-		log.Printf("Erro ao criar índices em project_members: %v", err)
+		log.Printf("erro ao criar índices em project_members: %v", err)
 		return err
 	}
 
@@ -132,10 +126,10 @@ func CreateMongoDBInitialUser(ctx context.Context, db *mongo.Database, user bson
 	if count == 0 {
 		_, err = db.Collection("users").InsertOne(ctx, user)
 		if err != nil {
-			log.Printf("Erro ao criar usuário inicial: %v", err)
+			log.Printf("erro ao criar usuário inicial: %v", err)
 			return err
 		}
-		log.Println("Usuário inicial criado com sucesso")
+		log.Println("usuário inicial criado com sucesso")
 	}
 
 	return nil

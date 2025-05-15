@@ -6,10 +6,11 @@ import (
 	"os"
 	"time"
 
-	"github.com/codinomello/weebie-go/services/authentication"
-	"github.com/codinomello/weebie-go/services/database"
-	"github.com/codinomello/weebie-go/services/environment"
-	"github.com/codinomello/weebie-go/services/routes"
+	"github.com/codinomello/weebie-go/api/authentication"
+	"github.com/codinomello/weebie-go/api/database"
+	"github.com/codinomello/weebie-go/api/environment"
+	"github.com/codinomello/weebie-go/api/repository"
+	"github.com/codinomello/weebie-go/api/routes"
 )
 
 func main() {
@@ -17,31 +18,42 @@ func main() {
 	environment.LoadEnviromentVariables()
 
 	// Conexão com o MongoDB
-	if err := database.ConnectMongoDB(os.Getenv("MONGODB_URI")); err != nil {
-		log.Fatalf("❌ erro ao verificar conexão com o mongodb: %v", err)
+	mongoDBURI := "MONGODB_URI"
+	if mongoDBURI == "" {
+		mongoDBURI = "mongodb://localhost:27017"
+	}
+
+	db, err := database.ConnectMongoDB(os.Getenv(mongoDBURI))
+	if err != nil {
+		log.Fatalf("❌ erro ao conectar ao banco de dados mongodb: %s\n", err)
 	} else {
 		log.Println("🍃 banco de dados mongodb conectado com sucesso!")
 	}
 
 	// Fecha a conexão com o banco de dados ao final da execução do programa
-	defer database.DisconnectMongoDB()
+	defer database.DisconnectMongoDB(db.Client())
 
 	// Inicialização do Firebase
-	_, err := authentication.InitFirebaseApp(os.Getenv("FIREBASE_CONFIG"))
+	_, err = authentication.InitializeFirebaseAuth()
 	if err != nil {
 		log.Fatalf("❌ erro ao inicializar o firebase: %s\n", err)
 	} else {
 		log.Println("🔥 autenticação com o firebase inicializada com sucesso!")
 	}
 
-	// Criação do roteador de servidores HTTP
-	router := http.NewServeMux()
+	// Repositórios para o MongoDB
+	userRepo := repository.NewUserRepository(db)
+	projectRepo := repository.NewProjectRepository(db)
+	memberRepo := repository.NewMemberRepository(db)
 
-	// Setando as rotas
-	routes.SetupRoutes(router)
+	// Criação do roteador de servidores HTTP
+	router := routes.SetupRoutes(userRepo, projectRepo, memberRepo)
 
 	// Porta principal do servidor HTTP
-	port := os.Getenv("LISTEN_ADDRESS")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
 
 	// Configuração do servidor HTTP
 	server := &http.Server{
