@@ -15,11 +15,10 @@ templ Index() {
         @components.StyleHead()
         <!-- Flowbite CSS e Ícone -->
         @components.Link("house_with_garden.png")
-        <link rel="icon" type="image/x-icon" href="/images/icons/house_with_garden.png">
     </head>
     <body class="bg-gray-100 dark:bg-gray-900">
         <!-- Navegação  -->
-        @components.Nav("Weebie")
+        @components.Nav("Weebie", "house_with_garden.png")
         <!-- Hero Section -->
         <section class="container mx-auto px-4 py-16 text-center">
             <div class="max-w-2xl mx-auto">
@@ -114,22 +113,22 @@ templ Index() {
                     <h3 class="text-3xl font-bold mb-8 text-orange dark:text-golden">
                         <span class="text-green">❤️</span> Como Funcionamos
                     </h3>
-                    <div class="grid md:grid-cols-2 gap-8 text-left">
-                        <div class="dark:bg-gray-700 p-6 rounded-xl border-t-4 border-b-4 border-copper shadow-lg transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:scale-105">
-                            <div class="text-4xl mb-4">🤝</div>
-                            <h4 class="text-xl font-semibold mb-3 dark:text-gray-200">Conectamos</h4>
-                            <p class="text-gray-600 dark:text-gray-300">Unimos pessoas com ideias inovadoras a voluntários e apoiadores dispostos a colaborar</p>
-                        </div>
+                    // <div class="grid md:grid-cols-2 gap-8 text-left">
+                    //     <div class="dark:bg-gray-700 p-6 rounded-xl border-t-4 border-b-4 border-copper shadow-lg transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:scale-105">
+                    //         <div class="text-4xl mb-4">🤝</div>
+                    //         <h4 class="text-xl font-semibold mb-3 dark:text-gray-200">Conectamos</h4>
+                    //         <p class="text-gray-600 dark:text-gray-300">Unimos pessoas com ideias inovadoras a voluntários e apoiadores dispostos a colaborar</p>
+                    //     </div>
                         
-                        <div class="dark:bg-gray-700 p-6 rounded-xl border-t-4 border-b-4 border-silver shadow-lg transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:scale-105">
-                            <div class="text-4xl mb-4">🛠️</div>
-                            <h4 class="text-xl font-semibold mb-3 dark:text-gray-200">Implementamos</h4>
-                            <p class="text-gray-600 dark:text-gray-300">Oferecemos ferramentas e suporte para tirar projetos do papel</p>
-                        </div>
-                    </div>
+                    //     <div class="dark:bg-gray-700 p-6 rounded-xl border-t-4 border-b-4 border-silver shadow-lg transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:scale-105">
+                    //         <div class="text-4xl mb-4">🛠️</div>
+                    //         <h4 class="text-xl font-semibold mb-3 dark:text-gray-200">Implementamos</h4>
+                    //         <p class="text-gray-600 dark:text-gray-300">Oferecemos ferramentas e suporte para tirar projetos do papel</p>
+                    //     </div>
+                    // </div>
 
                     <div class="mt-12 dark:bg-gray-700 shadow-lg rounded-xl p-8 border-t-4 border-teal shadow-lg transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:scale-105">
-                        <h4 class="text-2xl font-bold text-orange dark:text-golden mb-4">Nossos Pilares</h4>
+                        <!-- <h4 class="text-2xl font-bold text-orange dark:text-golden mb-4">Nossos Pilares</h4> -->
                         <ul class="space-y-4 text-gray-600 dark:text-gray-300 text-left">
                             <li class="flex items-center gap-3">
                                 <span class="text-green">✓</span> Transparência total nos processos

@@ -58,7 +58,7 @@ func ButtonAccount() templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<button class=\"p-2 rounded-full text-white hover:text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-500 dark:hover:text-gray-100\"><svg class=\"w-7 h-7 text-white dark:golden\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M12 4a4 4 0 014 4 4 4 0 01-4 4 4 4 0 01-4-4 4 4 0 014-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4z\"></path></svg></button>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<a href=\"/signin\" class=\"p-2 rounded-full text-white hover:text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-500 dark:hover:text-gray-100\"><svg class=\"w-5 h-5 transform transition-all duration-150 ease-in-out\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M12 4a4 4 0 014 4 4 4 0 01-4 4 4 4 0 01-4-4 4 4 0 014-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4z\"></path></svg></a>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

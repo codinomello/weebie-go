@@ -29,7 +29,7 @@ func StyleHead() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<style>\r\n        @import url('https://fonts.cdnfonts.com/css/euclid-circular-a');\r\n        @import url('https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap');\r\n        * {\r\n            font-family: \"Euclid Circular A\", \"Noto Color Emoji\", sans-serif;\r\n        }\r\n    </style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<style>\n        @import url('https://fonts.cdnfonts.com/css/euclid-circular-a');\n        @import url('https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap');\n        * {\n            font-family: \"Euclid Circular A\", \"Noto Color Emoji\", sans-serif;\n        }\n    </style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -58,7 +58,7 @@ func StyleToggleTheme() templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\r\n        .theme-toggle {\r\n            position: relative;\r\n            width: 48px;\r\n            height: 24px;\r\n            border-radius: 9999px;\r\n            background-color: rgba(255, 255, 255, 0.1);\r\n            transition: background-color 0.3s;\r\n        }\r\n        .theme-toggle:hover {\r\n            background-color: rgba(255, 255, 255, 0.2);\r\n        }\r\n        .theme-toggle::before {\r\n            content: '';\r\n            position: absolute;\r\n            top: 2px;\r\n            left: 2px;\r\n            width: 20px;\r\n            height: 20px;\r\n            border-radius: 50%;\r\n            background-color: white;\r\n            transition: transform 0.3s, background-color 0.3s;\r\n        }\r\n        .dark .theme-toggle::before {\r\n            transform: translateX(24px);\r\n            background-color: #FFD700;\r\n        }\r\n    </style>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<style>\n        .theme-toggle {\n            position: relative;\n            width: 48px;\n            height: 24px;\n            border-radius: 9999px;\n            background-color: rgba(255, 255, 255, 0.1);\n            transition: background-color 0.3s;\n        }\n        .theme-toggle:hover {\n            background-color: rgba(255, 255, 255, 0.2);\n        }\n        .theme-toggle::before {\n            content: '';\n            position: absolute;\n            top: 2px;\n            left: 2px;\n            width: 20px;\n            height: 20px;\n            border-radius: 50%;\n            background-color: white;\n            transition: transform 0.3s, background-color 0.3s;\n        }\n        .dark .theme-toggle::before {\n            transform: translateX(24px);\n            background-color: #FFD700;\n        }\n    </style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

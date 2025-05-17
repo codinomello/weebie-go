@@ -13,104 +13,157 @@ templ About() {
         @components.ScriptHead()
         <!-- Fonte -->
         @components.StyleHead()
-        <!-- Flowbite CSS e Ícone -->
+        <!-- Ícone -->
         @components.Link("house_with_garden.png")
-        <link rel="icon" type="image/x-icon" href="/images/icons/house_with_garden.png">
     </head>
-    <body class="bg-gray-100 dark:bg-gray-900">
+    <body class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
         <!-- Header -->
-        @components.Nav("Sobre Nós")
+        @components.Nav("Sobre Nós", "house_with_garden.png")
+        
         <!-- Main Content -->
-        <main class="container mx-auto px-4 py-16 mt-20 flex-1">
+        <main class="container mx-auto px-4 py-16">
             <!-- Hero Section -->
             <section class="text-center mb-16">
-                <h1 class="text-4xl md:text-5xl font-bold text-orange dark:text-golden mb-6">
-                    <span class="text-blue">🏡</span> Weebie: Transformando Comunidades
+                <h1 class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange to-pink dark:from-golden dark:to-copper mb-6">
+                    <span class="text-blue">👋</span> Conheça a Weebie
                 </h1>
-                <p class="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-                    Weebie é uma plataforma que conecta pessoas apaixonadas por criar impacto positivo, promovendo iniciativas sustentáveis e colaborativas para fortalecer comunidades locais.
+                <p class="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-8">
+                    A plataforma que conecta boas ideias a pessoas que fazem acontecer
                 </p>
-                <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4">
-                    <a href="/project" class="bg-green text-white text-bold px-6 py-3 rounded-lg hover:bg-green/80 transition flex items-center gap-2 hover:shadow-lg hover:scale-105">
-                        <span>🌱</span> Explorar Projetos
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <a href="/project" class="bg-gradient-to-r from-green to-teal text-white font-bold px-6 py-3 rounded-lg hover:shadow-lg transition-all duration-300 hover:scale-105 flex items-center gap-2">
+                        <span>🌱</span> Ver Projetos
                     </a>
-                    <a href="/" class="bg-blue text-white text-bold px-6 py-3 rounded-lg hover:bg-blue/80 transition flex items-center gap-2 hover:shadow-lg hover:scale-105">
-                        <span>🚀</span> Começar Agora
+                    <a href="/form" class="bg-gradient-to-r from-blue to-purple-500 text-white font-bold px-6 py-3 rounded-lg hover:shadow-lg transition-all duration-300 hover:scale-105 flex items-center gap-2">
+                        <span>🚀</span> Criar Projeto
                     </a>
                 </div>
             </section>
 
-            <!-- Mission Section -->
-            <section class="mb-16">
-                <h2 class="text-3xl font-bold text-center mb-8 text-orange dark:text-golden">
+            <!-- Missão Section -->
+            <section class="mb-16 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border-l-4 border-blue">
+                <h2 class="text-3xl font-bold text-blue dark:text-blue-300 mb-6">
                     <span class="text-pink">🌍</span> Nossa Missão
                 </h2>
-                <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-700">
-                    <p class="text-gray-600 dark:text-gray-300 text-center max-w-3xl mx-auto">
-                        No Weebie, acreditamos que comunidades fortes são construídas por pessoas unidas por um propósito comum. Nossa missão é fornecer ferramentas para criar, gerenciar e compartilhar projetos que promovam sustentabilidade, colaboração e impacto social mensurável.
-                    </p>
+                <p class="text-gray-600 dark:text-gray-300 mb-4">
+                    Conectar pessoas com ideias inovadoras a voluntários e recursos, facilitando a criação e gestão de projetos comunitários que transformam realidades.
+                </p>
+                <div class="grid md:grid-cols-3 gap-6 mt-8">
+                    <div class="flex items-start gap-4 p-4 rounded-lg bg-blue/10 dark:bg-blue/20">
+                        <span class="text-2xl text-blue">🔗</span>
+                        <div>
+                            <h3 class="font-semibold dark:text-white">Conexão</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Unimos pessoas com propósitos similares</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4 p-4 rounded-lg bg-green/10 dark:bg-green/20">
+                        <span class="text-2xl text-green">🛠️</span>
+                        <div>
+                            <h3 class="font-semibold dark:text-white">Ferramentas</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Oferecemos recursos para tirar ideias do papel</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4 p-4 rounded-lg bg-orange/10 dark:bg-orange/20">
+                        <span class="text-2xl text-orange">📊</span>
+                        <div>
+                            <h3 class="font-semibold dark:text-white">Impacto</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Acompanhamos os resultados dos projetos</p>
+                        </div>
+                    </div>
                 </div>
             </section>
 
-            <!-- Values Section -->
+            <!-- Valores Section -->
             <section class="mb-16">
                 <h2 class="text-3xl font-bold text-center mb-8 text-orange dark:text-golden">
                     <span class="text-green">❤️</span> Nossos Valores
                 </h2>
                 <div class="grid md:grid-cols-3 gap-6">
-                    <div class="dark:bg-gray-700 p-6 rounded-xl border-l-4 border-blue shadow-lg transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:scale-105">
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border-l-4 border-blue shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                         <div class="text-4xl mb-4">🤝</div>
                         <h3 class="text-xl font-semibold dark:text-gray-200 mb-2">Colaboração</h3>
-                        <p class="text-gray-600 dark:text-gray-400">Unimos pessoas e organizações para transformar ideias em realidade.</p>
+                        <p class="text-gray-600 dark:text-gray-300">Acreditamos no poder do trabalho em equipe e da diversidade de ideias.</p>
                     </div>
-                    <div class="dark:bg-gray-700 p-6 rounded-xl border-l-4 border-green shadow-lg transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:scale-105">
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border-l-4 border-green shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                         <div class="text-4xl mb-4">🌱</div>
                         <h3 class="text-xl font-semibold dark:text-gray-200 mb-2">Sustentabilidade</h3>
-                        <p class="text-gray-600 dark:text-gray-400">Promovemos práticas que respeitam o meio ambiente e as gerações futuras.</p>
+                        <p class="text-gray-600 dark:text-gray-300">Promovemos projetos que respeitam o meio ambiente e as gerações futuras.</p>
                     </div>
-                    <div class="dark:bg-gray-700 p-6 rounded-xl border-l-4 border-orange shadow-lg transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:scale-105">
-                        <div class="text-4xl mb-4">📊</div>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border-l-4 border-pink shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                        <div class="text-4xl mb-4">🔍</div>
                         <h3 class="text-xl font-semibold dark:text-gray-200 mb-2">Transparência</h3>
-                        <p class="text-gray-600 dark:text-gray-400">Garantimos clareza em todos os processos e impactos dos projetos.</p>
+                        <p class="text-gray-600 dark:text-gray-300">Todos os nossos processos são abertos e claros para a comunidade.</p>
                     </div>
                 </div>
             </section>
 
-            <!-- Impact Section -->
+            <!-- Impacto Section -->
+            <section class="mb-16 bg-gradient-to-r from-blue to-purple-500 text-white rounded-xl p-8 shadow-lg">
+                <h2 class="text-3xl font-bold text-center mb-8">
+                    <span class="text-golden">📈</span> Nosso Impacto
+                </h2>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white/20 p-6 rounded-xl text-center backdrop-blur-sm">
+                        <div class="text-4xl font-bold mb-2">150+</div>
+                        <p>Projetos Ativos</p>
+                        <p class="text-sm opacity-90 mt-2">Em 20 cidades</p>
+                    </div>
+                    <div class="bg-white/20 p-6 rounded-xl text-center backdrop-blur-sm">
+                        <div class="text-4xl font-bold mb-2">7.2K</div>
+                        <p>Voluntários</p>
+                        <p class="text-sm opacity-90 mt-2">Comunidade ativa</p>
+                    </div>
+                    <div class="bg-white/20 p-6 rounded-xl text-center backdrop-blur-sm">
+                        <div class="text-4xl font-bold mb-2">94%</div>
+                        <p>Taxa de Sucesso</p>
+                        <p class="text-sm opacity-90 mt-2">Metas alcançadas</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Time Section -->
             <section class="mb-16">
                 <h2 class="text-3xl font-bold text-center mb-8 text-orange dark:text-golden">
-                    <span class="text-blue">📈</span> Nosso Impacto
+                    <span class="text-teal">👥</span> Nosso Time
                 </h2>
-                <div class="grid md:grid-cols-3 gap-8">
-                    <div class="dark:bg-gray-700 p-6 rounded-xl text-center border-b-4 border-red shadow-lg transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:scale-105">
-                        <div class="text-4xl text-green dark:text-golden">120+</div>
-                        <p class="text-gray-600 dark:text-gray-300">Projetos Ativos</p>
-                        <span class="text-sm text-orange dark:text-red">🏆 Em 15 cidades</span>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg text-center">
+                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Fundadora" class="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-blue-200 dark:border-blue-600">
+                        <h3 class="text-xl font-semibold dark:text-white">Maria Silva</h3>
+                        <p class="text-blue dark:text-blue-300 mb-2">Fundadora</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">"Acreditamos no poder das comunidades para criar mudanças reais."</p>
                     </div>
-                    <div class="dark:bg-gray-700 p-6 rounded-xl text-center border-b-4 border-green shadow-lg transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:scale-105">
-                        <div class="text-4xl text-blue dark:text-golden">5.8K</div>
-                        <p class="text-gray-600 dark:text-gray-300">Voluntários</p>
-                        <span class="text-sm text-orange dark:text-green">🤝 Comunidade ativa</span>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg text-center">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Tech Lead" class="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-green-200 dark:border-green-600">
+                        <h3 class="text-xl font-semibold dark:text-white">Carlos Oliveira</h3>
+                        <p class="text-green dark:text-green-300 mb-2">Tech Lead</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">"Construímos tecnologia que empodera pessoas."</p>
                     </div>
-                    <div class="dark:bg-gray-700 p-6 rounded-xl text-center border-b-4 border-blue shadow-lg transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:scale-105">
-                        <div class="text-4xl text-pink dark:text-golden">92%</div>
-                        <p class="text-gray-600 dark:text-gray-300">Sucesso</p>
-                        <span class="text-sm text-orange dark:text-blue">🎯 Metas alcançadas</span>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg text-center">
+                        <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Comunidade" class="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-pink-200 dark:border-pink-600">
+                        <h3 class="text-xl font-semibold dark:text-white">Ana Santos</h3>
+                        <p class="text-pink dark:text-pink-300 mb-2">Gestora de Comunidade</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">"Cada voluntário traz habilidades únicas para nossos projetos."</p>
                     </div>
                 </div>
             </section>
 
-            <!-- Call to Action -->
-            <section class="mb-16 text-center">
+            <!-- CTA Section -->
+            <section class="text-center">
                 <h2 class="text-3xl font-bold mb-6 text-orange dark:text-golden">
-                    <span class="text-pink">🚀</span> Junte-se ao Weebie!
+                    <span class="text-blue">🚀</span> Pronto para fazer parte?
                 </h2>
                 <p class="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-8">
-                    Faça parte de uma comunidade que transforma ideias em ações concretas. Crie, colabore e impacte o mundo ao seu redor.
+                    Junte-se a nós e comece a transformar sua comunidade hoje mesmo!
                 </p>
-                <a href="/form" class="bg-orange text-white text-bold px-6 py-3 rounded-lg hover:bg-orange/80 transition flex items-center gap-2 hover:shadow-lg hover:scale-105 mx-auto">
-                    <span>👉</span> Comece Agora
-                </a>
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <a href="/form" class="bg-gradient-to-r from-orange to-pink text-white font-bold px-6 py-3 rounded-lg hover:shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2">
+                        <span>👉</span> Criar Projeto
+                    </a>
+                    <a href="/contact" class="bg-gradient-to-r from-blue to-purple-500 text-white font-bold px-6 py-3 rounded-lg hover:shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2">
+                        <span>💬</span> Fale Conosco
+                    </a>
+                </div>
             </section>
         </main>
 

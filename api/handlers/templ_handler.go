@@ -28,8 +28,16 @@ func HandleTemplProject(w http.ResponseWriter, r *http.Request) error {
 }
 
 // Serve o template (signup.templ)
-func HandleTemplSignup(w http.ResponseWriter, r *http.Request) error {
+func HandleTemplSignUp(w http.ResponseWriter, r *http.Request) error {
 	return HandleTemplTemplate(public.SignUp(), w, r)
+}
+
+func HandleTemplSignIn(w http.ResponseWriter, r *http.Request) error {
+	return HandleTemplTemplate(public.SignIn(), w, r)
+}
+
+func HandleTemplSignOut(w http.ResponseWriter, r *http.Request) error {
+	return HandleTemplTemplate(public.SignOut(), w, r)
 }
 
 // Serve o template (explore.templ)

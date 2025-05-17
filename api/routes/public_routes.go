@@ -12,7 +12,13 @@ func SetupPublicRoutes(router *http.ServeMux) {
 	SetupRoutesTemplate(router, "/", handlers.HandleTemplIndex)
 
 	// Rota inscrição (signup.templ)
-	SetupRoutesTemplate(router, "/signup", handlers.HandleTemplSignup)
+	SetupRoutesTemplate(router, "/signup", handlers.HandleTemplSignUp)
+
+	// Rota login (signin.templ)
+	SetupRoutesTemplate(router, "/signin", handlers.HandleTemplSignIn)
+
+	// Rota logout (signout.templ)
+	SetupRoutesTemplate(router, "/signout", handlers.HandleTemplSignIn)
 
 	// Rota projetos (project.templ)
 	SetupRoutesTemplate(router, "/project", handlers.HandleTemplProject)
