@@ -6,15 +6,15 @@ import (
 	"time"
 
 	"github.com/codinomello/weebie-go/api/models"
-	"github.com/codinomello/weebie-go/api/repository"
+	"github.com/codinomello/weebie-go/api/repositories"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type MemberController struct {
-	MemberRepository repository.MemberRepository
+	MemberRepository repositories.MemberRepository
 }
 
-func NewMemberController(memberRepo repository.MemberRepository) *MemberController {
+func NewMemberController(memberRepo repositories.MemberRepository) *MemberController {
 	return &MemberController{
 		MemberRepository: memberRepo,
 	}

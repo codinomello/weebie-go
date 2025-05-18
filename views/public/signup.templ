@@ -1,6 +1,9 @@
 package public
 
-import components "github.com/codinomello/weebie-go/views/components"
+import  (
+    components "github.com/codinomello/weebie-go/views/components"
+    custom "github.com/codinomello/weebie-go/views/components/custom"
+)
 
 templ SignUp() {
     <html lang="pt-BR">
@@ -8,20 +11,19 @@ templ SignUp() {
         <!-- Meta Tags -->
         @components.Meta()
         <!-- Título -->
-        @components.Title("Weebie - Cadastro")
+        @components.Title("Weebie - Inscreva-se")
         <!-- HTMX e Tailwind CSS -->
         @components.ScriptHead()
         <!-- Fonte -->
         @components.StyleHead()
         <!-- Flowbite CSS e Ícone -->
         @components.Link("house_with_garden.png")
-        <link rel="icon" type="image/x-icon" href="/images/icons/house_with_garden.png">
     </head>
-    <body class="bg-gray-100 dark:bg-gray-900 min-h-screen flex flex-col">
+    <body class="bg-gray-100 dark:bg-gray-900">
         <!-- Header -->
-        @components.Nav("Weebie")
+        @components.Nav("Inscreva-se", "art.png")
         <!-- Formulário de Login/Cadastro -->
-        <main class="flex-grow flex items-center justify-center p-4">
+        <main class="flex-grow flex items-center justify-center p-4 pt-8">
             <div class="w-full max-w-md">
                 <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl">
                     <div class="text-center mb-6">
@@ -29,11 +31,7 @@ templ SignUp() {
                         <p class="text-gray-600 dark:text-gray-300">Junte-se à nossa comunidade de transformação</p>
                     </div>
                     <!-- Formulário de Autenticação-->
-                    <form id="auth-form"
-                        hx-post="/auth" 
-                        hx-target="#resultado" 
-                        hx-swap="innerHTML"
-                        class="space-y-4">
+                    <form id="auth-form" class="space-y-4">
                         <!-- Nome -->
                         <div id="name-field" class="space-y-1">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nome</label>
@@ -67,8 +65,8 @@ templ SignUp() {
                         </div>
                         <!-- Termos e Condições -->
                         <div class="flex items-center mt-2">
-                            <input id="terms" type="checkbox" class="w-4 h-4 text-orange bg-gray-100 border-gray-300 rounded focus:ring-orange dark:focus:ring-orange dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                            <label for="terms" class="ms-2 text-sm text-gray-600 dark:text-gray-300">
+                            <input id="terms" name="terms" type="checkbox" required class="w-4 h-4 text-orange bg-gray-100 border-gray-300 rounded focus:ring-orange dark:focus:ring-orange dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                            <label for="terms" class="ms-2 text-md text-gray-600 dark:text-gray-300">
                                 Concordo com os <a href="#" class="text-orange hover:underline dark:text-golden">Termos e Condições</a>
                             </label>
                         </div>
@@ -81,27 +79,13 @@ templ SignUp() {
                     <!-- Divisor -->
                     <div class="flex items-center my-6">
                         <div class="flex-1 h-px bg-gray-300 dark:bg-gray-600"></div>
-                        <span class="px-4 text-sm text-gray-600 dark:text-gray-300">ou</span>
+                        <span class="px-4 text-md text-gray-600 dark:text-gray-300">ou</span>
                         <div class="flex-1 h-px bg-gray-300 dark:bg-gray-600"></div>
                     </div>
                     <!-- Botões de OAuth2 -->
-                    <div class="space-y-3">
-                        <button id="google-signin" class="w-full flex items-center justify-center px-6 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-300 transform hover:scale-[1.02]">
-                            <img src="https://www.google.com/favicon.ico" alt="Google" class="w-5 h-5 mr-2">
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Continuar com Google</span>
-                        </button>
-                        <button id="facebook-signin" class="w-full flex items-center justify-center px-6 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-300 transform hover:scale-[1.02]">
-                            <img src="https://www.facebook.com/favicon.ico" alt="Facebook" class="w-5 h-5 mr-2">
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Continuar com Facebook</span>
-                        </button>
-                        <button id="github-signin" class="w-full flex items-center justify-center px-6 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-300 transform hover:scale-[1.02]">
-                            <img src="https://github.com/favicon.ico" alt="GitHub" class="w-5 h-5 mr-2">
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Continuar com GitHub</span>
-                        </button>
-                    </div>
-                    <!-- Alternar entre Login e Cadastro -->
+                    @custom.OAuthButtons()
                     <div class="mt-6 text-center">
-                        <p class="text-sm text-gray-600 dark:text-gray-300">
+                        <p class="text-md text-gray-600 dark:text-gray-300">
                             Já tem uma conta? 
                             <a href="/signin" class="text-orange font-medium hover:underline dark:text-golden">Faça login</a>
                         </p>
@@ -113,21 +97,8 @@ templ SignUp() {
         @components.FooterLogin()
         <!-- Scripts -->
         @components.ScriptBody()
-        <script>
-            // Adiciona animação de carregamento suave
-            document.addEventListener('DOMContentLoaded', () => {
-                const form = document.getElementById('auth-form');
-                if (form) {
-                    form.addEventListener('submit', () => {
-                        const button = form.querySelector('button[type="submit"]');
-                        if (button) {
-                            button.innerHTML = '<span class="inline-block animate-spin">⏳</span> Processando...';
-                            button.disabled = true;
-                        }
-                    });
-                }
-            });
-        </script>
+        <!-- Animações -->
+        @custom.Animations()
     </body>
     </html>
 }

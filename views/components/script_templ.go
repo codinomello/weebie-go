@@ -37,7 +37,7 @@ func ScriptHead() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = ScriptHeadTailwindConfig().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = ScriptHeadTailwindCSS().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -70,7 +70,7 @@ func ScriptBody() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = ScriptBodyFirebase().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = ScriptBodyFirebaseAuth().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -99,7 +99,7 @@ func ScriptHeadSource() templ.Component {
 			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!-- Tailwind CSS --><script src=\"https://cdn.tailwindcss.com\"></script><!-- HTMX --><script src=\"https://unpkg.com/htmx.org@2.0.4\"></script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!-- Tailwind CSS --><script src=\"https://cdn.tailwindcss.com\"></script><!-- HTMX --><script src=\"https://unpkg.com/htmx.org@2.0.4\"></script><!-- Biblioteca para validação de e-mail --><script src=\"https://cdnjs.cloudflare.com/ajax/libs/validator/13.11.0/validator.min.js\"></script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -136,7 +136,7 @@ func ScriptHeadTheme() templ.Component {
 	})
 }
 
-func ScriptHeadTailwindConfig() templ.Component {
+func ScriptHeadTailwindCSS() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -165,7 +165,7 @@ func ScriptHeadTailwindConfig() templ.Component {
 	})
 }
 
-func ScriptHeadODSList() templ.Component {
+func ScriptODSList() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -223,7 +223,7 @@ func ScriptBodySource() templ.Component {
 	})
 }
 
-func ScriptBodyFirebase() templ.Component {
+func ScriptBodyFirebaseAuth() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -244,7 +244,7 @@ func ScriptBodyFirebase() templ.Component {
 			templ_7745c5c3_Var8 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<script src=\"https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js\"></script><script src=\"https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js\"></script><script>\r\n        const firebaseConfig = {\r\n            apiKey: \"AIzaSyAI0Tc7GssKwWwtVdrz6OaK6KFACx58N5U\",\r\n            authDomain: \"weebie-go.firebaseapp.com\",\r\n            projectId: \"weebie-go\",\r\n            storageBucket: \"weebie-go.firebasestorage.app\",\r\n            messagingSenderId: \"321509944065\",\r\n            appId: \"1:321509944065:web:199a546b7055f461ec4900\",\r\n            measurementId: \"G-S5CG0CLRVS\"\r\n        };\r\n\r\n        // Inicialize o Firebase\r\n        const app = firebase.initializeApp(firebaseConfig);\r\n        const auth = firebase.auth();\r\n\r\n        // Funções de Login e Cadastro\r\n        document.getElementById(\"auth-form\").addEventListener(\"submit\", async (e) => {\r\n            e.preventDefault();\r\n\r\n            const email = document.querySelector(\"#auth-form input[type='email']\").value;\r\n            const password = document.querySelector(\"#auth-form input[type='password']\").value;\r\n\r\n            try {\r\n                const userCredential = await auth.signInWithEmailAndPassword(email, password);\r\n                const user = userCredential.user;\r\n                alert(\"Login realizado com sucesso!\");\r\n                // Redirecione o usuário ou faça algo com o objeto `user`\r\n            } catch (error) {\r\n                alert(\"Erro ao fazer login: \" + error.message);\r\n            }\r\n        });\r\n\r\n        document.getElementById(\"toggle-auth\").addEventListener(\"click\", () => {\r\n            const formTitle = document.getElementById(\"form-title\");\r\n            const formAction = document.getElementById(\"form-action\");\r\n            const nameField = document.getElementById(\"name-field\");\r\n            const phoneField = document.getElementById(\"phone-field\");\r\n\r\n            if (formTitle.textContent === \"Login\") {\r\n                formTitle.textContent = \"Cadastro\";\r\n                formAction.textContent = \"Cadastrar\";\r\n                nameField.classList.remove(\"hidden\");\r\n                phoneField.classList.remove(\"hidden\");\r\n            } else {\r\n                formTitle.textContent = \"Login\";\r\n                formAction.textContent = \"Entrar\";\r\n                nameField.classList.add(\"hidden\");\r\n                phoneField.classList.add(\"hidden\");\r\n            }\r\n        });\r\n\r\n        document.getElementById(\"auth-form\").addEventListener(\"submit\", async (e) => {\r\n            e.preventDefault();\r\n\r\n            const email = document.querySelector(\"#auth-form input[type='email']\").value;\r\n            const password = document.querySelector(\"#auth-form input[type='password']\").value;\r\n            const name = document.querySelector(\"#auth-form input[type='text']\").value;\r\n\r\n            try {\r\n                const userCredential = await auth.createUserWithEmailAndPassword(email, password);\r\n                const user = userCredential.user;\r\n                await user.updateProfile({ displayName: name });\r\n                alert(\"Cadastro realizado com sucesso!\");\r\n                // Redirecione o usuário ou faça algo com o objeto `user`\r\n            } catch (error) {\r\n                alert(\"Erro ao cadastrar: \" + error.message);\r\n            }\r\n        });\r\n\r\n        // Login com Google\r\n        const googleProvider = new firebase.auth.GoogleAuthProvider();\r\n        document.getElementById(\"google-signin\").addEventListener(\"click\", () => {\r\n            auth.signInWithPopup(googleProvider)\r\n                .then((result) => {\r\n                    const user = result.user;\r\n                    alert(\"Login com Google realizado com sucesso!\");\r\n                    // Redirecione o usuário ou faça algo com o objeto `user`\r\n                })\r\n                .catch((error) => {\r\n                    alert(\"Erro ao fazer login com Google: \" + error.message);\r\n                });\r\n        });\r\n\r\n        // Login com Facebook\r\n        const facebookProvider = new firebase.auth.FacebookAuthProvider();\r\n        document.getElementById(\"facebook-signin\").addEventListener(\"click\", () => {\r\n            auth.signInWithPopup(facebookProvider)\r\n                .then((result) => {\r\n                    const user = result.user;\r\n                    alert(\"Login com Facebook realizado com sucesso!\");\r\n                    // Redirecione o usuário ou faça algo com o objeto `user`\r\n                })\r\n                .catch((error) => {\r\n                    alert(\"Erro ao fazer login com Facebook: \" + error.message);\r\n                });\r\n        });\r\n\r\n        // Login com GitHub\r\n        const githubProvider = new firebase.auth.GithubAuthProvider();\r\n        document.getElementById(\"github-signin\").addEventListener(\"click\", () => {\r\n            auth.signInWithPopup(githubProvider)\r\n                .then((result) => {\r\n                    const user = result.user;\r\n                    alert(\"Login com GitHub realizado com sucesso!\");\r\n                    // Redirecione o usuário ou faça algo com o objeto `user`\r\n                })\r\n                .catch((error) => {\r\n                    alert(\"Erro ao fazer login com GitHub: \" + error.message);\r\n                });\r\n        });\r\n\r\n        // Observador de Autenticação\r\n        auth.onAuthStateChanged((user) => {\r\n            if (user) {\r\n                console.log(\"Usuário logado:\", user);\r\n                // Redirecione para a página principal ou faça algo com o objeto `user`\r\n            } else {\r\n                console.log(\"Usuário não logado\");\r\n            }\r\n        });\r\n    </script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<script src=\"https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js\"></script><script src=\"https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js\"></script><script>\r\n        // 1. Configuração do Firebase\r\n        const firebaseConfig = {\r\n            apiKey: \"AIzaSyAI0Tc7GssKwWwtVdrz6OaK6KFACx58N5U\",\r\n            authDomain: \"weebie-go.firebaseapp.com\",\r\n            projectId: \"weebie-go\",\r\n            storageBucket: \"weebie-go.firebasestorage.app\",\r\n            messagingSenderId: \"321509944065\",\r\n            appId: \"1:321509944065:web:199a546b7055f461ec4900\",\r\n            measurementId: \"G-S5CG0CLRVS\"\r\n        };\r\n\r\n        // 2. Inicialize o Firebase\r\n        const app = firebase.initializeApp(firebaseConfig);\r\n        const auth = firebase.auth();\r\n\r\n        // 3. Inicialize os provedores DEPOIS do Firebase estar configurado\r\n        const googleProvider = new firebase.auth.GoogleAuthProvider();\r\n        const facebookProvider = new firebase.auth.FacebookAuthProvider();\r\n        const githubProvider = new firebase.auth.GithubAuthProvider();\r\n\r\n        // 4. Configurar os listeners de clique DEPOIS das inicializações\r\n        document.getElementById(\"google-signin\").addEventListener(\"click\", () => {\r\n        auth.signInWithPopup(googleProvider)\r\n            .then((result) => {\r\n            console.log(\"Login com Google bem-sucedido:\", result.user);\r\n            })\r\n            .catch((error) => {\r\n            console.error(\"Erro no login Google:\", error);\r\n            });\r\n        });\r\n\r\n        document.getElementById(\"facebook-signin\").addEventListener(\"click\", () => {\r\n        auth.signInWithPopup(facebookProvider)\r\n            .then((result) => {\r\n            console.log(\"Login com Facebook bem-sucedido:\", result.user);\r\n            })\r\n            .catch((error) => {\r\n            console.error(\"Erro no login Facebook:\", error);\r\n            });\r\n        });\r\n\r\n        document.getElementById(\"github-signin\").addEventListener(\"click\", () => {\r\n        auth.signInWithPopup(githubProvider)\r\n            .then((result) => {\r\n            console.log(\"Login com GitHub bem-sucedido:\", result.user);\r\n            })\r\n            .catch((error) => {\r\n            console.error(\"Erro no login GitHub:\", error);\r\n            });\r\n        });\r\n    </script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

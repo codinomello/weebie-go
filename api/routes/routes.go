@@ -6,7 +6,7 @@ import (
 
 	"github.com/codinomello/weebie-go/api/controllers"
 	"github.com/codinomello/weebie-go/api/handlers"
-	"github.com/codinomello/weebie-go/api/repository"
+	"github.com/codinomello/weebie-go/api/repositories"
 )
 
 type Router struct {
@@ -25,7 +25,7 @@ func NewRouter() *Router {
 	return &Router{mux: http.NewServeMux()}
 }
 
-func SetupRoutes(userRepo *repository.MongoDBUserRepository, projectRepo *repository.MongoDBProjectRepository, memberRepo *repository.MongoDBMemberRepository) http.Handler {
+func SetupRoutes(userRepo *repositories.MongoDBUserRepository, projectRepo *repositories.MongoDBProjectRepository, memberRepo *repositories.MongoDBMemberRepository) http.Handler {
 	// Inicializa os controllers
 	userController := controllers.NewUserController(userRepo)
 	// projectController := controllers.NewProjectController(projectRepo, userRepo, memberRepo)
@@ -46,22 +46,22 @@ func SetupRoutes(userRepo *repository.MongoDBUserRepository, projectRepo *reposi
 
 	// Rotas públicas de usuário
 	publicMux.HandleFunc("/users", MethodSwitch{
-		Post: userHandler.SignUpUserHandler(),
+		Post: userHandler.SignUpUser(),
 	}.ServeHTTP)
 
 	publicMux.HandleFunc("/users/signin", MethodSwitch{
-		Post: userHandler.SignInUserHandler(),
+		Post: userHandler.SignInUser(),
 	}.ServeHTTP)
 
 	publicMux.HandleFunc("/users/signout", MethodSwitch{
-		Post: userHandler.SignOutUserHandler(),
+		Post: userHandler.SignOutUser(),
 	}.ServeHTTP)
 
 	// Rotas privadas de usuário
 	privateMux.HandleFunc("/users/{id}", MethodSwitch{
-		Get:    userHandler.GetUserHandler(),
-		Put:    userHandler.UpdateUserHandler(),
-		Delete: userHandler.DeleteUserHandler(),
+		Get:    userHandler.GetUser(),
+		Put:    userHandler.UpdateUser(),
+		Delete: userHandler.DeleteUser(),
 	}.ServeHTTP)
 
 	// // Rotas privadas de projeto

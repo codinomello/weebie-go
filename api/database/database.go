@@ -10,12 +10,11 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
 func ConnectMongoDB(mongoURI string) (*mongo.Database, error) {
 	// Configurações do MongoDB
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
 	// Conexão ao MongoDB
@@ -23,11 +22,6 @@ func ConnectMongoDB(mongoURI string) (*mongo.Database, error) {
 	// Configuração do cliente MongoDB
 	client, err := mongo.Connect(ctx, opts)
 	if err != nil {
-		return nil, err
-	}
-
-	// Verificando a conexão
-	if err := client.Ping(context.TODO(), readpref.Primary()); err != nil {
 		return nil, err
 	}
 
@@ -55,61 +49,138 @@ func DisconnectMongoDB(client *mongo.Client) error {
 }
 
 // Inicializa o banco de dados com índices necessários
-func InitMongoDBDatabase(ctx context.Context, db *mongo.Database) error {
-	// Cria índices na coleção de usuários
+func InitializeMongoDBDatabase(ctx context.Context, db *mongo.Database) error {
+	// Configura um contexto com timeout específico para operações de índice
+	idxCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	defer cancel()
+
+	// Índices para a coleção de usuários
 	userIndexes := []mongo.IndexModel{
 		{
-			Keys:    bson.D{{Key: "email", Value: 1}},
+			Keys: bson.D{{Key: "email", Value: 1}},
+			Options: options.Index().
+				SetUnique(true).
+				SetCollation(&options.Collation{
+					Locale:   "en",
+					Strength: 2,
+				}),
+		},
+		{
+			Keys:    bson.D{{Key: "uid", Value: 1}},
 			Options: options.Index().SetUnique(true),
 		},
 		{
-			Keys:    bson.D{{Key: "firebase_uid", Value: 1}},
+			Keys:    bson.D{{Key: "cpf", Value: 1}},
 			Options: options.Index().SetUnique(true),
+		},
+		{
+			Keys:    bson.D{{Key: "rg", Value: 1}},
+			Options: options.Index().SetUnique(true),
+		},
+		{
+			Keys: bson.D{{Key: "name", Value: "text"}},
+			Options: options.Index().
+				SetWeights(bson.D{{Key: "name", Value: 10}}),
+		},
+		{
+			Keys:    bson.D{{Key: "created_at", Value: -1}},
+			Options: options.Index(),
+		},
+		{
+			Keys:    bson.D{{Key: "deleted_at", Value: 1}},
+			Options: options.Index().SetSparse(true),
 		},
 	}
 
-	// Cria índices na coleção de projetos
+	// Índices para a coleção de projetos
 	projectIndexes := []mongo.IndexModel{
 		{
-			Keys: bson.D{{Key: "owner_id", Value: 1}},
+			Keys:    bson.D{{Key: "owner_id", Value: 1}},
+			Options: options.Index(),
 		},
 		{
-			Keys: bson.D{{Key: "members", Value: 1}},
+			Keys:    bson.D{{Key: "members", Value: 1}},
+			Options: options.Index(),
+		},
+		{
+			Keys: bson.D{{Key: "title", Value: "text"}, {Key: "details", Value: "text"}},
+			Options: options.Index().
+				SetWeights(bson.D{
+					{Key: "title", Value: 10},
+					{Key: "details", Value: 5},
+				}),
+		},
+		{
+			Keys:    bson.D{{Key: "year", Value: -1}},
+			Options: options.Index(),
+		},
+		{
+			Keys:    bson.D{{Key: "course", Value: 1}},
+			Options: options.Index(),
+		},
+		{
+			Keys:    bson.D{{Key: "ods", Value: 1}},
+			Options: options.Index(),
+		},
+		{
+			Keys:    bson.D{{Key: "created_at", Value: -1}},
+			Options: options.Index(),
 		},
 	}
 
-	// Cria índices na coleção de membros de projetos
-	projectMemberIndexes := []mongo.IndexModel{
+	// Índices para a coleção de membros de projetos
+	memberIndexes := []mongo.IndexModel{
 		{
 			Keys: bson.D{
-				{Key: "project_id", Value: 1},
 				{Key: "user_id", Value: 1},
+				{Key: "project_id", Value: 1},
 			},
-			Options: options.Index().SetUnique(true),
+			Options: options.Index().
+				SetUnique(true).
+				SetPartialFilterExpression(bson.M{
+					"deleted_at": nil, // Alternativa mais simples que funciona
+				}),
 		},
 		{
-			Keys: bson.D{{Key: "user_id", Value: 1}},
+			Keys:    bson.D{{Key: "user_id", Value: 1}},
+			Options: options.Index(),
+		},
+		{
+			Keys:    bson.D{{Key: "role", Value: 1}},
+			Options: options.Index(),
+		},
+		{
+			Keys:    bson.D{{Key: "status", Value: 1}},
+			Options: options.Index(),
+		},
+		{
+			Keys:    bson.D{{Key: "joined_at", Value: -1}},
+			Options: options.Index(),
+		},
+		{
+			Keys:    bson.D{{Key: "deleted_at", Value: 1}},
+			Options: options.Index().SetSparse(true),
 		},
 	}
 
-	// Aplica os índices às coleções
-	_, err := db.Collection("users").Indexes().CreateMany(ctx, userIndexes)
-	if err != nil {
-		log.Printf("erro ao criar índices em users: %v", err)
+	// Aplica os índices às coleções com tratamento de erros detalhado
+	if _, err := db.Collection("users").Indexes().CreateMany(idxCtx, userIndexes); err != nil {
+		log.Fatalf("  ✖ erro ao criar índices em 'users': %v", err)
 		return err
 	}
+	log.Println("  ✔ índices da coleção 'users' criados com sucesso!")
 
-	_, err = db.Collection("projects").Indexes().CreateMany(ctx, projectIndexes)
-	if err != nil {
-		log.Printf("erro ao criar índices em projects: %v", err)
+	if _, err := db.Collection("projects").Indexes().CreateMany(idxCtx, projectIndexes); err != nil {
+		log.Fatalf("  ✖ erro ao criar índices em 'projects': %v", err)
 		return err
 	}
+	log.Println("  ✔ índices da coleção 'projects' criados com sucesso!")
 
-	_, err = db.Collection("project_members").Indexes().CreateMany(ctx, projectMemberIndexes)
-	if err != nil {
-		log.Printf("erro ao criar índices em project_members: %v", err)
+	if _, err := db.Collection("members").Indexes().CreateMany(idxCtx, memberIndexes); err != nil {
+		log.Fatalf("  ✖ erro ao criar índices em 'members': %v", err)
 		return err
 	}
+	log.Println("  ✔ índices da coleção 'members' criados com sucesso!")
 
 	return nil
 }

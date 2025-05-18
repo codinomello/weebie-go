@@ -3,24 +3,24 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"net/http"
 
-	"firebase.google.com/go/v4/auth"
 	"github.com/codinomello/weebie-go/api/authentication"
 	"github.com/codinomello/weebie-go/api/models"
-	"github.com/codinomello/weebie-go/api/repository"
+	"github.com/codinomello/weebie-go/api/repositories"
 )
 
 type UserController struct {
-	UserRepository repository.UserRepository
+	UserRepository repositories.UserRepository
 }
 
-func NewUserController(userRepo repository.UserRepository) *UserController {
+func NewUserController(userRepo repositories.UserRepository) *UserController {
 	return &UserController{
 		UserRepository: userRepo,
 	}
 }
 
-// Register apenas salva o usuário no banco (sem Firebase)
+// Salva o usuário no banco (sem Firebase)
 func (c *UserController) Register(user *models.User) error {
 	if user.Name == "" {
 		return fmt.Errorf("nome do usuário não pode ser vazio")
@@ -33,38 +33,29 @@ func (c *UserController) Register(user *models.User) error {
 }
 
 // Cria usuário no Firebase e no MongoDB via UserRepository
-func (c *UserController) SignUp(user *models.User) (string, string, error) {
-	// Inicializa o cliente do Firebase
-	firebaseClient, err := authentication.InitializeFirebaseAuth()
-	if err != nil {
-		return "", "", fmt.Errorf("erro ao inicializar autenticação com o firebase: %v", err)
+func (c *UserController) CreateUser(w http.ResponseWriter, r *http.Request, user *models.User) (*models.User, error) {
+	// Aqui você pode adicionar lógica de negócios, como validação dos dados do usuário
+	if user.Email == "" || user.Name == "" {
+		http.Error(w, "Nome e e-mail são obrigatórios", http.StatusBadRequest)
+		return nil, nil // Retorna nil para o usuário e um erro HTTP já foi enviado
 	}
 
-	// Criação no Firebase Auth
-	firebaseUser, err := firebaseClient.CreateUser(context.Background(), (&auth.UserToCreate{}).
-		Email(user.Email).
-		Password(user.Password))
+	// Salvar o usuário no MongoDB usando o repositório
+	createdUser, err := c.UserRepository.CreateUser(context.Background(), user)
 	if err != nil {
-		return "", "", fmt.Errorf("erro ao criar usuário no firebase: %v", err)
+		http.Error(w, "Erro ao salvar o usuário no banco de dados", http.StatusInternalServerError)
+		return nil, err
 	}
 
-	// Define o UID e tenta salvar no MongoDB
-	user.UID = firebaseUser.UID
-	_, err = c.UserRepository.CreateUser(context.Background(), user)
-	if err != nil {
-		// Se falhar no MongoDB, remove do Firebase
-		_ = firebaseClient.DeleteUser(context.Background(), firebaseUser.UID)
-		return "", "", fmt.Errorf("erro ao salvar usuário no banco: %v", err)
-	}
-
-	return firebaseUser.UID, firebaseUser.Email, nil
+	return createdUser, nil
 }
 
 // Gera token para login usando Firebase Auth
 func (c *UserController) SignIn(user *models.User) (string, error) {
-	authClient, err := authentication.InitializeFirebaseAuth()
+	authService := authentication.NewFirebaseAuth()
+	authClient, err := authService.Initialize()
 	if err != nil {
-		return "", fmt.Errorf("erro ao inicializar autenticação com o firebase: %v", err)
+		return "", fmt.Errorf("erro ao inicializar Firebase Auth: %v", err)
 	}
 
 	token, err := authClient.CustomToken(context.Background(), user.Email)

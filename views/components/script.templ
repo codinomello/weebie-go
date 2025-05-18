@@ -3,12 +3,12 @@ package components
 templ ScriptHead() {
     @ScriptHeadSource()
     @ScriptHeadTheme()
-    @ScriptHeadTailwindConfig()
+    @ScriptHeadTailwindCSS()
 }
 
 templ ScriptBody() {
     @ScriptBodySource()
-    @ScriptBodyFirebase()
+    @ScriptBodyFirebaseAuth()
 }
 
 templ ScriptHeadSource() {
@@ -17,6 +17,9 @@ templ ScriptHeadSource() {
 
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+
+    <!-- Biblioteca para validação de e-mail -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/validator/13.11.0/validator.min.js"></script>
 }
 
 templ ScriptHeadTheme() {
@@ -58,7 +61,7 @@ templ ScriptHeadTheme() {
     </script>
 }
 
-templ ScriptHeadTailwindConfig() {
+templ ScriptHeadTailwindCSS() {
     <script>
         tailwind.config = {
           darkMode: 'class',
@@ -86,7 +89,7 @@ templ ScriptHeadTailwindConfig() {
     </script>
 }
 
-templ ScriptHeadODSList() {
+templ ScriptODSList() {
     <script>
         const odsList = [
             { number: 1, emoji: '🍽️', name: 'Erradicação da Pobreza', description: 'Acabar com a pobreza em todas as suas formas, em todos os lugares.' },
@@ -115,10 +118,11 @@ templ ScriptBodySource() {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
 }
 
-templ ScriptBodyFirebase() {
+templ ScriptBodyFirebaseAuth() {
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script>
+        // 1. Configuração do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAI0Tc7GssKwWwtVdrz6OaK6KFACx58N5U",
             authDomain: "weebie-go.firebaseapp.com",
@@ -129,118 +133,133 @@ templ ScriptBodyFirebase() {
             measurementId: "G-S5CG0CLRVS"
         };
 
-        // Inicialize o Firebase
+        // 2. Inicialize o Firebase
         const app = firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
 
-        // Funções de Login e Cadastro
-        document.getElementById("auth-form").addEventListener("submit", async (e) => {
-            e.preventDefault();
-
-            const email = document.querySelector("#auth-form input[type='email']").value;
-            const password = document.querySelector("#auth-form input[type='password']").value;
-
-            try {
-                const userCredential = await auth.signInWithEmailAndPassword(email, password);
-                const user = userCredential.user;
-                alert("Login realizado com sucesso!");
-                // Redirecione o usuário ou faça algo com o objeto `user`
-            } catch (error) {
-                alert("Erro ao fazer login: " + error.message);
-            }
-        });
-
-        document.getElementById("toggle-auth").addEventListener("click", () => {
-            const formTitle = document.getElementById("form-title");
-            const formAction = document.getElementById("form-action");
-            const nameField = document.getElementById("name-field");
-            const phoneField = document.getElementById("phone-field");
-
-            if (formTitle.textContent === "Login") {
-                formTitle.textContent = "Cadastro";
-                formAction.textContent = "Cadastrar";
-                nameField.classList.remove("hidden");
-                phoneField.classList.remove("hidden");
-            } else {
-                formTitle.textContent = "Login";
-                formAction.textContent = "Entrar";
-                nameField.classList.add("hidden");
-                phoneField.classList.add("hidden");
-            }
-        });
-
-        document.getElementById("auth-form").addEventListener("submit", async (e) => {
-            e.preventDefault();
-
-            const email = document.querySelector("#auth-form input[type='email']").value;
-            const password = document.querySelector("#auth-form input[type='password']").value;
-            const name = document.querySelector("#auth-form input[type='text']").value;
-
-            try {
-                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                const user = userCredential.user;
-                await user.updateProfile({ displayName: name });
-                alert("Cadastro realizado com sucesso!");
-                // Redirecione o usuário ou faça algo com o objeto `user`
-            } catch (error) {
-                alert("Erro ao cadastrar: " + error.message);
-            }
-        });
-
-        // Login com Google
+        // 3. Inicialize os provedores DEPOIS do Firebase estar configurado
         const googleProvider = new firebase.auth.GoogleAuthProvider();
-        document.getElementById("google-signin").addEventListener("click", () => {
-            auth.signInWithPopup(googleProvider)
-                .then((result) => {
-                    const user = result.user;
-                    alert("Login com Google realizado com sucesso!");
-                    // Redirecione o usuário ou faça algo com o objeto `user`
-                })
-                .catch((error) => {
-                    alert("Erro ao fazer login com Google: " + error.message);
-                });
-        });
-
-        // Login com Facebook
         const facebookProvider = new firebase.auth.FacebookAuthProvider();
-        document.getElementById("facebook-signin").addEventListener("click", () => {
-            auth.signInWithPopup(facebookProvider)
-                .then((result) => {
-                    const user = result.user;
-                    alert("Login com Facebook realizado com sucesso!");
-                    // Redirecione o usuário ou faça algo com o objeto `user`
-                })
-                .catch((error) => {
-                    alert("Erro ao fazer login com Facebook: " + error.message);
-                });
-        });
-
-        // Login com GitHub
         const githubProvider = new firebase.auth.GithubAuthProvider();
-        document.getElementById("github-signin").addEventListener("click", () => {
-            auth.signInWithPopup(githubProvider)
-                .then((result) => {
-                    const user = result.user;
-                    alert("Login com GitHub realizado com sucesso!");
-                    // Redirecione o usuário ou faça algo com o objeto `user`
-                })
-                .catch((error) => {
-                    alert("Erro ao fazer login com GitHub: " + error.message);
-                });
+
+        // 4. Configurar os listeners de clique DEPOIS das inicializações
+        document.getElementById("google-signin").addEventListener("click", () => {
+        auth.signInWithPopup(googleProvider)
+            .then((result) => {
+            console.log("Login com Google bem-sucedido:", result.user);
+            })
+            .catch((error) => {
+            console.error("Erro no login Google:", error);
+            });
         });
 
-        // Observador de Autenticação
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                console.log("Usuário logado:", user);
-                // Redirecione para a página principal ou faça algo com o objeto `user`
-            } else {
-                console.log("Usuário não logado");
-            }
+        document.getElementById("facebook-signin").addEventListener("click", () => {
+        auth.signInWithPopup(facebookProvider)
+            .then((result) => {
+            console.log("Login com Facebook bem-sucedido:", result.user);
+            })
+            .catch((error) => {
+            console.error("Erro no login Facebook:", error);
+            });
+        });
+
+        document.getElementById("github-signin").addEventListener("click", () => {
+        auth.signInWithPopup(githubProvider)
+            .then((result) => {
+            console.log("Login com GitHub bem-sucedido:", result.user);
+            })
+            .catch((error) => {
+            console.error("Erro no login GitHub:", error);
+            });
         });
     </script>
-}
 
+
+
+
+    
+
+    // <script src="https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js"></script>
+    // <script src="https://www.gstatic.com/firebasejs/11.7.3/firebase-auth.js"></script>
+    // <script>
+    //     const firebaseConfig = {
+    //         apiKey: "AIzaSyAI0Tc7GssKwWwtVdrz6OaK6KFACx58N5U",
+    //         authDomain: "weebie-go.firebaseapp.com",
+    //         projectId: "weebie-go",
+    //         storageBucket: "weebie-go.firebasestorage.app",
+    //         messagingSenderId: "321509944065",
+    //         appId: "1:321509944065:web:199a546b7055f461ec4900",
+    //         measurementId: "G-S5CG0CLRVS"
+    //     };
+
+    //     // Inicialize o Firebase
+    //     const app = firebase.initializeApp(firebaseConfig);
+    //     const auth = firebase.auth();
+
+    //     // Variável para controlar o modo (login/cadastro)
+    //     let isLoginMode = false;
+
+    //     // Elementos do DOM
+    //     const formTitle = document.getElementById("form-title");
+    //     const formAction = document.getElementById("form-action");
+    //     const nameField = document.getElementById("name-field");
+    //     const phoneField = document.getElementById("phone-field");
+    //     const termsCheckbox = document.getElementById("terms");
+    //     const toggleAuthBtn = document.getElementById("toggle-auth");
+    //     const authForm = document.getElementById("auth-form");
+
+    //     // Função para alternar entre login e cadastro
+    //     function toggleAuthMode() {
+    //         isLoginMode = !isLoginMode;
+            
+    //         if (isLoginMode) {
+    //             formTitle.textContent = "Login";
+    //             formAction.textContent = "Entrar";
+    //             nameField.style.display = "none";
+    //             phoneField.style.display = "none";
+    //             termsCheckbox.required = false;
+    //             termsCheckbox.closest('div').style.display = "none";
+    //             toggleAuthBtn.textContent = "Não tem uma conta? Cadastre-se";
+    //         } else {
+    //             formTitle.textContent = "Cadastre-se";
+    //             formAction.textContent = "Criar Conta";
+    //             nameField.style.display = "block";
+    //             phoneField.style.display = "block";
+    //             termsCheckbox.required = true;
+    //             termsCheckbox.closest('div').style.display = "flex";
+    //             toggleAuthBtn.textContent = "Já tem uma conta? Faça login";
+    //         }
+    //     }
+
+    //     // Event listener para o botão de alternar
+    //     toggleAuthBtn.addEventListener("click", toggleAuthMode);
+
+    //     // Manipulador único para o formulário
+    //     authForm.addEventListener("submit", async (e) => {
+    //         e.preventDefault();
+            
+    //         const email = authForm.querySelector("input[type='email']").value;
+    //         const password = authForm.querySelector("input[type='password']").value;
+            
+    //         try {
+    //             if (isLoginMode) {
+    //                 // Login
+    //                 const userCredential = await auth.signInWithEmailAndPassword(email, password);
+    //                 alert("Login realizado com sucesso!");
+    //             } else {
+    //                 // Cadastro
+    //                 const name = authForm.querySelector("input[type='text']").value;
+    //                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+    //                 await userCredential.user.updateProfile({ displayName: name });
+    //                 alert("Cadastro realizado com sucesso!");
+    //             }
+    //             // Redirecionar ou atualizar a UI após autenticação bem-sucedida
+    //         } catch (error) {
+    //             alert(`Erro: ${error.message}`);
+    //         }
+    //     });
+    // </script>
+}
 
 templ ScriptBodyODSList() {
     <script>

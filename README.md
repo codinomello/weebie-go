@@ -62,10 +62,28 @@ O Weebie foi projetado com um design moderno e responsivo, garantindo uma experi
    git clone https://github.com/codinomello/weebie-go.git
    cd weebie-go
 
-2. **Adicione o .env**:
+2. **Adicione o .env + firebase.json**:
    ```bash
    touch .env
 
-3. **Execute o projeto**:
+3. **Configure as variáveis de ambiente**:
    ```bash
-   make run
+   # Porta do servidor HTTP
+   PORT=...
+
+   # URI do MongoDB
+   MONGODB_URI=...
+
+   # Base de dados MongoDB
+   MONGODB_DATABASE=...
+
+   # Configuração do Firebase
+   FIREBASE_CREDENTIALS=...
+
+4. **Instale o templ**:
+   ```go
+   go install github.com/a-h/templ/cmd/templ@latest
+
+5. **Execute o projeto**:
+   ```bash
+   make

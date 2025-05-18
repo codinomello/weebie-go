@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
-	"firebase.google.com/go/v4/auth"
 	"github.com/codinomello/weebie-go/api/authentication"
 	"github.com/codinomello/weebie-go/api/controllers"
 	"github.com/codinomello/weebie-go/api/models"
@@ -27,51 +27,65 @@ func NewUserHandler(userCtrl *controllers.UserController) *UserHandler {
 }
 
 // POST /users
-func (c *UserHandler) SignUpUserHandler() http.HandlerFunc {
+func (c *UserHandler) SignUpUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var user models.User
-
-		// Decodifica o JSON recebido
-		if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-			http.Error(w, "dados inválidos", http.StatusBadRequest)
+		err := r.ParseForm()
+		if err != nil {
+			http.Error(w, "erro ao parsear o formulário", http.StatusBadRequest)
 			return
 		}
 
-		// Inicializa o Firebase Auth
-		firebaseClient, err := authentication.InitializeFirebaseAuth()
-		if err != nil {
-			http.Error(w, fmt.Sprintf("erro ao inicializar autenticação com o firebase: %v", err), http.StatusInternalServerError)
-			return
+		name := r.PostFormValue("name")
+		email := r.PostFormValue("email")
+		phone := r.PostFormValue("phone")
+		password := r.PostFormValue("password") // Lembre-se das considerações sobre a senha
+		ageStr := r.PostFormValue("age")
+		address := r.PostFormValue("address")
+		cpf := r.PostFormValue("cpf")
+		rg := r.PostFormValue("rg")
+		sexStr := r.PostFormValue("sex")
+
+		var age int
+		if ageStr != "" {
+			age, err = strconv.Atoi(ageStr)
+			if err != nil {
+				http.Error(w, "Idade inválida", http.StatusBadRequest)
+				return
+			}
 		}
 
-		// Cria o usuário no Firebase
-		firebaseUser, err := firebaseClient.CreateUser(context.Background(), (&auth.UserToCreate{}).
-			Email(user.Email).
-			Password(user.Password))
-		if err != nil {
-			http.Error(w, fmt.Sprintf("erro ao criar usuário no Firebase: %v", err), http.StatusInternalServerError)
-			return
+		var sex rune
+		if sexStr == "M" || sexStr == "F" {
+			sex = rune(sexStr[0])
 		}
 
-		// Preenche os dados
-		user.UID = firebaseUser.UID
-		user.CreatedAt = time.Now()
-		user.UpdatedAt = time.Now()
+		newUser := &models.User{
+			UID:       "", // O UID do Firebase virá de outra parte do seu sistema
+			Name:      name,
+			Email:     email,
+			Password:  password,
+			Phone:     phone,
+			Age:       age,
+			Address:   address,
+			CPF:       cpf,
+			RG:        rg,
+			Sex:       sex,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		}
 
-		// Salva no MongoDB via repositório
-		_, err = c.UserController.UserRepository.CreateUser(context.Background(), &user)
+		createdUser, err := c.UserController.CreateUser(w, r, newUser)
 		if err != nil {
-			// Remove o usuário do Firebase em caso de erro
-			_ = firebaseClient.DeleteUser(context.Background(), firebaseUser.UID)
-			http.Error(w, fmt.Sprintf("erro ao salvar usuário no MongoDB: %v", err), http.StatusInternalServerError)
+			// O controller já deve ter tratado a resposta de erro, mas você pode adicionar logging aqui
 			return
 		}
 
 		// Retorna o UID e email como resposta JSON
 		response := map[string]string{
-			"uid":   firebaseUser.UID,
-			"email": user.Email,
+			"uid":   createdUser.UID,
+			"email": createdUser.Email,
 		}
+
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
 		json.NewEncoder(w).Encode(response)
@@ -79,7 +93,7 @@ func (c *UserHandler) SignUpUserHandler() http.HandlerFunc {
 }
 
 // POST /users/signin
-func (c *UserHandler) SignInUserHandler() http.HandlerFunc {
+func (c *UserHandler) SignInUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var user models.User
 
@@ -88,7 +102,8 @@ func (c *UserHandler) SignInUserHandler() http.HandlerFunc {
 			return
 		}
 
-		authClient, err := authentication.InitializeFirebaseAuth()
+		authService := authentication.NewFirebaseAuth()
+		authClient, err := authService.Initialize()
 		if err != nil {
 			http.Error(w, fmt.Sprintf("erro ao inicializar Firebase Auth: %v", err), http.StatusInternalServerError)
 			return
@@ -107,7 +122,7 @@ func (c *UserHandler) SignInUserHandler() http.HandlerFunc {
 	}
 }
 
-func (c *UserHandler) SignOutUserHandler() http.HandlerFunc {
+func (c *UserHandler) SignOutUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Aqui você pode implementar a lógica de logout, se necessário.
 		// Por exemplo, invalidar o token ou remover o cookie de sessão.
@@ -119,7 +134,7 @@ func (c *UserHandler) SignOutUserHandler() http.HandlerFunc {
 }
 
 // GET /users/{id}
-func (c *UserHandler) GetUserHandler() http.HandlerFunc {
+func (c *UserHandler) GetUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Obtém o userID do contexto
 		userID, ok := r.Context().Value("userID").(string)
@@ -147,7 +162,7 @@ func (c *UserHandler) GetUserHandler() http.HandlerFunc {
 }
 
 // PUT /users/{id}
-func (c *UserHandler) UpdateUserHandler() http.HandlerFunc {
+func (c *UserHandler) UpdateUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var user models.User
 
@@ -187,7 +202,7 @@ func (c *UserHandler) UpdateUserHandler() http.HandlerFunc {
 }
 
 // DELETE /users/{id}
-func (c *UserHandler) DeleteUserHandler() http.HandlerFunc {
+func (c *UserHandler) DeleteUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Obtém o userID do contexto
 		userID, ok := r.Context().Value("userID").(string)

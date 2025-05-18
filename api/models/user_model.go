@@ -18,6 +18,8 @@ type User struct {
 	CPF       string             `bson:"cpf" json:"cpf"`                                   // CPF do usuário
 	RG        string             `bson:"rg" json:"rg"`                                     // RG do usuário
 	Sex       rune               `bson:"sex" json:"sex"`                                   // Sexo do usuário ('M' ou 'F')
+	Role      string             `bson:"role" json:"role"`                                 // Papel do usuário (ex: admin, user)
+	Status    string             `bson:"status" json:"status"`                             // Status do usuário (ex: active, inactive)
 	CreatedAt time.Time          `bson:"created_at" json:"created_at"`                     // Data de criação do usuário
 	UpdatedAt time.Time          `bson:"updated_at" json:"updated_at"`                     // Data de atualização do usuário
 	DeletedAt *time.Time         `bson:"deleted_at,omitempty" json:"deleted_at,omitempty"` // Data de exclusão do usuário (opcional)

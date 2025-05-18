@@ -13,7 +13,7 @@ import (
 	custom "github.com/codinomello/weebie-go/views/components/custom"
 )
 
-func SignUp() templ.Component {
+func SignIn() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -46,7 +46,7 @@ func SignUp() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = components.Title("Weebie - Inscreva-se").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = components.Title("Weebie - Login").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -78,11 +78,11 @@ func SignUp() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = components.Nav("Inscreva-se", "art.png").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = components.Nav("Login", "page_facing_up.png").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<!-- Formulário de Login/Cadastro --><main class=\"flex-grow flex items-center justify-center p-4 pt-8\"><div class=\"w-full max-w-md\"><div class=\"bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl\"><div class=\"text-center mb-6\"><h2 id=\"form-title\" class=\"text-3xl font-bold text-orange dark:text-golden mb-2\">Cadastre-se</h2><p class=\"text-gray-600 dark:text-gray-300\">Junte-se à nossa comunidade de transformação</p></div><!-- Formulário de Autenticação--><form id=\"auth-form\" class=\"space-y-4\"><!-- Nome --><div id=\"name-field\" class=\"space-y-1\"><label class=\"block text-sm font-medium text-gray-700 dark:text-gray-300\">Nome</label> <input name=\"name\" type=\"text\" required class=\"w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 focus:ring-2 focus:ring-orange focus:border-transparent transition\"></div><!-- E-mail --><div class=\"space-y-1\"><label class=\"block text-sm font-medium text-gray-700 dark:text-gray-300\">E-mail</label> <input name=\"email\" type=\"email\" required class=\"w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 focus:ring-2 focus:ring-orange focus:border-transparent transition\"></div><!-- Telefone --><div id=\"phone-field\" class=\"space-y-1\"><label class=\"block text-sm font-medium text-gray-700 dark:text-gray-300\">Telefone</label> <input name=\"phone\" type=\"tel\" class=\"w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 focus:ring-2 focus:ring-orange focus:border-transparent transition\"></div><!-- Senha --><div class=\"space-y-1\"><label class=\"block text-sm font-medium text-gray-700 dark:text-gray-300\">Senha</label> <input name=\"password\" type=\"password\" required class=\"w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 focus:ring-2 focus:ring-orange focus:border-transparent transition\"></div><!-- Termos e Condições --><div class=\"flex items-center mt-2\"><input id=\"terms\" name=\"terms\" type=\"checkbox\" required class=\"w-4 h-4 text-orange bg-gray-100 border-gray-300 rounded focus:ring-orange dark:focus:ring-orange dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600\"> <label for=\"terms\" class=\"ms-2 text-md text-gray-600 dark:text-gray-300\">Concordo com os <a href=\"#\" class=\"text-orange hover:underline dark:text-golden\">Termos e Condições</a></label></div><!-- Botão de Ação --><button type=\"submit\" class=\"w-full mt-6 px-6 py-3 bg-gradient-to-r from-orange to-golden text-white font-medium rounded-lg hover:opacity-90 transition-all duration-300 transform hover:scale-[1.02] shadow-md\"><span id=\"form-action\">Criar Conta</span></button></form><!-- Divisor --><div class=\"flex items-center my-6\"><div class=\"flex-1 h-px bg-gray-300 dark:bg-gray-600\"></div><span class=\"px-4 text-md text-gray-600 dark:text-gray-300\">ou</span><div class=\"flex-1 h-px bg-gray-300 dark:bg-gray-600\"></div></div><!-- Botões de OAuth2 -->")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<!-- Formulário de Login --><main class=\"flex-grow flex items-center justify-center p-4 pt-8\"><div class=\"w-full max-w-md\"><div class=\"bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl\"><div class=\"text-center mb-6\"><h2 class=\"text-3xl font-bold text-orange dark:text-golden mb-2\">Bem-vindo de volta!</h2><p class=\"text-gray-600 dark:text-gray-300\">Faça login para acessar sua conta</p></div><!-- Formulário --><form id=\"login-form\" hx-post=\"/auth/login\" hx-target=\"#auth-result\" hx-swap=\"innerHTML\" class=\"space-y-4\"><!-- E-mail --><div class=\"space-y-2\"><label for=\"email\" class=\"block text-sm font-medium text-gray-700 dark:text-gray-300\">E-mail</label> <input id=\"email\" name=\"email\" type=\"email\" required class=\"w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-orange focus:border-transparent transition\" placeholder=\"seu@email.com\"></div><!-- Senha --><div class=\"space-y-2\"><label for=\"password\" class=\"block text-sm font-medium text-gray-700 dark:text-gray-300\">Senha</label> <input id=\"password\" name=\"password\" type=\"password\" required class=\"w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-orange focus:border-transparent transition\" placeholder=\"••••••••\"><div class=\"flex justify-end\"><a href=\"/forgot-password\" class=\"text-sm text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300\">Esqueceu a senha?</a></div></div><!-- Resultado da Autenticação --><div id=\"auth-result\" class=\"hidden\"></div><!-- Botão de Ação --><button type=\"submit\" class=\"w-full mt-6 px-6 py-2 bg-gradient-to-r from-orange to-golden text-white font-medium rounded-lg hover:opacity-90 transition-all duration-300 transform hover:scale-[1.02] shadow-md\">Entrar</button></form><!-- Divisor --><div class=\"flex items-center my-6\"><div class=\"flex-1 h-px bg-gray-300 dark:bg-gray-600\"></div><span class=\"px-4 text-md text-gray-600 dark:text-gray-300\">ou</span><div class=\"flex-1 h-px bg-gray-300 dark:bg-gray-600\"></div></div><!-- Botões de OAuth2 -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -90,7 +90,7 @@ func SignUp() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"mt-6 text-center\"><p class=\"text-md text-gray-600 dark:text-gray-300\">Já tem uma conta?  <a href=\"/signin\" class=\"text-orange font-medium hover:underline dark:text-golden\">Faça login</a></p></div></div></div></main><!-- Rodapé -->")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<!-- Link para Cadastro --><div class=\"mt-6 text-center\"><p class=\"text-md text-gray-600 dark:text-gray-300\">Não tem uma conta?  <a href=\"/signup\" class=\"text-orange font-medium hover:underline dark:text-golden\">Cadastre-se</a></p></div></div></div></main><!-- Rodapé -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -106,11 +106,11 @@ func SignUp() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<!-- Animações -->")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<!-- Animação de Carregamento -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = custom.Animations().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = custom.LoadingAnimations().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

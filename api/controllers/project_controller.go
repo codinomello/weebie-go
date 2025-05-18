@@ -6,18 +6,18 @@ import (
 	"time"
 
 	"github.com/codinomello/weebie-go/api/models"
-	"github.com/codinomello/weebie-go/api/repository"
+	"github.com/codinomello/weebie-go/api/repositories"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type ProjectController struct {
-	ProjectRepository repository.ProjectRepository
-	UserRepository    repository.UserRepository
-	MemberRepository  repository.MemberRepository
+	ProjectRepository repositories.ProjectRepository
+	UserRepository    repositories.UserRepository
+	MemberRepository  repositories.MemberRepository
 }
 
-func NewProjectController(projectRepo repository.ProjectRepository, userRepo repository.UserRepository, memberRepo repository.MemberRepository) *ProjectController {
+func NewProjectController(projectRepo repositories.ProjectRepository, userRepo repositories.UserRepository, memberRepo repositories.MemberRepository) *ProjectController {
 	return &ProjectController{
 		ProjectRepository: projectRepo,
 		UserRepository:    userRepo,
