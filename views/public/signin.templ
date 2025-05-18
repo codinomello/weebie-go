@@ -73,7 +73,6 @@ templ SignIn() {
                         <span class="px-4 text-md text-gray-600 dark:text-gray-300">ou</span>
                         <div class="flex-1 h-px bg-gray-300 dark:bg-gray-600"></div>
                     </div>
-
                     <!-- Botões de OAuth2 -->
                     @custom.OAuthButtons()
                     <!-- Link para Cadastro -->
@@ -90,20 +89,8 @@ templ SignIn() {
         @components.FooterLogin()
         <!-- Scripts -->
         @components.ScriptBody()
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                const form = document.getElementById('login-form');
-                if (form) {
-                    form.addEventListener('submit', () => {
-                        const button = form.querySelector('button[type="submit"]');
-                        if (button) {
-                            button.innerHTML = '<span class="inline-block animate-spin">⏳</span> Entrando...';
-                            button.disabled = true;
-                        }
-                    });
-                }
-            });
-        </script>
+        <!-- Animação de Carregamento -->
+        @custom.LoadingAnimations()
     </body>
     </html>
 }

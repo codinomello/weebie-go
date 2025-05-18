@@ -31,11 +31,7 @@ templ SignUp() {
                         <p class="text-gray-600 dark:text-gray-300">Junte-se à nossa comunidade de transformação</p>
                     </div>
                     <!-- Formulário de Autenticação-->
-                    <form id="auth-form"
-                        hx-post="/auth" 
-                        hx-target="#resultado" 
-                        hx-swap="innerHTML"
-                        class="space-y-4">
+                    <form id="auth-form" class="space-y-4">
                         <!-- Nome -->
                         <div id="name-field" class="space-y-1">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nome</label>
@@ -69,7 +65,7 @@ templ SignUp() {
                         </div>
                         <!-- Termos e Condições -->
                         <div class="flex items-center mt-2">
-                            <input id="terms" type="checkbox" class="w-4 h-4 text-orange bg-gray-100 border-gray-300 rounded focus:ring-orange dark:focus:ring-orange dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                            <input id="terms" name="terms" type="checkbox" required class="w-4 h-4 text-orange bg-gray-100 border-gray-300 rounded focus:ring-orange dark:focus:ring-orange dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                             <label for="terms" class="ms-2 text-md text-gray-600 dark:text-gray-300">
                                 Concordo com os <a href="#" class="text-orange hover:underline dark:text-golden">Termos e Condições</a>
                             </label>
@@ -88,6 +84,12 @@ templ SignUp() {
                     </div>
                     <!-- Botões de OAuth2 -->
                     @custom.OAuthButtons()
+                    <div class="mt-6 text-center">
+                        <p class="text-md text-gray-600 dark:text-gray-300">
+                            Já tem uma conta? 
+                            <a href="/signin" class="text-orange font-medium hover:underline dark:text-golden">Faça login</a>
+                        </p>
+                    </div>
                 </div>
             </div>
         </main>
@@ -95,21 +97,8 @@ templ SignUp() {
         @components.FooterLogin()
         <!-- Scripts -->
         @components.ScriptBody()
-        <script>
-            // Adiciona animação de carregamento suave
-            document.addEventListener('DOMContentLoaded', () => {
-                const form = document.getElementById('auth-form');
-                if (form) {
-                    form.addEventListener('submit', () => {
-                        const button = form.querySelector('button[type="submit"]');
-                        if (button) {
-                            button.innerHTML = '<span class="inline-block animate-spin">⏳</span> Processando...';
-                            button.disabled = true;
-                        }
-                    });
-                }
-            });
-        </script>
+        <!-- Animações -->
+        @custom.Animations()
     </body>
     </html>
 }

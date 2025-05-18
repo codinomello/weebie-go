@@ -95,7 +95,7 @@ func SignOut() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<script>\n            document.addEventListener('DOMContentLoaded', () => {\n                // Redirecionamento automático\n                let seconds = 5;\n                const countdownElement = document.getElementById('countdown');\n                const countdownInterval = setInterval(() => {\n                    seconds--;\n                    countdownElement.textContent = seconds;\n                    \n                    if (seconds <= 0) {\n                        clearInterval(countdownInterval);\n                        window.location.href = '/signin';\n                    }\n                }, 1000);\n            });\n        </script></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<script>\r\n            document.addEventListener('DOMContentLoaded', () => {\r\n                // Redirecionamento automático\r\n                let seconds = 5;\r\n                const countdownElement = document.getElementById('countdown');\r\n                const countdownInterval = setInterval(() => {\r\n                    seconds--;\r\n                    countdownElement.textContent = seconds;\r\n                    \r\n                    if (seconds <= 0) {\r\n                        clearInterval(countdownInterval);\r\n                        window.location.href = '/signin';\r\n                    }\r\n                }, 1000);\r\n            });\r\n        </script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

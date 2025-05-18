@@ -1,4 +1,4 @@
-package repository
+package repositories
 
 import (
 	"context"
@@ -36,8 +36,9 @@ func NewUserRepository(db *mongo.Database) *MongoDBUserRepository {
 }
 
 func (r *MongoDBUserRepository) CreateUser(ctx context.Context, user *models.User) (*models.User, error) {
-	user.CreatedAt = time.Now()
-	user.UpdatedAt = user.CreatedAt
+	now := time.Now()
+	user.CreatedAt = now
+	user.UpdatedAt = now
 
 	result, err := r.Users.InsertOne(ctx, user)
 	if err != nil {

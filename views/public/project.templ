@@ -11,7 +11,6 @@ templ Project() {
         @components.Title("Weebie - Cadastro de Projetos")
         <!-- HTMX e Tailwind CSS -->
         @components.ScriptHead()
-        @components.ScriptHeadODSList()
         <!-- Fonte -->
         @components.StyleHead()
         <!-- Ícone -->
@@ -192,6 +191,7 @@ templ Project() {
 
         <!-- Scripts -->
         @components.ScriptBody()
+        @components.ScriptODSList()
         <script>
             document.addEventListener('DOMContentLoaded', () => {
                 // Configurar campos automáticos

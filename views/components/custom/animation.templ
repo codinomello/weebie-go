@@ -1,0 +1,36 @@
+package custom
+
+templ Animations() {
+    <script>
+        // Adiciona animação de carregamento suave
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('auth-form');
+            if (form) {
+                form.addEventListener('submit', () => {
+                    const button = form.querySelector('button[type="submit"]');
+                    if (button) {
+                        button.innerHTML = '<span class="inline-block animate-spin">⏳</span> Processando...';
+                        button.disabled = true;
+                    }
+                });
+            }
+        });
+    </script>
+}
+
+templ LoadingAnimations() {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('login-form');
+            if (form) {
+                form.addEventListener('submit', () => {
+                    const button = form.querySelector('button[type="submit"]');
+                    if (button) {
+                        button.innerHTML = '<span class="inline-block animate-spin">⏳</span> Entrando...';
+                        button.disabled = true;
+                    }
+                });
+            }
+        });
+    </script>
+}

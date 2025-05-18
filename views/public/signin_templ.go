@@ -106,7 +106,15 @@ func SignIn() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<script>\n            document.addEventListener('DOMContentLoaded', () => {\n                const form = document.getElementById('login-form');\n                if (form) {\n                    form.addEventListener('submit', () => {\n                        const button = form.querySelector('button[type=\"submit\"]');\n                        if (button) {\n                            button.innerHTML = '<span class=\"inline-block animate-spin\">⏳</span> Entrando...';\n                            button.disabled = true;\n                        }\n                    });\n                }\n            });\n        </script></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<!-- Animação de Carregamento -->")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = custom.LoadingAnimations().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
