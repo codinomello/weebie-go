@@ -52,9 +52,10 @@ func (c *UserController) CreateUser(w http.ResponseWriter, r *http.Request, user
 
 // Gera token para login usando Firebase Auth
 func (c *UserController) SignIn(user *models.User) (string, error) {
-	authClient, err := authentication.InitializeFirebaseAuth()
+	authService := authentication.NewFirebaseAuth()
+	authClient, err := authService.Initialize()
 	if err != nil {
-		return "", fmt.Errorf("erro ao inicializar autenticação com o firebase: %v", err)
+		return "", fmt.Errorf("erro ao inicializar Firebase Auth: %v", err)
 	}
 
 	token, err := authClient.CustomToken(context.Background(), user.Email)

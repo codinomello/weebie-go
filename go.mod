@@ -6,7 +6,9 @@ require (
 	firebase.google.com/go/v4 v4.15.2
 	github.com/a-h/templ v0.3.865
 	github.com/joho/godotenv v1.5.1
+	github.com/pkg/errors v0.9.1
 	go.mongodb.org/mongo-driver v1.17.3
+	golang.org/x/crypto v0.38.0
 	google.golang.org/api v0.233.0
 )
 
@@ -67,7 +69,6 @@ require (
 	go.opentelemetry.io/otel/sdk v1.35.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v1.35.0 // indirect
 	go.opentelemetry.io/otel/trace v1.35.0 // indirect
-	golang.org/x/crypto v0.38.0 // indirect
 	golang.org/x/mod v0.24.0 // indirect
 	golang.org/x/net v0.40.0 // indirect
 	golang.org/x/oauth2 v0.30.0 // indirect

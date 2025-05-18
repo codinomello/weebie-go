@@ -33,18 +33,25 @@ func main() {
 
 	ctx := context.Background()
 	if err := database.InitializeMongoDBDatabase(ctx, db); err != nil {
-		log.Fatal("Falha ao criar índices: ", err)
+		log.Fatal("❌ falha ao criar índices: ", err)
 	}
 
 	// Fecha a conexão com o banco de dados ao final da execução do programa
 	defer database.DisconnectMongoDB(db.Client())
 
 	// Inicialização do Firebase
-	_, err = authentication.InitializeFirebaseAuth()
-	if err != nil {
+	authService := authentication.NewFirebaseAuth()
+	if _, err := authService.Initialize(); err != nil {
 		log.Fatalf("❌ erro ao inicializar o firebase: %s\n", err)
 	} else {
 		log.Println("🔥 autenticação com o firebase inicializada com sucesso!")
+	}
+
+	// Criar usuário padrão-admin
+	if err := authService.CreateDefaultAdmin(db); err != nil {
+		log.Fatalf("❌ falha ao criar usuário admin: %v", err)
+	} else {
+		log.Println("👨‍💻 usuário admin criado com sucesso!")
 	}
 
 	// Repositórios para o MongoDB

@@ -31,7 +31,7 @@ func (c *UserHandler) SignUpUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
 		if err != nil {
-			http.Error(w, "Erro ao parsear o formulário", http.StatusBadRequest)
+			http.Error(w, "erro ao parsear o formulário", http.StatusBadRequest)
 			return
 		}
 
@@ -102,7 +102,8 @@ func (c *UserHandler) SignInUser() http.HandlerFunc {
 			return
 		}
 
-		authClient, err := authentication.InitializeFirebaseAuth()
+		authService := authentication.NewFirebaseAuth()
+		authClient, err := authService.Initialize()
 		if err != nil {
 			http.Error(w, fmt.Sprintf("erro ao inicializar Firebase Auth: %v", err), http.StatusInternalServerError)
 			return
