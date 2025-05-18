@@ -56,6 +56,10 @@
             { number: 16, emoji: '🕊️', name: 'Paz, Justiça e Instituições Eficazes', description: 'Promover sociedades pacíficas e inclusivas para o desenvolvimento sustentável.' },
             { number: 17, emoji: '🤝', name: 'Parcerias e Meios de Implementação', description: 'Fortalecer os meios de implementação e revitalizar a parceria global.' }
         ];
+
+        // Acrescentar possível configuração 
+        // da lista de estados brasileiros (IBGE)
+
     </script>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900">
@@ -152,6 +156,116 @@
                         <input id="new-author-input" 
                             class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-pink">
                         
+                    <!-- Campo da localização (Estado, CEP, Munícipio, etc) -->
+                        <div class="flex items-center gap-2">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Localização
+                            </label>
+                            <button data-tooltip-target="local-tooltip" data-tooltip-placement="right" type="button" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                                </svg>
+                                </button>
+                        </div>
+                    <!-- CEP + Estado + Município -->
+                        <div class="flex flex-wrap gap-4 mb-4">
+                        <div class="flex flex-col">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">CEP</label>
+                            <input id="cep" placeholder="CEP" maxlength="9" oninput="mascaraCEP(this)" onblur="buscarCEP()"
+                                class="w-32 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 
+                                        bg-white dark:bg-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-pink" />
+                        </div>
+
+                        <div class="flex flex-col">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Estado</label>
+                                <select id="state_select" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 
+                                bg-white dark:text-gray-300 dark:bg-gray-700 focus:ring-2 focus:ring-pink">
+                                
+                                    <option value="Selecione ..."></option>
+                                </select>
+
+                            <script>
+                                const estados = {
+                                    "AC": "Acre", "AL": "Alagoas", "AP": "Amapá", "AM": "Amazonas", "BA": "Bahia",
+                                    "CE": "Ceará", "DF": "Distrito Federal", "ES": "Espírito Santo", "GO": "Goiás",
+                                    "MA": "Maranhão", "MT": "Mato Grosso", "MS": "Mato Grosso do Sul", "MG": "Minas Gerais",
+                                    "PA": "Pará", "PB": "Paraíba", "PR": "Paraná", "PE": "Pernambuco", "PI": "Piauí",
+                                    "RJ": "Rio de Janeiro", "RN": "Rio Grande do Norte", "RS": "Rio Grande do Sul",
+                                    "RO": "Rondônia", "RR": "Roraima", "SC": "Santa Catarina", "SP": "São Paulo",
+                                    "SE": "Sergipe", "TO": "Tocantins"
+                                };
+                                
+                                const select = document.getElementById('state_select');
+                                    for (const [value, label] of Object.entries(estados)) {
+                                        const option = document.createElement('option');
+                                        option.value = value;
+                                        option.textContent = label;
+                                        select.appendChild(option);
+                                    }
+                                  function mascaraCEP(input) {
+                                    let value = input.value.replace(/\D/g, ''); // Remove tudo que não for dígito
+                                
+                                    if (value.length > 5) {
+                                    input.value = value.slice(0, 5) + '-' + value.slice(5, 8);
+                                    } else {
+                                    input.value = value;
+                                    }
+                                }
+                            
+                            function buscarCEP() {
+                                    const cep = document.getElementById('cep').value.replace(/\D/g, '');
+
+                                    if (cep.length !== 8) {
+                                        alert("CEP inválido");
+                                        return;
+                                    }
+
+                                    fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                                        .then(res => res.json())
+                                        .then(data => {
+                                        if (data.erro) {
+                                            alert("CEP não encontrado");
+                                            return;
+                                        }
+
+                                        document.getElementById('state_select').value = data.uf;
+                                        document.getElementById('city').value = data.localidade;
+                                        document.getElementById('address').value = data.logradouro;
+                                        })
+                                        .catch(() => alert("Erro ao buscar CEP"));
+                                    }
+                            </script>
+                        </div>
+
+                        <div class="flex-1 flex flex-col">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Município</label>
+                            <input id="city" placeholder="Município"
+                                class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 
+                                        bg-white dark:bg-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-pink" />
+                        </div>
+                        </div>
+
+                        <!-- Endereço + Número -->
+                        <div class="flex gap-4 mb-4">
+                        <div class="flex flex-col w-3/4">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Endereço</label>
+                            <input id="address" placeholder="Endereço"
+                                class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 
+                                        bg-white dark:bg-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-pink" />
+                        </div>
+
+                        <div class="flex flex-col w-1/4">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Número (opcional)</label>
+                            <input id="number" placeholder="Número"
+                                class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 
+                                        bg-white dark:bg-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-pink" />
+                        </div>
+                        </div>
+
+                        <script>
+                            // Adicionar 
+                        </script>
                         <!-- Div dos e-mails (inicialmente oculta) -->
                         <div id="authors-container" class="hidden flex flex-wrap gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-gray-300 rounded-lg mb-4">
                             <!-- E-mails serão adicionados aqui dinamicamente -->
@@ -170,11 +284,17 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                             </button>
+
+                            
                         </div>
 
                         <!-- Tooltip -->
                         <div id="email-tooltip" role="tooltip" class="inline-block absolute invisible z-10 py-2 px-3 text-sm font-medium dark:text-gray-300 bg-pink/10 rounded-lg shadow-sm opacity-0 transition-opacity duration-300">
                             Insira e-mails separados por vírgula ou espaço.
+                        </div>
+
+                        <div id="local-tooltip" role="tooltip" class="inline-block absolute invisible z-10 py-2 px-3 text-sm font-medium dark:text-gray-300 bg-pink/10 rounded-lg shadow-sm opacity-0 transition-opacity duration-300">
+                            Pré-visualização do local inserido
                         </div>
                     </div>
                 </div>
