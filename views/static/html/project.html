@@ -161,13 +161,26 @@
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Localização
                             </label>
-                            <button data-tooltip-target="local-tooltip" data-tooltip-placement="right" type="button" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                            <button id="toggle-map-btn" 
+                            data-tooltip-target="local-tooltip"
+                            data-tooltip-placement="right"
+                            type="button" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                    stroke="currentColor" class="size-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/>
                                 </svg>
-                                </button>
+                            </button>
                         </div>
+
+                                                <!-- Container do mapa (fica escondido até o clique) -->
+                        <div id="mapContainer" class="hidden fixed top-4 right-4 w-64 h-40 z-50 rounded-lg shadow-lg border border-gray-300">
+                            <div id="map" class="w-full h-full rounded-lg"></div>
+                        </div>
+
+
                     <!-- CEP + Estado + Município -->
                         <div class="flex flex-wrap gap-4 mb-4">
                         <div class="flex flex-col">
@@ -256,15 +269,43 @@
                         </div>
 
                         <div class="flex flex-col w-1/4">
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Número (opcional)</label>
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Número</label>
                             <input id="number" placeholder="Número"
                                 class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 
                                         bg-white dark:bg-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-pink" />
                         </div>
                         </div>
-
+                        
                         <script>
-                            // Adicionar 
+                                document.addEventListener("DOMContentLoaded", function () {
+                                let mapVisible = false;
+                                let mapInitialized = false;
+                                let map;
+
+                                const toggleBtn = document.getElementById("toggle-map-btn");
+                                const mapContainer = document.getElementById("mapContainer");
+
+                                toggleBtn.addEventListener("click", function () {
+                                    mapVisible = !mapVisible;
+                                    mapContainer.classList.toggle("hidden", !mapVisible);
+
+                                    if (mapVisible && !mapInitialized) {
+                                        map = L.map("map").setView([-23.55052, -46.633308], 13); // Ex: São Paulo como centro inicial
+
+                                        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                                            maxZoom: 19,
+                                            attribution: '&copy; OpenStreetMap contributors'
+                                        }).addTo(map);
+
+                                        mapInitialized = true;
+
+                                        // Adiciona marcador central
+                                        L.marker([-23.55052, -46.633308]).addTo(map)
+                                        .bindPopup("Você está aqui?")
+                                        .openPopup();
+                                    }
+                                });
+                            });
                         </script>
                         <!-- Div dos e-mails (inicialmente oculta) -->
                         <div id="authors-container" class="hidden flex flex-wrap gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-gray-300 rounded-lg mb-4">
@@ -490,4 +531,9 @@
         });
     </script>
 </body>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </html>
