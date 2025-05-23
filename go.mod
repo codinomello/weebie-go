@@ -9,6 +9,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	go.mongodb.org/mongo-driver v1.17.3
 	golang.org/x/crypto v0.38.0
+	golang.org/x/time v0.11.0
 	google.golang.org/api v0.233.0
 )
 
@@ -75,7 +76,6 @@ require (
 	golang.org/x/sync v0.14.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/text v0.25.0 // indirect
-	golang.org/x/time v0.11.0 // indirect
 	golang.org/x/tools v0.32.0 // indirect
 	google.golang.org/appengine/v2 v2.0.6 // indirect
 	google.golang.org/genproto v0.0.0-20241118233622-e639e219e697 // indirect

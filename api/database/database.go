@@ -78,6 +78,10 @@ func InitializeMongoDBDatabase(ctx context.Context, db *mongo.Database) error {
 			Options: options.Index().SetUnique(true),
 		},
 		{
+			Keys:    bson.D{{Key: "phone", Value: 1}},
+			Options: options.Index().SetUnique(true),
+		},
+		{
 			Keys: bson.D{{Key: "name", Value: "text"}},
 			Options: options.Index().
 				SetWeights(bson.D{{Key: "name", Value: 10}}),
@@ -87,8 +91,20 @@ func InitializeMongoDBDatabase(ctx context.Context, db *mongo.Database) error {
 			Options: options.Index(),
 		},
 		{
+			Keys:    bson.D{{Key: "updated_at", Value: -1}},
+			Options: options.Index(),
+		},
+		{
 			Keys:    bson.D{{Key: "deleted_at", Value: 1}},
 			Options: options.Index().SetSparse(true),
+		},
+		{
+			Keys:    bson.D{{Key: "status", Value: 1}},
+			Options: options.Index(),
+		},
+		{
+			Keys:    bson.D{{Key: "role", Value: 1}},
+			Options: options.Index(),
 		},
 	}
 
@@ -165,22 +181,16 @@ func InitializeMongoDBDatabase(ctx context.Context, db *mongo.Database) error {
 
 	// Aplica os índices às coleções com tratamento de erros detalhado
 	if _, err := db.Collection("users").Indexes().CreateMany(idxCtx, userIndexes); err != nil {
-		log.Fatalf("  ✖ erro ao criar índices em 'users': %v", err)
 		return err
 	}
-	log.Println("  ✔ índices da coleção 'users' criados com sucesso!")
 
 	if _, err := db.Collection("projects").Indexes().CreateMany(idxCtx, projectIndexes); err != nil {
-		log.Fatalf("  ✖ erro ao criar índices em 'projects': %v", err)
 		return err
 	}
-	log.Println("  ✔ índices da coleção 'projects' criados com sucesso!")
 
 	if _, err := db.Collection("members").Indexes().CreateMany(idxCtx, memberIndexes); err != nil {
-		log.Fatalf("  ✖ erro ao criar índices em 'members': %v", err)
 		return err
 	}
-	log.Println("  ✔ índices da coleção 'members' criados com sucesso!")
 
 	return nil
 }
