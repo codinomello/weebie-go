@@ -39,6 +39,127 @@ templ About() {
                     </a>
                 </div>
             </section>
+            <section class="mb-16">
+                <h2 class="text-3xl font-bold text-center mb-8 text-orange dark:text-golden">
+                        <span class="text-teal">👥</span> Nosso Time
+                </h2>
+
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <!-- Gabriel Mello -->
+                        <div class="dark:bg-gray-700 p-6 rounded-xl text-center border-b-4 border-green shadow-lg transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:scale-105">
+                            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Fundadora" class="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-blue-200 dark:border-blue-600">
+                            <h3 class="text-xl font-semibold dark:text-white">Gabriel Mello</h3>
+                            <p class="mb-2 animate-color-change-blue dark:animate-color-change-red">
+                                Desenvolvedor e Scrum Master
+                            </p>
+                            <p class="text-sm text-gray-600 dark:text-gray-300">"Acreditamos no poder das comunidades para criar mudanças reais."</p>
+                        </div>
+
+                        <!-- Rafael Brito -->
+                        <div class="dark:bg-gray-700 p-6 rounded-xl text-center border-b-4 border-red shadow-lg transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:scale-105">
+                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Tech Lead" class="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-green-200 dark:border-green-600">
+                            <h3 class="text-xl font-semibold dark:text-white">Rafael Brito</h3>
+                            <p class="mb-2 animate-color-change-green dark:animate-color-change-green-dark">
+                                Programador Full-Stack
+                            </p>
+                            <p class="text-sm text-gray-600 dark:text-gray-300">"A boa educação é moeda de ouro. Em toda parte tem valor"</p>
+                        </div>
+
+                        <!-- Arthur Santos -->
+                        <div class="dark:bg-gray-700 p-6 rounded-xl text-center border-b-4 border-blue shadow-lg transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:scale-105">
+                            <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Comunidade" class="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-pink-200 dark:border-pink-600">
+                            <h3 class="text-xl font-semibold dark:text-white">Arthur Santos</h3>
+                            <p class="mb-2 animate-color-change-pink dark:animate-color-change-orange">
+                                Product Owner
+                            </p>
+                            <p class="text-sm text-gray-600 dark:text-gray-300">"Cada voluntário traz habilidades únicas para nossos projetos."</p>
+                        </div>
+                    </div>
+
+                    <style>
+                        /* Animações para Gabriel Mello (Azul/Vermelho) */
+                        .animate-color-change-blue {
+                            animation: colorShiftBlue 6s infinite;
+                            color: #3b82f6; /* blue-500 */
+                        }
+                        
+                        .animate-color-change-red {
+                            animation: colorShiftRed 6s infinite;
+                            color: #fca5a5; /* red-300 */
+                        }
+
+                        /* Animações para Rafael Brito (Verde/Verde escuro) */
+                        .animate-color-change-green {
+                            animation: colorShiftGreen 6s infinite;
+                            color: #22c55e; /* green-500 */
+                        }
+                        
+                        .animate-color-change-green-dark {
+                            animation: colorShiftGreenDark 6s infinite;
+                            color: #86efac; /* green-300 */
+                        }
+
+                        /* Animações para Arthur Santos (Rosa/Laranja) */
+                        .animate-color-change-pink {
+                            animation: colorShiftPink 6s infinite;
+                            color: #ec4899; /* pink-500 */
+                        }
+                        
+                        .animate-color-change-orange {
+                            animation: colorShiftOrange 6s infinite;
+                            color: #fdba74; /* orange-300 */
+                        }
+
+                        /* Keyframes para as animações */
+                        @keyframes colorShiftBlue {
+                            0% { color: #3b82f6; }
+                            25% { color: #1d4ed8; }
+                            50% { color: #60a5fa; }
+                            75% { color: #93c5fd; }
+                            100% { color: #3b82f6; }
+                        }
+                        
+                        @keyframes colorShiftRed {
+                            0% { color: #fca5a5; }
+                            25% { color: #f87171; }
+                            50% { color: #ef4444; }
+                            75% { color: #dc2626; }
+                            100% { color: #fca5a5; }
+                        }
+
+                        @keyframes colorShiftGreen {
+                            0% { color: #22c55e; }
+                            25% { color: #16a34a; }
+                            50% { color: #4ade80; }
+                            75% { color: #86efac; }
+                            100% { color: #22c55e; }
+                        }
+                        
+                        @keyframes colorShiftGreenDark {
+                            0% { color: #86efac; }
+                            25% { color: #4ade80; }
+                            50% { color: #22c55e; }
+                            75% { color: #16a34a; }
+                            100% { color: #86efac; }
+                        }
+
+                        @keyframes colorShiftPink {
+                            0% { color: #ec4899; }
+                            25% { color: #db2777; }
+                            50% { color: #f472b6; }
+                            75% { color: #f9a8d4; }
+                            100% { color: #ec4899; }
+                        }
+                        
+                        @keyframes colorShiftOrange {
+                            0% { color: #fdba74; }
+                            25% { color: #fb923c; }
+                            50% { color: #f97316; }
+                            75% { color: #ea580c; }
+                            100% { color: #fdba74; }
+                        }
+                    </style>
+            </section>
 
             <!-- Missão Section -->
             <section class="mb-16 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border-l-4 border-blue">
@@ -138,128 +259,6 @@ templ About() {
                 </div>
             </div>
             </div>
-        </section>
-
-        <section class="mb-16">
-         <h2 class="text-3xl font-bold text-center mb-8 text-orange dark:text-golden">
-                <span class="text-teal">👥</span> Nosso Time
-        </h2>
-
-            <div class="grid md:grid-cols-3 gap-6">
-                <!-- Gabriel Mello -->
-                <div class="dark:bg-gray-700 p-6 rounded-xl text-center border-b-4 border-green shadow-lg transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:scale-105">
-                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Fundadora" class="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-blue-200 dark:border-blue-600">
-                    <h3 class="text-xl font-semibold dark:text-white">Gabriel Mello</h3>
-                    <p class="mb-2 animate-color-change-blue dark:animate-color-change-red">
-                        Desenvolvedor e Scrum Master
-                    </p>
-                    <p class="text-sm text-gray-600 dark:text-gray-300">"Acreditamos no poder das comunidades para criar mudanças reais."</p>
-                </div>
-
-                <!-- Rafael Brito -->
-                <div class="dark:bg-gray-700 p-6 rounded-xl text-center border-b-4 border-red shadow-lg transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:scale-105">
-                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Tech Lead" class="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-green-200 dark:border-green-600">
-                    <h3 class="text-xl font-semibold dark:text-white">Rafael Brito</h3>
-                    <p class="mb-2 animate-color-change-green dark:animate-color-change-green-dark">
-                        Programador Full-Stack
-                    </p>
-                    <p class="text-sm text-gray-600 dark:text-gray-300">"A boa educação é moeda de ouro. Em toda parte tem valor"</p>
-                </div>
-
-                <!-- Arthur Santos -->
-                <div class="dark:bg-gray-700 p-6 rounded-xl text-center border-b-4 border-blue shadow-lg transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:scale-105">
-                    <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Comunidade" class="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-pink-200 dark:border-pink-600">
-                    <h3 class="text-xl font-semibold dark:text-white">Arthur Santos</h3>
-                    <p class="mb-2 animate-color-change-pink dark:animate-color-change-orange">
-                        Product Owner
-                    </p>
-                    <p class="text-sm text-gray-600 dark:text-gray-300">"Cada voluntário traz habilidades únicas para nossos projetos."</p>
-                </div>
-            </div>
-
-            <style>
-                /* Animações para Gabriel Mello (Azul/Vermelho) */
-                .animate-color-change-blue {
-                    animation: colorShiftBlue 6s infinite;
-                    color: #3b82f6; /* blue-500 */
-                }
-                
-                .animate-color-change-red {
-                    animation: colorShiftRed 6s infinite;
-                    color: #fca5a5; /* red-300 */
-                }
-
-                /* Animações para Rafael Brito (Verde/Verde escuro) */
-                .animate-color-change-green {
-                    animation: colorShiftGreen 6s infinite;
-                    color: #22c55e; /* green-500 */
-                }
-                
-                .animate-color-change-green-dark {
-                    animation: colorShiftGreenDark 6s infinite;
-                    color: #86efac; /* green-300 */
-                }
-
-                /* Animações para Arthur Santos (Rosa/Laranja) */
-                .animate-color-change-pink {
-                    animation: colorShiftPink 6s infinite;
-                    color: #ec4899; /* pink-500 */
-                }
-                
-                .animate-color-change-orange {
-                    animation: colorShiftOrange 6s infinite;
-                    color: #fdba74; /* orange-300 */
-                }
-
-                /* Keyframes para as animações */
-                @keyframes colorShiftBlue {
-                    0% { color: #3b82f6; }
-                    25% { color: #1d4ed8; }
-                    50% { color: #60a5fa; }
-                    75% { color: #93c5fd; }
-                    100% { color: #3b82f6; }
-                }
-                
-                @keyframes colorShiftRed {
-                    0% { color: #fca5a5; }
-                    25% { color: #f87171; }
-                    50% { color: #ef4444; }
-                    75% { color: #dc2626; }
-                    100% { color: #fca5a5; }
-                }
-
-                @keyframes colorShiftGreen {
-                    0% { color: #22c55e; }
-                    25% { color: #16a34a; }
-                    50% { color: #4ade80; }
-                    75% { color: #86efac; }
-                    100% { color: #22c55e; }
-                }
-                
-                @keyframes colorShiftGreenDark {
-                    0% { color: #86efac; }
-                    25% { color: #4ade80; }
-                    50% { color: #22c55e; }
-                    75% { color: #16a34a; }
-                    100% { color: #86efac; }
-                }
-
-                @keyframes colorShiftPink {
-                    0% { color: #ec4899; }
-                    25% { color: #db2777; }
-                    50% { color: #f472b6; }
-                    75% { color: #f9a8d4; }
-                    100% { color: #ec4899; }
-                }
-                
-                @keyframes colorShiftOrange {
-                    0% { color: #fdba74; }
-                    25% { color: #fb923c; }
-                    50% { color: #f97316; }
-                    75% { color: #ea580c; }
-                    100% { color: #fdba74; }
-                }
-            </style>
         </section>
 
             <!-- CTA Section -->
