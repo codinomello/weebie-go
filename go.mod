@@ -10,7 +10,7 @@ require (
 	go.mongodb.org/mongo-driver v1.17.3
 	golang.org/x/crypto v0.38.0
 	golang.org/x/time v0.11.0
-	google.golang.org/api v0.233.0
+	google.golang.org/api v0.215.0
 )
 
 require (

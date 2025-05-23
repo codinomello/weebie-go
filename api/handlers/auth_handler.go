@@ -26,6 +26,17 @@ func (h *AuthHandler) RegisterUser() http.HandlerFunc {
 	}
 }
 
+// Login com Firebase ID Token (recomendado)
+func (h *AuthHandler) LoginWithToken() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
+			return
+		}
+		h.AuthController.LoginWithToken(w, r)
+	}
+}
+
 func (h *AuthHandler) CreateToken() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {

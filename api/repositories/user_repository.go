@@ -43,37 +43,57 @@ func (r *MongoDBUserRepository) CreateUser(ctx context.Context, user *models.Use
 	}
 	user.DeletedAt = nil
 
-	_, err := r.UsersCollection.InsertOne(ctx, user)
+	log.Printf("Inserindo usuário no MongoDB: UID=%s, Email=%s", user.UID, user.Email)
+
+	result, err := r.UsersCollection.InsertOne(ctx, user)
 	if err != nil {
 		if mongo.IsDuplicateKeyError(err) {
+			log.Printf("Erro: usuário já existe - %v", err)
 			return nil, errors.New("usuário já existe")
 		}
 		log.Printf("Erro ao criar usuário: %v", err)
 		return nil, err
 	}
 
+	log.Printf("Usuário inserido com ID: %v", result.InsertedID)
 	return user, nil
 }
 
 func (r *MongoDBUserRepository) GetUserByUID(ctx context.Context, uid string) (*models.User, error) {
 	var user models.User
-	filter := bson.M{"uid": uid, "deleted_at": nil}
+	filter := bson.M{
+		"uid": uid,
+		"$or": []bson.M{
+			{"deleted_at": nil},
+			{"deleted_at": bson.M{"$exists": false}},
+		},
+	}
+
+	log.Printf("Buscando usuário por UID: %s", uid)
 
 	err := r.UsersCollection.FindOne(ctx, filter).Decode(&user)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
+			log.Printf("Usuário não encontrado para UID: %s", uid)
 			return nil, nil
 		}
 		log.Printf("Erro ao buscar usuário por UID %s: %v", uid, err)
 		return nil, err
 	}
 
+	log.Printf("Usuário encontrado: %s", user.Email)
 	return &user, nil
 }
 
 func (r *MongoDBUserRepository) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
 	var user models.User
-	filter := bson.M{"email": email, "deleted_at": nil}
+	filter := bson.M{
+		"email": email,
+		"$or": []bson.M{
+			{"deleted_at": nil},
+			{"deleted_at": bson.M{"$exists": false}},
+		},
+	}
 
 	err := r.UsersCollection.FindOne(ctx, filter).Decode(&user)
 	if err != nil {
@@ -88,7 +108,14 @@ func (r *MongoDBUserRepository) GetUserByEmail(ctx context.Context, email string
 }
 
 func (r *MongoDBUserRepository) UpdateUser(ctx context.Context, uid string, updateData *models.User) (*models.User, error) {
-	filter := bson.M{"uid": uid, "deleted_at": nil}
+	filter := bson.M{
+		"uid": uid,
+		"$or": []bson.M{
+			{"deleted_at": nil},
+			{"deleted_at": bson.M{"$exists": false}},
+		},
+	}
+
 	update := bson.M{
 		"$set": bson.M{
 			"updated_at": time.Now(),
@@ -151,7 +178,14 @@ func (r *MongoDBUserRepository) UpdateUser(ctx context.Context, uid string, upda
 }
 
 func (r *MongoDBUserRepository) DeleteUser(ctx context.Context, uid string) error {
-	filter := bson.M{"uid": uid, "deleted_at": nil}
+	filter := bson.M{
+		"uid": uid,
+		"$or": []bson.M{
+			{"deleted_at": nil},
+			{"deleted_at": bson.M{"$exists": false}},
+		},
+	}
+
 	update := bson.M{
 		"$set": bson.M{
 			"deleted_at": time.Now(),

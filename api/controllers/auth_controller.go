@@ -3,10 +3,9 @@ package controllers
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
-	"time"
 
-	firebaseAuth "firebase.google.com/go/v4/auth"
 	"github.com/codinomello/weebie-go/api/authentication"
 	"github.com/codinomello/weebie-go/api/models"
 	"github.com/codinomello/weebie-go/api/repositories"
@@ -27,65 +26,98 @@ func NewAuthController(userRepo repositories.UserRepository) *AuthController {
 
 // RegisterUser cria um novo usuário
 func (c *AuthController) RegisterUser(w http.ResponseWriter, r *http.Request) {
-	var user models.User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+	var request models.UserCreateRequest
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		log.Printf("Erro ao decodificar JSON: %v", err)
 		http.Error(w, "JSON inválido", http.StatusBadRequest)
 		return
 	}
 
+	log.Printf("Dados recebidos: %+v", request)
+
 	// Validação básica
-	if user.Email == "" || user.Password == "" {
-		http.Error(w, "Email e senha são obrigatórios", http.StatusBadRequest)
+	if request.Name == "" || request.IDToken == "" {
+		http.Error(w, "Nome e ID Token são obrigatórios", http.StatusBadRequest)
 		return
 	}
 
-	// Hash da senha
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-	if err != nil {
-		http.Error(w, "Erro ao processar senha", http.StatusInternalServerError)
-		return
-	}
-	user.Password = string(hashedPassword)
-
-	// Cria usuário no Firebase
+	// Inicializa cliente Firebase
 	client, err := c.AuthenticationService.Initialize()
 	if err != nil {
+		log.Printf("Erro ao inicializar Firebase: %v", err)
 		http.Error(w, "Erro ao inicializar autenticação", http.StatusInternalServerError)
 		return
 	}
 
-	params := (&firebaseAuth.UserToCreate{}).
-		Email(user.Email).
-		Password(user.Password)
-
-	firebaseUser, err := client.CreateUser(context.Background(), params)
+	// Verifica o ID Token para obter informações do usuário Firebase
+	token, err := client.VerifyIDToken(context.Background(), request.IDToken)
 	if err != nil {
-		http.Error(w, "Erro ao criar usuário no Firebase", http.StatusInternalServerError)
+		log.Printf("Erro ao verificar ID Token: %v", err)
+		http.Error(w, "Token inválido", http.StatusUnauthorized)
 		return
 	}
 
-	user.UID = firebaseUser.UID
-	user.CreatedAt = time.Now()
+	log.Printf("Token verificado para UID: %s", token.UID)
+
+	// Verifica se o usuário já existe no MongoDB
+	existingUser, err := c.UserRepository.GetUserByUID(context.Background(), token.UID)
+	if err != nil {
+		log.Printf("Erro ao verificar usuário existente: %v", err)
+		http.Error(w, "Erro interno do servidor", http.StatusInternalServerError)
+		return
+	}
+
+	if existingUser != nil {
+		log.Printf("Usuário já existe: %s", token.UID)
+		http.Error(w, "Usuário já existe", http.StatusConflict)
+		return
+	}
+
+	// Obtém email do token ou dos claims
+	email := ""
+	if token.Claims["email"] != nil {
+		email = token.Claims["email"].(string)
+	}
+
+	if email == "" {
+		log.Printf("Email não encontrado no token")
+		http.Error(w, "Email não encontrado no token", http.StatusBadRequest)
+		return
+	}
+
+	// Cria o modelo User
+	user := &models.User{
+		UID:     token.UID,
+		Name:    request.Name,
+		Email:   email,
+		Phone:   request.Phone,
+		Age:     request.Age,
+		Address: request.Address,
+		CPF:     request.CPF,
+		RG:      request.RG,
+		Sex:     request.Sex,
+		Role:    request.Role,
+	}
+
+	// Define valores padrão
+	user.SetDefaults()
+
+	log.Printf("Criando usuário no MongoDB: %+v", user)
 
 	// Salva no MongoDB
-	newUser, err := c.UserRepository.CreateUser(context.Background(), &user)
+	newUser, err := c.UserRepository.CreateUser(context.Background(), user)
 	if err != nil {
-		// Tenta remover do Firebase se falhar no MongoDB
-		_ = client.DeleteUser(context.Background(), firebaseUser.UID)
+		log.Printf("Erro ao criar usuário no MongoDB: %v", err)
 		http.Error(w, "Erro ao criar usuário", http.StatusInternalServerError)
 		return
 	}
 
-	// Gera token de acesso
-	token, err := client.CustomToken(context.Background(), firebaseUser.UID)
-	if err != nil {
-		http.Error(w, "Erro ao gerar token", http.StatusInternalServerError)
-		return
-	}
+	log.Printf("Usuário criado com sucesso: %s", newUser.UID)
 
+	// Retorna resposta
 	response := map[string]interface{}{
-		"token": token,
-		"user":  newUser,
+		"message": "Usuário criado com sucesso",
+		"user":    newUser.ToResponse(),
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -93,7 +125,74 @@ func (c *AuthController) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-// CreateToken (Login)
+// LoginWithToken - Login usando Firebase ID Token (recomendado)
+func (c *AuthController) LoginWithToken(w http.ResponseWriter, r *http.Request) {
+	var request struct {
+		IDToken string `json:"id_token" binding:"required"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		log.Printf("Erro ao decodificar JSON: %v", err)
+		http.Error(w, "JSON inválido", http.StatusBadRequest)
+		return
+	}
+
+	log.Printf("Tentativa de login com ID Token")
+
+	// Inicializa cliente Firebase
+	client, err := c.AuthenticationService.Initialize()
+	if err != nil {
+		log.Printf("Erro ao inicializar Firebase: %v", err)
+		http.Error(w, "Erro ao inicializar autenticação", http.StatusInternalServerError)
+		return
+	}
+
+	// Verifica o ID Token
+	token, err := client.VerifyIDToken(context.Background(), request.IDToken)
+	if err != nil {
+		log.Printf("Erro ao verificar ID Token: %v", err)
+		http.Error(w, "Token inválido", http.StatusUnauthorized)
+		return
+	}
+
+	log.Printf("Token verificado para UID: %s", token.UID)
+
+	// Busca usuário no MongoDB
+	user, err := c.UserRepository.GetUserByUID(context.Background(), token.UID)
+	if err != nil {
+		log.Printf("Erro ao buscar usuário: %v", err)
+		http.Error(w, "Erro interno do servidor", http.StatusInternalServerError)
+		return
+	}
+
+	if user == nil {
+		log.Printf("Usuário não encontrado no MongoDB: %s", token.UID)
+		http.Error(w, "Usuário não encontrado. Faça o registro primeiro.", http.StatusNotFound)
+		return
+	}
+
+	// Verifica se usuário está ativo
+	if user.Status != "active" {
+		log.Printf("Usuário inativo: %s", user.UID)
+		http.Error(w, "Conta inativa", http.StatusForbidden)
+		return
+	}
+
+	log.Printf("Login realizado com sucesso para: %s", user.Email)
+
+	// Retorna dados do usuário
+	response := map[string]interface{}{
+		"message":  "Login realizado com sucesso",
+		"user":     user.ToResponse(),
+		"uid":      user.UID,
+		"id_token": request.IDToken, // Retorna o mesmo token para uso no frontend
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
+
+// CreateToken (Login tradicional - opcional, caso queira manter)
 func (c *AuthController) CreateToken(w http.ResponseWriter, r *http.Request) {
 	var credentials struct {
 		Email    string `json:"email"`
@@ -101,44 +200,70 @@ func (c *AuthController) CreateToken(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&credentials); err != nil {
+		log.Printf("Erro ao decodificar JSON: %v", err)
 		http.Error(w, "JSON inválido", http.StatusBadRequest)
 		return
 	}
 
+	log.Printf("Tentativa de login tradicional para: %s", credentials.Email)
+
 	// Verifica usuário no banco
 	user, err := c.UserRepository.GetUserByEmail(context.Background(), credentials.Email)
 	if err != nil {
+		log.Printf("Erro ao buscar usuário: %v", err)
 		http.Error(w, "Erro ao buscar usuário", http.StatusInternalServerError)
 		return
 	}
 
 	if user == nil {
+		log.Printf("Usuário não encontrado: %s", credentials.Email)
 		http.Error(w, "Credenciais inválidas", http.StatusUnauthorized)
+		return
+	}
+
+	// Verifica se tem senha (pode não ter se foi criado apenas via Firebase)
+	if user.Password == "" {
+		log.Printf("Usuário sem senha cadastrada: %s", credentials.Email)
+		http.Error(w, "Use o login com Firebase", http.StatusBadRequest)
 		return
 	}
 
 	// Verifica senha
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(credentials.Password)); err != nil {
+		log.Printf("Senha incorreta para: %s", credentials.Email)
 		http.Error(w, "Credenciais inválidas", http.StatusUnauthorized)
 		return
 	}
 
-	// Gera token
+	// Verifica se usuário está ativo
+	if user.Status != "active" {
+		log.Printf("Usuário inativo: %s", user.Email)
+		http.Error(w, "Conta inativa", http.StatusForbidden)
+		return
+	}
+
+	// Gera custom token do Firebase
 	client, err := c.AuthenticationService.Initialize()
 	if err != nil {
+		log.Printf("Erro ao inicializar Firebase: %v", err)
 		http.Error(w, "Erro ao inicializar autenticação", http.StatusInternalServerError)
 		return
 	}
 
-	token, err := client.CustomToken(context.Background(), user.UID)
+	customToken, err := client.CustomToken(context.Background(), user.UID)
 	if err != nil {
+		log.Printf("Erro ao gerar custom token: %v", err)
 		http.Error(w, "Erro ao gerar token", http.StatusInternalServerError)
 		return
 	}
 
-	response := map[string]string{
-		"token":         token,
-		"refresh_token": "", // Implementar se usar refresh tokens
+	log.Printf("Login tradicional realizado com sucesso para: %s", user.Email)
+
+	response := map[string]interface{}{
+		"message":      "Login realizado com sucesso",
+		"custom_token": customToken,
+		"user":         user.ToResponse(),
+		"uid":          user.UID,
 	}
 
 	w.Header().Set("Content-Type", "application/json")

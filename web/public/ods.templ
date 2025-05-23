@@ -1,0 +1,157 @@
+package public
+
+import (
+    components "github.com/codinomello/weebie-go/web/components"
+)
+
+templ ODSListPage() {
+    <html lang="pt-BR">
+    <head>
+        @components.Meta()
+        @components.Title("Weebie - Objetivos de Desenvolvimento Sustentável")
+        @components.ScriptHead()
+        @components.StyleHead()
+        @components.Link("house_with_garden.png")
+    </head>
+    <body class="bg-gray-100 dark:bg-gray-900 min-h-screen flex flex-col">
+        @components.Nav("ODS - Objetivos de Desenvolvimento Sustentável", "earth_globe.png")
+        
+        <main class="flex-grow container mx-auto px-4 py-8">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold text-blue dark:text-blue-300 mb-4">
+                    <span class="text-yellow-600">🌎</span> ODS
+                </h1>
+                <p class="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+                    Os 17 Objetivos de Desenvolvimento Sustentável (ODS) da ONU para transformar nosso mundo
+                </p>
+            </div>
+
+            <!-- Loading state -->
+            <div id="loading" class="flex justify-center py-12">
+                <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue"></div>
+            </div>
+
+            <!-- ODS Grid -->
+            <div id="ods-grid" class="hidden grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <!-- ODS cards will be inserted here by JavaScript -->
+            </div>
+
+            <!-- Modal para detalhes do ODS -->
+            <div id="ods-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div class="bg-white dark:bg-gray-800 rounded-xl max-w-2xl w-full p-6 shadow-2xl">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 id="ods-modal-title" class="text-2xl font-bold text-yellow-600 dark:text-yellow-300"></h3>
+                            <p id="ods-modal-number" class="text-lg text-gray-500 dark:text-gray-400"></p>
+                        </div>
+                        <button onclick="closeODSModal()" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <div class="flex-1 flex flex-col items-center">
+                            <img id="ods-modal-image" src="" alt="" class="w-full max-w-xs rounded-lg mb-4">
+                            <span id="ods-modal-emoji" class="text-6xl"></span>
+                        </div>
+                        <div class="flex-1">
+                            <p id="ods-modal-description" class="text-gray-700 dark:text-gray-300 mb-4"></p>
+                            <div class="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
+                                <h4 class="font-bold text-blue-800 dark:text-blue-200 mb-2">Metas principais:</h4>
+                                <ul id="ods-modal-targets" class="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-1"></ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 flex justify-end">
+                        <button onclick="closeODSModal()" class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition">
+                            Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Scripts -->
+        @components.ScriptBody()
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                // Carregar ODS do endpoint
+                fetch('/api/ods')
+                    .then(response => response.json())
+                    .then(data => {
+                        const loading = document.getElementById('loading');
+                        const odsGrid = document.getElementById('ods-grid');
+                        
+                        loading.classList.add('hidden');
+                        odsGrid.classList.remove('hidden');
+                        
+                        data.forEach(ods => {
+                            const odsCard = document.createElement('div');
+                            odsCard.className = 'bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-200 dark:border-gray-700 hover:shadow-lg transition cursor-pointer';
+                            odsCard.innerHTML = `
+                                <div onclick="showODSDetails(${ods.number})">
+                                    <img src="${ods.image_url}" alt="ODS ${ods.number}" class="w-full h-48 object-cover">
+                                    <div class="p-4">
+                                        <div class="flex items-center gap-3 mb-2">
+                                            <span class="text-3xl">${ods.emoji}</span>
+                                            <h3 class="text-xl font-bold text-yellow-600 dark:text-yellow-300">ODS ${ods.number}</h3>
+                                        </div>
+                                        <p class="text-gray-700 dark:text-gray-300">${ods.title}</p>
+                                    </div>
+                                </div>
+                            `;
+                            odsGrid.appendChild(odsCard);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Erro ao carregar ODS:', error);
+                        document.getElementById('loading').innerHTML = `
+                            <div class="text-center py-12">
+                                <p class="text-red-500">Falha ao carregar os ODS. Tente recarregar a página.</p>
+                                <button onclick="window.location.reload()" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                                    Recarregar
+                                </button>
+                            </div>
+                        `;
+                    });
+            });
+            
+            // Função para mostrar detalhes do ODS
+            window.showODSDetails = function(odsNumber) {
+                fetch(`/api/ods/${odsNumber}`)
+                    .then(response => response.json())
+                    .then(ods => {
+                        document.getElementById('ods-modal-title').textContent = ods.title;
+                        document.getElementById('ods-modal-number').textContent = `ODS ${ods.number}`;
+                        document.getElementById('ods-modal-emoji').textContent = ods.emoji;
+                        document.getElementById('ods-modal-image').src = ods.image_url;
+                        document.getElementById('ods-modal-image').alt = `ODS ${ods.number} - ${ods.title}`;
+                        document.getElementById('ods-modal-description').textContent = ods.description;
+                        
+                        const targetsList = document.getElementById('ods-modal-targets');
+                        targetsList.innerHTML = '';
+                        ods.targets.forEach(target => {
+                            const li = document.createElement('li');
+                            li.textContent = target;
+                            targetsList.appendChild(li);
+                        });
+                        
+                        document.getElementById('ods-modal').classList.remove('hidden');
+                    })
+                    .catch(error => {
+                        console.error('Erro ao carregar detalhes do ODS:', error);
+                        alert('Erro ao carregar detalhes do ODS');
+                    });
+            };
+            
+            // Função para fechar modal ODS
+            window.closeODSModal = function() {
+                document.getElementById('ods-modal').classList.add('hidden');
+            };
+        </script>
+    </body>
+    </html>
+}

@@ -10,7 +10,6 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"github.com/codinomello/weebie-go/web/components"
-	"github.com/codinomello/weebie-go/web/components/custom"
 )
 
 func Dashboard() templ.Component {
@@ -34,7 +33,7 @@ func Dashboard() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<html lang=\"pt-BR\"><head>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<html lang=\"pt-BR\"><head><!-- Meta Tags -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -42,7 +41,15 @@ func Dashboard() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<!-- Título -->")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		templ_7745c5c3_Err = components.Title("Weebie - Dashboard").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<!-- HTMX e Tailwind CSS -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -50,43 +57,47 @@ func Dashboard() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<!-- Fonte -->")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		templ_7745c5c3_Err = components.StyleHead().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = components.Link("bar_chart.png").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<!-- Flowbite CSS e Ícone -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><body class=\"bg-gray-50 dark:bg-gray-900\"><!-- Sidebar --><!-- Main Content --><div class=\"p-4 sm:ml-64\"><!-- Header --><div class=\"mb-6\"><h1 class=\"text-3xl font-bold text-gray-900 dark:text-white\">Dashboard</h1><nav class=\"flex mt-2\" aria-label=\"Breadcrumb\"><ol class=\"inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse\"><li class=\"inline-flex items-center\"><a href=\"/dashboard\" class=\"inline-flex items-center text-sm font-medium text-orange dark:text-golden hover:text-orange-600 dark:hover:text-white\"><svg class=\"w-3 h-3 me-2.5\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"currentColor\" viewBox=\"0 0 20 20\"><path d=\"m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z\"></path></svg> Home</a></li><li aria-current=\"page\"><div class=\"flex items-center\"><svg class=\"rtl:rotate-180 w-3 h-3 text-gray-400 mx-1\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 6 10\"><path stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"m1 9 4-4-4-4\"></path></svg> <span class=\"ms-1 text-sm font-medium text-gray-500 md:ms-2 dark:text-gray-400\">Dashboard</span></div></li></ol></nav></div><!-- Stats Cards --><div class=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6\">")
+		templ_7745c5c3_Err = components.Link("house_with_garden.png").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = custom.StatCard("Total de Projetos", "24", "text-blue-500", "blue").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</head><body class=\"bg-gray-100 dark:bg-gray-900\"><!-- Navegação  -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = custom.StatCard("Tarefas Pendentes", "12", "text-orange", "orange").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = components.Nav("Weebie - Meus Projetos", "house_with_garden.png").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = custom.StatCard("Tarefas Concluídas", "32", "text-green-500", "green").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<!-- Conteúdo Principal --><div class=\"container mx-auto px-4 py-8\"><div class=\"flex flex-col md:flex-row gap-6\"><!-- Sidebar --><div class=\"w-full md:w-64 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4\"><div class=\"mb-8 text-center\"><div class=\"text-3xl mb-2\">👋</div><h3 class=\"font-bold text-orange dark:text-golden\">Seu Painel</h3><p class=\"text-sm text-gray-500 dark:text-gray-400\">Bem-vindo de volta!</p></div><nav class=\"space-y-2\"><a href=\"#\" class=\"flex items-center gap-3 p-3 rounded-lg bg-blue/10 text-blue dark:bg-blue/20 dark:text-blue/80\"><span>📊</span> Visão Geral</a> <a href=\"#\" class=\"flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300\"><span>💼</span> Meus Projetos</a> <a href=\"#\" class=\"flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300\"><span>🤝</span> Colaborações</a> <a href=\"#\" class=\"flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300\"><span>🔔</span> Notificações</a> <a href=\"#\" class=\"flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300\"><span>⚙️</span> Configurações</a></nav></div><!-- Main Content --><div class=\"flex-1\"><!-- Cards de Resumo --><div class=\"grid grid-cols-1 md:grid-cols-3 gap-6 mb-8\"><div class=\"bg-white dark:bg-gray-800 p-6 rounded-xl border-l-4 border-green shadow-lg\"><div class=\"flex justify-between items-start\"><div><p class=\"text-gray-500 dark:text-gray-400\">Projetos Ativos</p><h3 class=\"text-2xl font-bold text-orange dark:text-golden\">5</h3></div><span class=\"text-green text-2xl\">🌱</span></div></div><div class=\"bg-white dark:bg-gray-800 p-6 rounded-xl border-l-4 border-blue shadow-lg\"><div class=\"flex justify-between items-start\"><div><p class=\"text-gray-500 dark:text-gray-400\">Colaboradores</p><h3 class=\"text-2xl font-bold text-orange dark:text-golden\">23</h3></div><span class=\"text-blue text-2xl\">👥</span></div></div><div class=\"bg-white dark:bg-gray-800 p-6 rounded-xl border-l-4 border-pink shadow-lg\"><div class=\"flex justify-between items-start\"><div><p class=\"text-gray-500 dark:text-gray-400\">Tarefas Pendentes</p><h3 class=\"text-2xl font-bold text-orange dark:text-golden\">7</h3></div><span class=\"text-pink text-2xl\">📝</span></div></div></div><!-- Seção de Projetos Recentes --><div class=\"bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8\"><div class=\"flex justify-between items-center mb-6\"><h3 class=\"text-xl font-bold text-orange dark:text-golden\">Meus Projetos Recentes</h3><a href=\"#\" class=\"text-blue hover:underline\">Ver todos</a></div><div class=\"space-y-4\"><div class=\"p-4 border rounded-lg hover:shadow-md transition\"><div class=\"flex justify-between items-start\"><div><h4 class=\"font-semibold dark:text-gray-200\">🌻 Horta Comunitária</h4><p class=\"text-sm text-gray-500 dark:text-gray-400\">Última atualização: 2 dias atrás</p></div><span class=\"bg-green/10 text-green px-2 py-1 rounded-full text-xs\">Ativo</span></div><div class=\"mt-3\"><div class=\"flex items-center gap-2 text-sm mb-2\"><span>Progresso:</span><div class=\"flex-1 h-2 bg-gray-200 rounded-full\"><div class=\"h-2 bg-blue rounded-full w-3/4\"></div></div><span>75%</span></div><div class=\"flex gap-2\"><button class=\"text-sm bg-blue text-white px-3 py-1 rounded hover:bg-blue/80 transition\">Gerenciar</button> <button class=\"text-sm border border-gray-300 px-3 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition\">Detalhes</button></div></div></div><!-- Adicione mais projetos seguindo o mesmo padrão --></div></div><!-- Atividades Recentes --><div class=\"bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6\"><h3 class=\"text-xl font-bold text-orange dark:text-golden mb-6\">Atividades Recentes</h3><div class=\"space-y-4\"><div class=\"flex gap-3\"><div class=\"text-blue text-xl\">📢</div><div><p class=\"text-sm dark:text-gray-300\">Novo colaborador no projeto <span class=\"font-semibold\">Biblioteca Livre</span></p><p class=\"text-xs text-gray-500 dark:text-gray-400\">2 horas atrás</p></div></div><div class=\"flex gap-3\"><div class=\"text-green text-xl\">✅</div><div><p class=\"text-sm dark:text-gray-300\">Tarefa concluída: <span class=\"font-semibold\">Comprar materiais para oficina</span></p><p class=\"text-xs text-gray-500 dark:text-gray-400\">Ontem, 15:32</p></div></div><!-- Adicione mais atividades seguindo o mesmo padrão --></div></div></div></div></div><!-- Footer -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = custom.StatCard("Membros da Equipe", "5", "text-purple-500", "purple").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = components.FooterIndex().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</div><!-- Charts Row --><div class=\"grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6\"><!-- Gráfico de Barras --><div class=\"p-6 bg-white rounded-lg shadow dark:bg-gray-800\"><div class=\"flex justify-between items-center mb-4\"><h5 class=\"text-xl font-bold leading-none text-gray-900 dark:text-white\">Progresso Mensal</h5><a href=\"#\" class=\"text-sm font-medium text-orange hover:underline dark:text-golden\">Ver tudo</a></div><div id=\"bar-chart\"></div></div><!-- Gráfico de Pizza --><div class=\"p-6 bg-white rounded-lg shadow dark:bg-gray-800\"><h5 class=\"text-xl font-bold leading-none text-gray-900 dark:text-white mb-4\">Distribuição de Tarefas</h5><div class=\"py-6\" id=\"pie-chart\"></div></div></div><!-- Recent Activity & Projects --><div class=\"grid grid-cols-1 lg:grid-cols-3 gap-6\"><!-- Atividades Recentes --><div class=\"lg:col-span-2\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<!-- Scripts -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = custom.ActivityTimeline().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = components.ScriptBody().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div><!-- Projetos em Andamento --><div></div></div></div><!-- Flowbite Scripts --><script src=\"https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js\"></script><!-- ApexCharts --><script src=\"https://cdn.jsdelivr.net/npm/apexcharts\"></script><script>\r\n            // Inicialização dos gráficos\r\n            document.addEventListener('DOMContentLoaded', function() {\r\n                // Gráfico de Barras\r\n                const barChartOptions = {\r\n                    series: [{\r\n                        name: \"Concluídas\",\r\n                        data: [12, 19, 15, 20, 14, 25, 18]\r\n                    }, {\r\n                        name: \"Pendentes\",\r\n                        data: [8, 11, 5, 10, 6, 15, 7]\r\n                    }],\r\n                    chart: {\r\n                        type: 'bar',\r\n                        height: 350,\r\n                        toolbar: { show: false },\r\n                        foreColor: '#6B7280'\r\n                    },\r\n                    colors: ['#3B82F6', '#F97316'],\r\n                    plotOptions: {\r\n                        bar: {\r\n                            borderRadius: 4,\r\n                            horizontal: false,\r\n                            columnWidth: '55%',\r\n                        }\r\n                    },\r\n                    dataLabels: { enabled: false },\r\n                    stroke: { show: true, width: 2, colors: ['transparent'] },\r\n                    xaxis: {\r\n                        categories: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],\r\n                    },\r\n                    yaxis: { title: { text: \"Tarefas\" } },\r\n                    fill: { opacity: 1 },\r\n                    tooltip: {\r\n                        y: {\r\n                            formatter: function(val) {\r\n                                return val + \" tarefas\"\r\n                            }\r\n                        }\r\n                    },\r\n                    legend: { position: 'top' }\r\n                };\r\n\r\n                const barChart = new ApexCharts(document.querySelector(\"#bar-chart\"), barChartOptions);\r\n                barChart.render();\r\n\r\n                // Gráfico de Pizza\r\n                const pieChartOptions = {\r\n                    series: [44, 55, 13, 33],\r\n                    chart: {\r\n                        type: 'pie',\r\n                        height: 350\r\n                    },\r\n                    labels: ['Design', 'Desenvolvimento', 'Testes', 'Reuniões'],\r\n                    colors: ['#3B82F6', '#F97316', '#10B981', '#8B5CF6'],\r\n                    responsive: [{\r\n                        breakpoint: 480,\r\n                        options: {\r\n                            chart: { width: 200 },\r\n                            legend: { position: 'bottom' }\r\n                        }\r\n                    }]\r\n                };\r\n\r\n                const pieChart = new ApexCharts(document.querySelector(\"#pie-chart\"), pieChartOptions);\r\n                pieChart.render();\r\n\r\n                // Inicializa os tooltips do Flowbite\r\n                const tooltipTriggers = document.querySelectorAll('[data-tooltip-target]');\r\n                tooltipTriggers.forEach(trigger => {\r\n                    new FlowbiteTooltip(trigger);\r\n                });\r\n            });\r\n        </script></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
