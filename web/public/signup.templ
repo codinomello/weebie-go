@@ -1,0 +1,422 @@
+package public
+
+import (
+    components "github.com/codinomello/weebie-go/web/components"
+    custom "github.com/codinomello/weebie-go/web/components/custom"
+)
+
+templ SignUp() {
+    <html lang="pt-BR">
+    <head>
+        <!-- Meta Tags -->
+        @components.Meta()
+        <!-- Título -->
+        @components.Title("Weebie - Inscreva-se")
+        <!-- HTMX e Tailwind CSS -->
+        @components.ScriptHead()
+        <!-- Fonte -->
+        @components.StyleHead()
+        <!-- Flowbite CSS e Ícone -->
+        @components.Link("house_with_garden.png")
+    </head>
+    <body class="bg-gray-100 dark:bg-gray-900">
+        <!-- Header -->
+        @components.Nav("Weebie", "art.png")
+        <!-- Formulário de Login/Cadastro -->
+        <main class="flex-grow flex items-center justify-center p-4 pt-8">
+            <div class="w-full max-w-xl">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl">
+                    <div class="text-center mb-6">
+                        <h2 id="form-title" class="text-3xl font-bold text-orange dark:text-golden mb-2">👤 Cadastre-se</h2>
+                        <p class="text-gray-600 dark:text-gray-300">Junte-se à nossa comunidade de transformação</p>
+                    </div>
+                    <!-- Formulário de Autenticação-->
+                    <form id="email-signup-form" class="space-y-5 text-base">
+                        <!-- Seção 1: Dados Pessoais -->
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+                            <!-- Nome -->
+                            <div class="space-y-2 md:col-span-3">
+                                <label class="block text-base font-medium text-gray-700 dark:text-gray-300">Nome Completo*</label>
+                                <input name="name" 
+                                    type="text" 
+                                    required
+                                    class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-orange focus:border-transparent transition">
+                            </div>
+                            <!-- Idade -->
+                            <div class="space-y-2">
+                                <label class="block text-base font-medium text-gray-700 dark:text-gray-300">Idade*</label>
+                                <input name="age" 
+                                    type="number" 
+                                    required
+                                    min="1"
+                                    max="120"
+                                    class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-orange focus:border-transparent transition">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                            <!-- CPF -->
+                            <div class="space-y-2">
+                                <label class="block text-base font-medium text-gray-700 dark:text-gray-300">CPF*</label>
+                                <input name="cpf" 
+                                    type="text" 
+                                    required
+                                    placeholder="000.000.000-00"
+                                    data-mask="000.000.000-00"
+                                    class="cpf-mask w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-orange focus:border-transparent transition">
+                            </div>
+                            
+                            <!-- RG -->
+                            <div class="space-y-2">
+                                <label class="block text-base font-medium text-gray-700 dark:text-gray-300">RG*</label>
+                                <input name="rg" 
+                                    type="text" 
+                                    required
+                                    placeholder="00.000.000-0"
+                                    data-mask="00.000.000-0"
+                                    class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-orange focus:border-transparent transition">
+                            </div>
+
+                            <!-- Sexo -->
+                            <div class="space-y-2">
+                                <label class="block text-base font-medium text-gray-700 dark:text-gray-300">Sexo*</label>
+                                <select name="sex" required
+                                    class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-orange focus:border-transparent transition">
+                                    <option value="">Selecione</option>
+                                    <option value="male">Masculino</option>
+                                    <option value="female">Feminino</option>
+                                    <option value="other">Outro</option>
+                                    <option value="none">Prefiro não dizer</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Seção 2: Contato -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <!-- E-mail -->
+                            <div class="space-y-2">
+                                <label class="block text-base font-medium text-gray-700 dark:text-gray-300">E-mail*</label>
+                                <input name="email"
+                                    type="email" 
+                                    required
+                                    class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-orange focus:border-transparent transition">
+                            </div>
+
+                            <!-- Telefone -->
+                            <div class="space-y-2">
+                                <label class="block text-base font-medium text-gray-700 dark:text-gray-300">Telefone*</label>
+                                <input name="phone" 
+                                    type="tel" 
+                                    required
+                                    placeholder="(00) 00000-0000"
+                                    data-mask="(00) 00000-0000"
+                                    class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-orange focus:border-transparent transition">
+                            </div>
+                        </div>
+
+                        <!-- Seção 3: Endereço -->
+                        <!-- CEP -->
+                        <div class="space-y-2">
+                            <label class="block text-base font-medium text-gray-700 dark:text-gray-300">CEP*</label>
+                            <div class="flex gap-2">
+                                <input name="cep"
+                                    type="text" 
+                                    required
+                                    placeholder="00000-000"
+                                    data-mask="00000-000"
+                                    class="cep-mask flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-orange focus:border-transparent transition">
+                                <button type="button" id="buscar-cep" class="px-4 py-2 bg-gradient-to-r from-orange to-golden rounded-lg transition text-white font-semibold rounded-lg hover:opacity-90 transition-all duration-300 transform hover:scale-[1.02] shadow-m">
+                                    Buscar
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+                            <!-- Endereço -->
+                            <div class="space-y-2 md:col-span-3">
+                                <label class="block text-base font-medium text-gray-700 dark:text-gray-300">Endereço*</label>
+                                <input name="address"
+                                    type="text" 
+                                    required
+                                    class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-orange focus:border-transparent transition">
+                            </div>
+                            
+                            <!-- Número -->
+                            <div class="space-y-2 md:col-span-1">
+                                <label class="block text-base font-medium text-gray-700 dark:text-gray-300">Número*</label>
+                                <input name="number"
+                                    type="text" 
+                                    required
+                                    class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-orange focus:border-transparent transition">
+                            </div>
+                        </div>
+
+                        <!-- Complemento -->
+                        <div class="space-y-2">
+                            <label class="block text-base font-medium text-gray-700 dark:text-gray-300">Complemento</label>
+                            <input name="complement"
+                                type="text" 
+                                class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-orange focus:border-transparent transition">
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                            <!-- Bairro -->
+                            <div class="space-y-2">
+                                <label class="block text-base font-medium text-gray-700 dark:text-gray-300">Bairro*</label>
+                                <input name="neighborhood"
+                                    type="text" 
+                                    required
+                                    class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-orange focus:border-transparent transition">
+                            </div>
+                            
+                            <!-- Cidade -->
+                            <div class="space-y-2">
+                                <label class="block text-base font-medium text-gray-700 dark:text-gray-300">Cidade*</label>
+                                <input name="city"
+                                    type="text" 
+                                    required
+                                    class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-orange focus:border-transparent transition">
+                            </div>
+                            
+                            <!-- Estado -->
+                            <div class="space-y-2">
+                                <label class="block text-base font-medium text-gray-700 dark:text-gray-300">Estado*</label>
+                                <select name="state" required
+                                    class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-orange focus:border-transparent transition">
+                                    <option value="">Selecione</option>
+                                    <option value="AC">Acre</option>
+                                    <option value="AL">Alagoas</option>
+                                    <option value="AP">Amapá</option>
+                                    <option value="AM">Amazonas</option>
+                                    <option value="BA">Bahia</option>
+                                    <option value="CE">Ceará</option>
+                                    <option value="DF">Distrito Federal</option>
+                                    <option value="ES">Espírito Santo</option>
+                                    <option value="GO">Goiás</option>
+                                    <option value="MA">Maranhão</option>
+                                    <option value="MT">Mato Grosso</option>
+                                    <option value="MS">Mato Grosso do Sul</option>
+                                    <option value="MG">Minas Gerais</option>
+                                    <option value="PA">Pará</option>
+                                    <option value="PB">Paraíba</option>
+                                    <option value="PR">Paraná</option>
+                                    <option value="PE">Pernambuco</option>
+                                    <option value="PI">Piauí</option>
+                                    <option value="RJ">Rio de Janeiro</option>
+                                    <option value="RN">Rio Grande do Norte</option>
+                                    <option value="RS">Rio Grande do Sul</option>
+                                    <option value="RO">Rondônia</option>
+                                    <option value="RR">Roraima</option>
+                                    <option value="SC">Santa Catarina</option>
+                                    <option value="SP">São Paulo</option>
+                                    <option value="SE">Sergipe</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Seção 4: Segurança -->
+                        <!-- Senha -->
+                        <div class="space-y-2">
+                            <label class="block text-base font-medium text-gray-700 dark:text-gray-300">Senha*</label>
+                            <input name="password"
+                                type="password" 
+                                required
+                                class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-orange focus:border-transparent transition">
+                        </div>
+
+                        <!-- Termos e Condições -->
+                        <div class="flex items-center mt-3">
+                            <input id="terms" name="terms" type="checkbox" required class="w-5 h-5 text-orange bg-gray-100 border-gray-300 rounded focus:ring-orange dark:focus:ring-orange dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                            <label for="terms" class="ms-3 text-base text-gray-700 dark:text-gray-300">
+                                Concordo com os <a href="#" class="text-orange hover:underline dark:text-golden">Termos e Condições</a>
+                            </label>
+                        </div>
+
+                        <!-- Div para mensagens de autenticação -->
+                        <div id="auth-result" class="hidden"></div>
+
+                        <!-- Botão de Ação -->
+                        <button type="submit" 
+                            class="w-full mt-8 px-4 py-3 text-lg bg-gradient-to-r from-orange to-golden text-white font-semibold rounded-lg hover:opacity-90 transition-all duration-300 transform hover:scale-[1.02] shadow-md">
+                            <span id="form-action">Criar Conta</span>
+                        </button>
+                    </form>
+
+                    <!-- Scripts para máscaras e CEP -->
+                    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+                    <script>
+                    $(document).ready(function(){
+                        // Máscaras corrigidas
+                        $('.cpf-mask').mask('000.000.000-00', {reverse: true});
+                        $('[data-mask="00.000.000-0"]').mask('00.000.000-0');
+                        $('[data-mask="(00) 00000-0000"]').mask('(00) 00000-0000');
+                        $('.cep-mask').mask('00000-000');
+
+                        // Auto-completar CEP
+                        $('#buscar-cep').click(function(){
+                            const cep = $('.cep-mask').cleanVal();
+                            if(cep.length !== 8) return;
+                            
+                            // ViaCEP
+                            $.getJSON(`https://viacep.com.br/ws/${cep}/json/?callback=?`, function(data){
+                                if(!data.erro) {
+                                    $('input[name="address"]').val(data.logradouro);
+                                    $('input[name="neighborhood"]').val(data.bairro);
+                                    $('input[name="city"]').val(data.localidade);
+                                    $('select[name="state"]').val(data.uf);
+                                    $('input[name="complement"]').val(data.complemento);
+                                    $('input[name="number"]').focus();
+                                } else {
+                                    alert('CEP não encontrado!');
+                                }
+                            });
+                        });
+                    });
+                    </script>
+                    <div class="mt-6 text-center">
+                        <p class="text-md text-gray-600 dark:text-gray-300">
+                            Já tem uma conta? 
+                            <a href="/signin" class="text-orange font-medium hover:underline dark:text-golden">Faça login</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <!-- Rodapé -->
+        @components.FooterLogin()
+        <!-- Scripts -->
+        <script>
+            const signupForm = document.getElementById("email-signup-form");
+            signupForm?.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                
+                // 1. Autenticação básica
+                const email = document.getElementById("email").value;
+                const password = document.getElementById("password").value;
+                const name = document.getElementById("name").value;
+                const phone = document.getElementById("phone").value;
+                const cpf = document.getElementById("cpf").value;
+                const rg = document.getElementById("rg").value;
+                const sex = document.getElementById("sex").value;
+                const age = document.getElementById("age").value;
+                const address = document.getElementById("address").value;
+                const complement = document.getElementById("complement").value;
+                const number = document.getElementById("number").value;
+                const neighborhood = document.getElementById("neighborhood").value;
+                const city = document.getElementById("city").value;
+                const state = document.getElementById("state").value;
+                const cep = document.getElementById("cep").value;
+
+                if (!email || !password) {
+                    showError("Informe email e senha");
+                    return;
+                }
+
+                try {
+                    // 2. Login com Firebase
+                    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                    const user = userCredential.user;
+
+                    // 2. Obtém o ID Token do Firebase
+                    const idToken = await user.getIdToken();
+
+                    // 4. Montar payload completa
+                    const userData = {
+                        id_token: idToken,
+                        email: email,
+                        password: password, // Enviar a senha atual
+                        uid: user.uid || "",
+                        name: name || "",
+                        phone: phone || "",
+                        cpf: cpf || "",
+                        rg: rg || "",
+                        sex: sex || "none",
+                        age: age || 0,
+                        address: address || "",
+                        complement: complement || "",
+                        number: number || "",
+                        neighborhood: neighborhood || "",
+                        city: city || "",
+                        state: state || "",
+                        cep: cep || "",
+                        role: "user",
+                        status: "active",
+                        terms: true // Usuário já aceitou os termos ao se cadastrar
+                    };
+
+                    // 5. Enviar para o endpoint de login
+                    const backendResponse = await fetch("http://localhost:8080/api/auth/register", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(userData)
+                    });
+
+                    if (backendResponse.ok) {
+                        const result = await backendResponse.json();
+                        showMessage('Usuário registrado com sucesso!', 'success');
+                        console.log('Backend response:', result);
+                        signupForm.reset();
+                        // Redirecionar para a página inicial
+                        window.location.href = "/";
+                    } else {
+                        const errorData = await backendResponse.json();
+                        showMessage(`Erro ao registrar usuário no backend: ${errorData.message || backendResponse.statusText}`, 'error');
+                        console.error('Backend error:', errorData);
+                    }
+                } catch (err) {
+                    let errorMessage = 'Ocorreu um erro desconhecido.';
+                    if (err.code) {
+                        switch (err.code) {
+                            case 'auth/email-already-in-use':
+                                errorMessage = 'Este e-mail já está em uso.';
+                                break;
+                            case 'auth/invalid-email':
+                                errorMessage = 'O formato do e-mail é inválido.';
+                                break;
+                            case 'auth/weak-password':
+                                errorMessage = 'A senha é muito fraca (mínimo 6 caracteres).';
+                                break;
+                            case 'auth/network-request-failed':
+                                errorMessage = 'Erro de rede. Verifique sua conexão.';
+                                break;
+                            default:
+                                errorMessage = `Erro do Firebase: ${err.message}`;
+                        }
+                    } else {
+                        errorMessage = `Erro: ${err.message}`;
+                    }
+                    showError(errorMessage);
+                    console.error('Registration error:', err);
+                }
+            });
+
+            // Função auxiliar para exibir erros
+            function showError(message) {
+                const authResult = document.getElementById("auth-result");
+                authResult.classList.remove("hidden");
+                authResult.innerHTML = `
+                    <div class="p-3 mb-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-200 dark:text-red-800">
+                        ${message}
+                    </div>
+                `;
+            }
+
+            // Função auxiliar para exibir mensagens
+            function showMessage(message, type) {
+                const authResult = document.getElementById("auth-result");
+                authResult.classList.remove("hidden");
+                const bgColor = type === 'success' ? 'bg-green-100 dark:bg-green-200' : 'bg-red-100 dark:bg-red-200';
+                const textColor = type === 'success' ? 'text-green-700 dark:text-green-800' : 'text-red-700 dark:text-red-800';
+                authResult.innerHTML = `
+                    <div class="p-3 mb-4 text-sm ${textColor} ${bgColor} rounded-lg">
+                        ${message}
+                    </div>
+                `;
+            }
+        </script>
+        <!-- Animações -->
+        @custom.Animations()
+    </body>
+    </html>
+}

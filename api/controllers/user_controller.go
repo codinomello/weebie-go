@@ -2,10 +2,9 @@ package controllers
 
 import (
 	"context"
-	"fmt"
+	"encoding/json"
 	"net/http"
 
-	"github.com/codinomello/weebie-go/api/authentication"
 	"github.com/codinomello/weebie-go/api/models"
 	"github.com/codinomello/weebie-go/api/repositories"
 )
@@ -20,48 +19,73 @@ func NewUserController(userRepo repositories.UserRepository) *UserController {
 	}
 }
 
-// Salva o usuário no banco (sem Firebase)
-func (c *UserController) Register(user *models.User) error {
-	if user.Name == "" {
-		return fmt.Errorf("nome do usuário não pode ser vazio")
+// GetUser retorna um usuário pelo UID
+func (c *UserController) GetUser(w http.ResponseWriter, r *http.Request) {
+	uid := r.PathValue("uid")
+	if uid == "" {
+		http.Error(w, "UID é obrigatório", http.StatusBadRequest)
+		return
 	}
-	if user.Email == "" || user.Password == "" {
-		return fmt.Errorf("email e senha são obrigatórios")
+
+	user, err := c.UserRepository.GetUserByUID(context.Background(), uid)
+	if err != nil {
+		http.Error(w, "Erro ao buscar usuário", http.StatusInternalServerError)
+		return
 	}
-	_, err := c.UserRepository.CreateUser(context.Background(), user)
-	return err
+
+	if user == nil {
+		http.Error(w, "Usuário não encontrado", http.StatusNotFound)
+		return
+	}
+
+	// Remove dados sensíveis
+	user.Password = ""
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(user)
 }
 
-// Cria usuário no Firebase e no MongoDB via UserRepository
-func (c *UserController) CreateUser(w http.ResponseWriter, r *http.Request, user *models.User) (*models.User, error) {
-	// Aqui você pode adicionar lógica de negócios, como validação dos dados do usuário
-	if user.Email == "" || user.Name == "" {
-		http.Error(w, "Nome e e-mail são obrigatórios", http.StatusBadRequest)
-		return nil, nil // Retorna nil para o usuário e um erro HTTP já foi enviado
+// UpdateUser atualiza um usuário
+func (c *UserController) UpdateUser(w http.ResponseWriter, r *http.Request) {
+	uid := r.PathValue("uid")
+	if uid == "" {
+		http.Error(w, "UID é obrigatório", http.StatusBadRequest)
+		return
 	}
 
-	// Salvar o usuário no MongoDB usando o repositório
-	createdUser, err := c.UserRepository.CreateUser(context.Background(), user)
+	var updateData models.User
+	if err := json.NewDecoder(r.Body).Decode(&updateData); err != nil {
+		http.Error(w, "JSON inválido", http.StatusBadRequest)
+		return
+	}
+
+	// Atualiza no repositório
+	updatedUser, err := c.UserRepository.UpdateUser(context.Background(), uid, &updateData)
 	if err != nil {
-		http.Error(w, "Erro ao salvar o usuário no banco de dados", http.StatusInternalServerError)
-		return nil, err
+		http.Error(w, "Erro ao atualizar usuário", http.StatusInternalServerError)
+		return
 	}
 
-	return createdUser, nil
+	// Remove dados sensíveis
+	updatedUser.Password = ""
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(updatedUser)
 }
 
-// Gera token para login usando Firebase Auth
-func (c *UserController) SignIn(user *models.User) (string, error) {
-	authService := authentication.NewFirebaseAuth()
-	authClient, err := authService.Initialize()
-	if err != nil {
-		return "", fmt.Errorf("erro ao inicializar Firebase Auth: %v", err)
+// DeleteUser remove um usuário
+func (c *UserController) DeleteUser(w http.ResponseWriter, r *http.Request) {
+	uid := r.PathValue("uid")
+	if uid == "" {
+		http.Error(w, "UID é obrigatório", http.StatusBadRequest)
+		return
 	}
 
-	token, err := authClient.CustomToken(context.Background(), user.Email)
+	err := c.UserRepository.DeleteUser(context.Background(), uid)
 	if err != nil {
-		return "", fmt.Errorf("erro ao gerar token: %v", err)
+		http.Error(w, "Erro ao deletar usuário", http.StatusInternalServerError)
+		return
 	}
 
-	return token, nil
+	w.WriteHeader(http.StatusNoContent)
 }

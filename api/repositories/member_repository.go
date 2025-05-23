@@ -13,34 +13,35 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+// MemberRepository define a interface para operações de membro no banco de dados.
 type MemberRepository interface {
 	CreateMember(ctx context.Context, member *models.Member) (*models.Member, error)
 	GetMemberByID(ctx context.Context, id primitive.ObjectID) (*models.Member, error)
-	GetMembersByProject(ctx context.Context, projectID primitive.ObjectID) ([]models.Member, error)
+	GetMembersByProjectID(ctx context.Context, projectID primitive.ObjectID) ([]models.Member, error) // Renomeado para consistência
 	GetProjectsByUser(ctx context.Context, userID primitive.ObjectID) ([]models.Member, error)
 	UpdateMemberRole(ctx context.Context, id primitive.ObjectID, role string) error
 	UpdateMemberStatus(ctx context.Context, id primitive.ObjectID, status string) error
-	DeleteMember(ctx context.Context, id primitive.ObjectID) error
-	VerifyIfMemberExists(ctx context.Context, id primitive.ObjectID) (bool, error)
-	// ...
+	DeleteMember(ctx context.Context, id primitive.ObjectID) (*mongo.DeleteResult, error)                                // Retorna *mongo.DeleteResult
+	DeleteMembersByProjectID(ctx context.Context, projectID primitive.ObjectID) (*mongo.DeleteResult, error)             // Novo método
+	DeleteMemberByProjectAndUser(ctx context.Context, projectID, userID primitive.ObjectID) (*mongo.DeleteResult, error) // Novo método
+	VerifyIfMemberExists(ctx context.Context, projectID, userID primitive.ObjectID) (bool, error)                        // Ajustado para aceitar projectID e userID
 }
 
+// MongoDBMemberRepository implementa MemberRepository para MongoDB.
 type MongoDBMemberRepository struct {
-	Members  *mongo.Collection
-	Users    *mongo.Collection
-	Projects *mongo.Collection
+	Members *mongo.Collection
 }
 
+// NewMemberRepository cria uma nova instância de MongoDBMemberRepository.
 func NewMemberRepository(db *mongo.Database) *MongoDBMemberRepository {
 	return &MongoDBMemberRepository{
-		Members:  db.Collection("members"),
-		Users:    db.Collection("users"),
-		Projects: db.Collection("projects"),
+		Members: db.Collection("members"),
 	}
 }
 
-// Cria um membro de um projeto
+// CreateMember cria um membro de um projeto no MongoDB.
 func (r *MongoDBMemberRepository) CreateMember(ctx context.Context, member *models.Member) (*models.Member, error) {
+	member.ID = primitive.NewObjectID() // Garante que um ID é gerado antes da inserção
 	member.JoinedAt = time.Now()
 	member.Status = "active" // Status padrão
 
@@ -53,21 +54,21 @@ func (r *MongoDBMemberRepository) CreateMember(ctx context.Context, member *mode
 	return member, nil
 }
 
-// Retorna um membro pelo ID
+// GetMemberByID retorna um membro pelo seu ObjectID.
 func (r *MongoDBMemberRepository) GetMemberByID(ctx context.Context, id primitive.ObjectID) (*models.Member, error) {
 	var member models.Member
 	err := r.Members.FindOne(ctx, bson.M{"_id": id}).Decode(&member)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return nil, errors.New("member not found")
+			return nil, mongo.ErrNoDocuments // Retorna o erro original para o controller
 		}
 		return nil, err
 	}
 	return &member, nil
 }
 
-// Retorna um membro pelo projeto
-func (r *MongoDBMemberRepository) GetMembersByProject(ctx context.Context, projectID primitive.ObjectID) ([]models.Member, error) {
+// GetMembersByProjectID retorna todos os membros de um projeto específico.
+func (r *MongoDBMemberRepository) GetMembersByProjectID(ctx context.Context, projectID primitive.ObjectID) ([]models.Member, error) {
 	var members []models.Member
 
 	cursor, err := r.Members.Find(ctx, bson.M{"project_id": projectID})
@@ -83,7 +84,7 @@ func (r *MongoDBMemberRepository) GetMembersByProject(ctx context.Context, proje
 	return members, nil
 }
 
-// Retorna um membro pelo usuário
+// GetProjectsByUser retorna todas as associações de membro de um usuário.
 func (r *MongoDBMemberRepository) GetProjectsByUser(ctx context.Context, userID primitive.ObjectID) ([]models.Member, error) {
 	var memberships []models.Member
 
@@ -100,6 +101,7 @@ func (r *MongoDBMemberRepository) GetProjectsByUser(ctx context.Context, userID 
 	return memberships, nil
 }
 
+// UpdateMemberRole atualiza o papel de um membro.
 func (r *MongoDBMemberRepository) UpdateMemberRole(ctx context.Context, id primitive.ObjectID, role string) error {
 	_, err := r.Members.UpdateOne(
 		ctx,
@@ -109,6 +111,7 @@ func (r *MongoDBMemberRepository) UpdateMemberRole(ctx context.Context, id primi
 	return err
 }
 
+// UpdateMemberStatus atualiza o status de um membro.
 func (r *MongoDBMemberRepository) UpdateMemberStatus(ctx context.Context, id primitive.ObjectID, status string) error {
 	_, err := r.Members.UpdateOne(
 		ctx,
@@ -118,19 +121,43 @@ func (r *MongoDBMemberRepository) UpdateMemberStatus(ctx context.Context, id pri
 	return err
 }
 
-func (r *MongoDBMemberRepository) DeleteMember(ctx context.Context, id primitive.ObjectID) error {
-	_, err := r.Members.DeleteOne(ctx, bson.M{"_id": id})
-	return err
+// DeleteMember deleta um membro pelo seu ObjectID.
+func (r *MongoDBMemberRepository) DeleteMember(ctx context.Context, id primitive.ObjectID) (*mongo.DeleteResult, error) {
+	result, err := r.Members.DeleteOne(ctx, bson.M{"_id": id})
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
-func (r *MongoDBMemberRepository) VerifyIfMemberExists(ctx context.Context, id primitive.ObjectID) (bool, error) {
-	err := r.Members.FindOne(ctx, bson.M{"_id": id}, options.FindOne().SetProjection(bson.M{"_id": 1})).Err()
+// DeleteMembersByProjectID deleta todos os membros associados a um projeto específico.
+func (r *MongoDBMemberRepository) DeleteMembersByProjectID(ctx context.Context, projectID primitive.ObjectID) (*mongo.DeleteResult, error) {
+	result, err := r.Members.DeleteMany(ctx, bson.M{"project_id": projectID})
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+// DeleteMemberByProjectAndUser deleta uma relação de membro específica entre um projeto e um usuário.
+func (r *MongoDBMemberRepository) DeleteMemberByProjectAndUser(ctx context.Context, projectID, userID primitive.ObjectID) (*mongo.DeleteResult, error) {
+	result, err := r.Members.DeleteOne(ctx, bson.M{"project_id": projectID, "user_id": userID})
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+// VerifyIfMemberExists verifica se um usuário é membro de um projeto.
+func (r *MongoDBMemberRepository) VerifyIfMemberExists(ctx context.Context, projectID, userID primitive.ObjectID) (bool, error) {
+	filter := bson.M{"project_id": projectID, "user_id": userID}
+	err := r.Members.FindOne(ctx, filter, options.FindOne().SetProjection(bson.M{"_id": 1})).Err()
 
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return false, nil
+			return false, nil // Membro não encontrado
 		}
-		return false, err
+		return false, err // Outro erro
 	}
-	return true, nil
+	return true, nil // Membro encontrado
 }

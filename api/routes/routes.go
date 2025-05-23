@@ -2,11 +2,10 @@ package routes
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/codinomello/weebie-go/api/controllers"
 	"github.com/codinomello/weebie-go/api/handlers"
-	"github.com/codinomello/weebie-go/api/repositories"
+	"github.com/codinomello/weebie-go/api/middleware"
 )
 
 type Router struct {
@@ -25,105 +24,92 @@ func NewRouter() *Router {
 	return &Router{mux: http.NewServeMux()}
 }
 
-func SetupRoutes(userRepo *repositories.MongoDBUserRepository, projectRepo *repositories.MongoDBProjectRepository, memberRepo *repositories.MongoDBMemberRepository) http.Handler {
-	// Inicializa os controllers
-	userController := controllers.NewUserController(userRepo)
-	// projectController := controllers.NewProjectController(projectRepo, userRepo, memberRepo)
-	// memberController := controllers.NewMemberController(memberRepo)
-
+func SetupRoutes(
+	authCtrl *controllers.AuthController,
+	userCtrl *controllers.UserController,
+	projectCtrl *controllers.ProjectController,
+	memberCtrl *controllers.MemberController,
+) http.Handler {
 	// Inicializa handlers
-	userHandler := handlers.NewUserHandler(userController)
-	// projectHandler := handlers.NewProjectHandler(projectController)
-	// memberHandler := handlers.NewMemberHandler(memberController)
+	authHandler := handlers.NewAuthHandler(authCtrl)
+	userHandler := handlers.NewUserHandler(userCtrl)
+	//projectHandler := handlers.NewProjectHandler(projectCtrl)
+	//memberHandler := handlers.NewMemberHandler(memberCtrl)
 
-	// Roteadores HTTP
-	publicMux := http.NewServeMux()
-	privateMux := http.NewServeMux()
+	// Cria router principal
+	mainRouter := http.NewServeMux()
 
-	// Serve imagens
-	fs := http.FileServer(http.Dir("../images"))
-	publicMux.Handle("/images/", http.StripPrefix("/images/", fs))
+	// 1. Rotas estáticas (HTML e arquivos)
+	staticRouter := http.NewServeMux()
+	handlers.HandleTemplPublicRoutes(staticRouter)
 
-	// Rotas públicas de usuário
-	publicMux.HandleFunc("/users", MethodSwitch{
-		Post: userHandler.SignUpUser(),
+	// Serve arquivos estáticos (imagens e JS)
+	fileServer := http.FileServer(http.Dir("../images"))
+	staticRouter.Handle("/images/", http.StripPrefix("/images/", fileServer))
+
+	// 2. Rotas de API
+	apiRouter := http.NewServeMux()
+
+	// 2.1 Rotas de autenticação (/api/auth)
+	authRouter := http.NewServeMux()
+	authRouter.HandleFunc("/api/auth/register", MethodSwitch{
+		Post: authHandler.RegisterUser(),
 	}.ServeHTTP)
 
-	publicMux.HandleFunc("/users/signin", MethodSwitch{
-		Post: userHandler.SignInUser(),
+	authRouter.HandleFunc("/api/auth/token", MethodSwitch{
+		Post: authHandler.CreateToken(),
 	}.ServeHTTP)
 
-	publicMux.HandleFunc("/users/signout", MethodSwitch{
-		Post: userHandler.SignOutUser(),
+	authRouter.HandleFunc("/api/auth/verify", MethodSwitch{
+		Post: authHandler.VerifyToken(),
 	}.ServeHTTP)
 
-	// Rotas privadas de usuário
-	privateMux.HandleFunc("/users/{id}", MethodSwitch{
+	authRouter.HandleFunc("/api/auth/session", MethodSwitch{
+		Delete: authHandler.RevokeSession(),
+	}.ServeHTTP)
+
+	authRouter.HandleFunc("/api/auth/refresh", MethodSwitch{
+		Post: authHandler.RefreshToken(),
+	}.ServeHTTP)
+
+	// Aplica middlewares às rotas de autenticação
+	authWithMiddlewares := middleware.CORS(authRouter)
+	authWithMiddlewares = middleware.JSONContentType(authWithMiddlewares)
+	apiRouter.Handle("/api/auth/", authWithMiddlewares)
+
+	// 2.2 Rotas protegidas
+	protectedRouter := http.NewServeMux()
+	protectedRouter.HandleFunc("/api/users/{uid}", MethodSwitch{
 		Get:    userHandler.GetUser(),
 		Put:    userHandler.UpdateUser(),
 		Delete: userHandler.DeleteUser(),
 	}.ServeHTTP)
 
-	// // Rotas privadas de projeto
-	// privateMux.HandleFunc("/projects", MethodSwitch{
-	// 	Get:  projectHandler.GetUserProjects,
-	// 	Post: projectHandler.CreateProject,
-	// }.ServeHTTP)
+	protectedRouter.HandleFunc("/api/projects", MethodSwitch{
+		//Get:  projectHandler.GetProjects(),
+		//Post: projectHandler.CreateProject(),
+	}.ServeHTTP)
 
-	// privateMux.HandleFunc("/projects/{id}", MethodSwitch{
-	// 	Get:    projectHandler.GetProject,
-	// 	Put:    projectHandler.UpdateProject,
-	// 	Delete: projectHandler.DeleteProject,
-	// }.ServeHTTP)
+	protectedRouter.HandleFunc("/api/members", MethodSwitch{
+		//Get: memberHandler.GetMembers(),
+	}.ServeHTTP)
 
-	// // Rotas privadas de membro
-	// privateMux.HandleFunc("/projects/{id}/members", MethodSwitch{
-	// 	Get:  memberHandler.GetProjectMembers,
-	// 	Post: memberHandler.AddMember,
-	// }.ServeHTTP)
+	// Aplica middleware de autenticação nas rotas protegidas
+	protectedWithAuth := middleware.AuthMiddleware(protectedRouter)
+	apiRouter.Handle("/api/users/", protectedWithAuth)
+	apiRouter.Handle("/api/projects/", protectedWithAuth)
+	apiRouter.Handle("/api/members/", protectedWithAuth)
 
-	// privateMux.HandleFunc("/projects/{id}/members/{memberId}", MethodSwitch{
-	// 	Delete: memberHandler.DeleteMemberHandler,
-	// }.ServeHTTP)
+	// Aplica middlewares gerais da API
+	apiWithMiddlewares := middleware.CORS(apiRouter)
+	apiWithMiddlewares = middleware.JSONContentType(apiWithMiddlewares)
 
-	// privateMux.HandleFunc("/projects/{id}/members/{memberId}/role", MethodSwitch{
-	// 	Put: memberHandler.UpdateMemberRole,
-	// }.ServeHTTP)
+	// 3. Monta estrutura final de roteamento
+	mainRouter.Handle("/", staticRouter)
+	mainRouter.Handle("/api/", apiWithMiddlewares)
 
-	// Rotas estáticas (HTML, CSS, JS)
-	SetupPublicRoutes(publicMux)
-	SetupPrivateRoutes(privateMux)
-
-	// Aplicando middleware de autenticação
-	authProtected := AuthMiddleware(privateMux)
-
-	// Roteador principal
-	mainMux := http.NewServeMux()
-	mainMux.Handle("/", publicMux)
-	mainMux.Handle("/projects", authProtected)
-	mainMux.Handle("/projects/", authProtected)
-	mainMux.Handle("/users/", authProtected)
-	mainMux.Handle("/profile", authProtected)
-
-	return mainMux
-}
-
-func AuthMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Exemplo: validação de header (coloque autenticação real aqui)
-		if strings.HasPrefix(r.URL.Path, "/users/") || strings.HasPrefix(r.URL.Path, "/projects") || r.URL.Path == "/profile" {
-			auth := r.Header.Get("Authorization")
-			if auth == "" {
-				http.Error(w, "não autorizado", http.StatusUnauthorized)
-				return
-			}
-			// Aqui você deve validar o token e injetar o userID no contexto
-			// Por exemplo:
-			// ctx := context.WithValue(r.Context(), "userID", extrairUserIDDoToken(auth))
-			// r = r.WithContext(ctx)
-		}
-		next.ServeHTTP(w, r)
-	})
+	// Aplica middleware de logging global
+	return middleware.LoggingMiddleware(mainRouter)
 }
 
 func (m MethodSwitch) ServeHTTP(w http.ResponseWriter, r *http.Request) {

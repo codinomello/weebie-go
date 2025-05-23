@@ -1,0 +1,77 @@
+package public
+
+import components "github.com/codinomello/weebie-go/web/components"
+
+templ SignOut() {
+    <html lang="pt-BR">
+    <head>
+        <!-- Meta Tags -->
+        @components.Meta()
+        <!-- Título -->
+        @components.Title("Weebie - Logout")
+        <!-- HTMX e Tailwind CSS -->
+        @components.ScriptHead()
+        <!-- Fonte -->
+        @components.StyleHead()
+        <!-- Flowbite CSS e Ícone -->
+        @components.Link("house_with_garden.png")
+    </head>
+    <body class="bg-gray-100 dark:bg-gray-900">
+        <!-- Header -->
+        @components.Nav("Sair da Conta", "house_with_garden.png")
+        <!-- Mensagem de Logout -->
+        <main class="flex-grow flex items-center justify-center p-4 pt-8">
+            <div class="w-full max-w-md">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-700 text-center">
+                    <!-- Ícone -->
+                    <div class="text-6xl mb-4 text-orange dark:text-golden">👋</div>
+                    
+                    <h2 class="text-2xl font-bold text-gray-600 dark:text-gray-300 dark:text-white mb-2">Você saiu da sua conta</h2>
+                    
+                    <p class="text-gray-600 dark:text-gray-300 mb-6">
+                        Você foi desconectado com sucesso. Volte sempre!
+                    </p>
+                    
+                    <!-- Timer de redirecionamento -->
+                    <div class="mb-6">
+                        <p class="text-sm text-gray-600 dark:text-gray-300">
+                            Redirecionando em <span id="countdown" class="font-medium">5</span> segundos...
+                        </p>
+                    </div>
+                    
+                    <!-- Botões -->
+                    <div class="flex flex-col space-y-3">
+                        <a href="/login" class="w-full px-6 py-3 bg-gradient-to-r from-orange to-golden text-white font-medium rounded-lg hover:opacity-90 transition-all duration-300 transform hover:scale-[1.02] shadow-md">
+                            Fazer login novamente
+                        </a>
+                        <a href="/" class="w-full px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                            Voltar à página inicial
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <!-- Rodapé -->
+        @components.FooterLogin()
+
+        <!-- Scripts -->
+        @components.ScriptBody()
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                // Redirecionamento automático
+                let seconds = 5;
+                const countdownElement = document.getElementById('countdown');
+                const countdownInterval = setInterval(() => {
+                    seconds--;
+                    countdownElement.textContent = seconds;
+                    
+                    if (seconds <= 0) {
+                        clearInterval(countdownInterval);
+                        window.location.href = '/signin';
+                    }
+                }, 1000);
+            });
+        </script>
+    </body>
+    </html>
+}

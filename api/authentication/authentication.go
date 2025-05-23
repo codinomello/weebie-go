@@ -34,17 +34,17 @@ type AuthService interface {
 }
 
 // Implementa a interface AuthService para o Firebase
-type FirebaseAuth struct {
-	client *auth.Client
+type FirebaseAuthentication struct {
+	Client *auth.Client
 }
 
 // Cria uma nova instância do serviço de autenticação
-func NewFirebaseAuth() *FirebaseAuth {
-	return &FirebaseAuth{}
+func NewFirebaseAuthentication() *FirebaseAuthentication {
+	return &FirebaseAuthentication{}
 }
 
 // Inicializa o cliente Firebase
-func (fa *FirebaseAuth) Initialize() (*auth.Client, error) {
+func (fa *FirebaseAuthentication) Initialize() (*auth.Client, error) {
 	firebaseConfigPath := os.Getenv("FIREBASE_CREDENTIALS")
 	if firebaseConfigPath == "" {
 		return nil, errors.New("variável de ambiente 'FIREBASE_CREDENTIALS' não encontrada")
@@ -60,17 +60,17 @@ func (fa *FirebaseAuth) Initialize() (*auth.Client, error) {
 		return nil, errors.Wrap(err, "falha ao inicializar Firebase App")
 	}
 
-	fa.client, err = app.Auth(context.Background())
+	fa.Client, err = app.Auth(context.Background())
 	if err != nil {
 		return nil, errors.Wrap(err, "falha ao obter cliente de autenticação")
 	}
 
-	return fa.client, nil
+	return fa.Client, nil
 }
 
 // Verifica um token de ID do Firebase
-func (fa *FirebaseAuth) VerifyIDToken(idToken string) (*auth.Token, error) {
-	token, err := fa.client.VerifyIDToken(context.Background(), idToken)
+func (fa *FirebaseAuthentication) VerifyIDToken(idToken string) (*auth.Token, error) {
+	token, err := fa.Client.VerifyIDToken(context.Background(), idToken)
 	if err != nil {
 		return nil, errors.Wrap(err, "falha ao verificar token")
 	}
@@ -78,13 +78,13 @@ func (fa *FirebaseAuth) VerifyIDToken(idToken string) (*auth.Token, error) {
 }
 
 // Gera um novo UID no Firebase
-func (fa *FirebaseAuth) GenerateFirebaseUID() (string, error) {
+func (fa *FirebaseAuthentication) GenerateFirebaseUID() (string, error) {
 	email := fmt.Sprintf("%d@weebie.com", time.Now().UnixNano())
 	user := (&auth.UserToCreate{}).
 		Email(email).
 		Password("senha123")
 
-	createdUser, err := fa.client.CreateUser(context.Background(), user)
+	createdUser, err := fa.Client.CreateUser(context.Background(), user)
 	if err != nil {
 		return "", errors.Wrap(err, "falha ao criar usuário no Firebase")
 	}
@@ -92,8 +92,8 @@ func (fa *FirebaseAuth) GenerateFirebaseUID() (string, error) {
 }
 
 // Obtém um usuário pelo UID
-func (fa *FirebaseAuth) GetUser(uid string) (*auth.UserRecord, error) {
-	user, err := fa.client.GetUser(context.Background(), uid)
+func (fa *FirebaseAuthentication) GetUser(uid string) (*auth.UserRecord, error) {
+	user, err := fa.Client.GetUser(context.Background(), uid)
 	if err != nil {
 		return nil, errors.Wrap(err, "falha ao obter usuário")
 	}
@@ -101,8 +101,8 @@ func (fa *FirebaseAuth) GetUser(uid string) (*auth.UserRecord, error) {
 }
 
 // Obtém um usuário pelo email
-func (fa *FirebaseAuth) GetUserByEmail(email string) (*auth.UserRecord, error) {
-	user, err := fa.client.GetUserByEmail(context.Background(), email)
+func (fa *FirebaseAuthentication) GetUserByEmail(email string) (*auth.UserRecord, error) {
+	user, err := fa.Client.GetUserByEmail(context.Background(), email)
 	if err != nil {
 		return nil, errors.Wrap(err, "falha ao obter usuário por email")
 	}
@@ -110,50 +110,50 @@ func (fa *FirebaseAuth) GetUserByEmail(email string) (*auth.UserRecord, error) {
 }
 
 // Remove um usuário do Firebase
-func (fa *FirebaseAuth) DeleteUser(uid string) error {
-	if err := fa.client.DeleteUser(context.Background(), uid); err != nil {
+func (fa *FirebaseAuthentication) DeleteUser(uid string) error {
+	if err := fa.Client.DeleteUser(context.Background(), uid); err != nil {
 		return errors.Wrap(err, "falha ao deletar usuário")
 	}
 	return nil
 }
 
 // Atualiza o email de um usuário
-func (fa *FirebaseAuth) UpdateUserEmail(uid, newEmail string) error {
+func (fa *FirebaseAuthentication) UpdateUserEmail(uid, newEmail string) error {
 	user := (&auth.UserToUpdate{}).Email(newEmail)
-	_, err := fa.client.UpdateUser(context.Background(), uid, user)
+	_, err := fa.Client.UpdateUser(context.Background(), uid, user)
 	return errors.Wrap(err, "falha ao atualizar email")
 }
 
 // Atualiza a senha de um usuário
-func (fa *FirebaseAuth) UpdateUserPassword(uid, newPassword string) error {
+func (fa *FirebaseAuthentication) UpdateUserPassword(uid, newPassword string) error {
 	user := (&auth.UserToUpdate{}).Password(newPassword)
-	_, err := fa.client.UpdateUser(context.Background(), uid, user)
+	_, err := fa.Client.UpdateUser(context.Background(), uid, user)
 	return errors.Wrap(err, "falha ao atualizar senha")
 }
 
 // Atualiza o nome de um usuário
-func (fa *FirebaseAuth) UpdateUserName(uid, newName string) error {
+func (fa *FirebaseAuthentication) UpdateUserName(uid, newName string) error {
 	user := (&auth.UserToUpdate{}).DisplayName(newName)
-	_, err := fa.client.UpdateUser(context.Background(), uid, user)
+	_, err := fa.Client.UpdateUser(context.Background(), uid, user)
 	return errors.Wrap(err, "falha ao atualizar nome")
 }
 
 // Atualiza o telefone de um usuário
-func (fa *FirebaseAuth) UpdateUserPhone(uid, newPhone string) error {
+func (fa *FirebaseAuthentication) UpdateUserPhone(uid, newPhone string) error {
 	user := (&auth.UserToUpdate{}).PhoneNumber(newPhone)
-	_, err := fa.client.UpdateUser(context.Background(), uid, user)
+	_, err := fa.Client.UpdateUser(context.Background(), uid, user)
 	return errors.Wrap(err, "falha ao atualizar telefone")
 }
 
 // Atualiza a foto de um usuário
-func (fa *FirebaseAuth) UpdateUserPhoto(uid, newPhoto string) error {
+func (fa *FirebaseAuthentication) UpdateUserPhoto(uid, newPhoto string) error {
 	user := (&auth.UserToUpdate{}).PhotoURL(newPhoto)
-	_, err := fa.client.UpdateUser(context.Background(), uid, user)
+	_, err := fa.Client.UpdateUser(context.Background(), uid, user)
 	return errors.Wrap(err, "falha ao atualizar foto")
 }
 
 // Cria um usuário admin padrão
-func (fa *FirebaseAuth) CreateDefaultAdmin(db *mongo.Database) error {
+func (fa *FirebaseAuthentication) CreateDefaultAdmin(db *mongo.Database) error {
 	ctx := context.Background()
 	adminEmail := os.Getenv("ADMIN_EMAIL")
 	adminPassword := os.Getenv("ADMIN_INITIAL_PASSWORD")
@@ -183,7 +183,7 @@ func (fa *FirebaseAuth) CreateDefaultAdmin(db *mongo.Database) error {
 		DisplayName("Administrator").
 		Disabled(false)
 
-	firebaseUser, err := fa.client.CreateUser(ctx, params)
+	firebaseUser, err := fa.Client.CreateUser(ctx, params)
 	if err != nil {
 		return errors.Wrap(err, "falha ao criar usuário admin no Firebase")
 	}
@@ -220,7 +220,7 @@ func (fa *FirebaseAuth) CreateDefaultAdmin(db *mongo.Database) error {
 
 	// Definir claims customizados
 	claims := map[string]interface{}{"role": "admin", "status": "active"}
-	if err := fa.client.SetCustomUserClaims(ctx, firebaseUser.UID, claims); err != nil {
+	if err := fa.Client.SetCustomUserClaims(ctx, firebaseUser.UID, claims); err != nil {
 		log.Printf("aviso: falha ao definir claims: %v\n", err)
 	}
 

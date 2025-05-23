@@ -5,9 +5,12 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/codinomello/weebie-go/api/authentication"
+	"github.com/codinomello/weebie-go/api/controllers"
 	"github.com/codinomello/weebie-go/api/database"
 	"github.com/codinomello/weebie-go/api/environment"
 	"github.com/codinomello/weebie-go/api/repositories"
@@ -18,49 +21,53 @@ func main() {
 	// Carrega as variáveis do ambiente
 	environment.LoadEnviromentVariables()
 
+	// Configura contexto principal da aplicação
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	// Conexão com o MongoDB
-	mongoDBURI := "MONGODB_URI"
+	mongoDBURI := os.Getenv("MONGODB_URI")
 	if mongoDBURI == "" {
 		mongoDBURI = "mongodb://localhost:27017"
 	}
 
-	db, err := database.ConnectMongoDB(os.Getenv(mongoDBURI))
+	// Conecta ao banco de dados MongoDB
+	log.Println("🧠 conectando ao mongodb...")
+	db, err := database.ConnectMongoDB(mongoDBURI)
 	if err != nil {
 		log.Fatalf("❌ erro ao conectar ao banco de dados mongodb: %s\n", err)
-	} else {
-		log.Println("🍃 banco de dados mongodb conectado com sucesso!")
 	}
+	log.Println("🍃 banco de dados mongodb conectado com sucesso!")
 
-	ctx := context.Background()
+	// Criação de índices no MongoDB
 	if err := database.InitializeMongoDBDatabase(ctx, db); err != nil {
 		log.Fatal("❌ falha ao criar índices: ", err)
 	}
+	log.Println("📊 índices do mongodb criados com sucesso!")
 
 	// Fecha a conexão com o banco de dados ao final da execução do programa
 	defer database.DisconnectMongoDB(db.Client())
 
 	// Inicialização do Firebase
-	authService := authentication.NewFirebaseAuth()
-	if _, err := authService.Initialize(); err != nil {
+	auth := authentication.NewFirebaseAuthentication()
+	if _, err := auth.Initialize(); err != nil {
 		log.Fatalf("❌ erro ao inicializar o firebase: %s\n", err)
-	} else {
-		log.Println("🔥 autenticação com o firebase inicializada com sucesso!")
 	}
-
-	// Criar usuário padrão-admin
-	if err := authService.CreateDefaultAdmin(db); err != nil {
-		log.Fatalf("❌ falha ao criar usuário admin: %v", err)
-	} else {
-		log.Println("👨‍💻 usuário admin criado com sucesso!")
-	}
+	log.Println("🔥 autenticação com o firebase inicializada com sucesso!")
 
 	// Repositórios para o MongoDB
-	userRepo := repositories.NewUserRepository(db)
-	projectRepo := repositories.NewProjectRepository(db)
-	memberRepo := repositories.NewMemberRepository(db)
+	userRepository := repositories.NewUserRepository(db)
+	projectRepository := repositories.NewProjectRepository(db)
+	memberRepository := repositories.NewMemberRepository(db)
+
+	// Controladores para os repositórios
+	authController := controllers.NewAuthController(userRepository)
+	userController := controllers.NewUserController(userRepository)
+	projectController := controllers.NewProjectController(projectRepository, userRepository, memberRepository)
+	memberController := controllers.NewMemberController(memberRepository)
 
 	// Criação do roteador de servidores HTTP
-	router := routes.SetupRoutes(userRepo, projectRepo, memberRepo)
+	router := routes.SetupRoutes(authController, userController, projectController, memberController)
 
 	// Porta principal do servidor HTTP
 	port := os.Getenv("PORT")
@@ -77,9 +84,39 @@ func main() {
 		IdleTimeout:  60 * time.Second,
 	}
 
-	// Inicialização do servidor
-	log.Printf("🌐 servidor inicializado no endereço: http://localhost%s\n", server.Addr)
-	if err := server.ListenAndServe(); err != nil {
-		log.Fatalf("❌ erro ao inicializar o servidor: %s\n", err)
+	// Canal para capturar sinais do sistema
+	signalChannel := make(chan os.Signal, 1)
+	signal.Notify(signalChannel, syscall.SIGINT, syscall.SIGTERM)
+
+	// Goroutine para iniciar o servidor
+	go func() {
+		log.Println("🚀 servidor pronto para receber requisições!")
+		log.Println("📋 endpoints disponíveis:")
+		log.Println(" ➕ POST   /api/users/verify")
+		// log.Println(" ➕ POST   /api/users/signup")
+		// log.Println(" ➕ POST   /api/users/signin")
+		// log.Println(" ➕ POST   /api/users/signout")
+		// log.Println(" 🔍 GET    /api/users/{uid}")
+		// log.Println(" ✏️  PUT    /api/users/{uid}")
+		// log.Println(" 🗑️  DELETE /api/users/{uid}")
+		log.Printf("🌐 servidor iniciado em: http://localhost:%s", port)
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("❌ erro ao inicializar servidor: %v", err)
+		}
+	}()
+
+	// Aguarda sinal de encerramento
+	<-signalChannel
+	log.Println("🛑 sinal de encerramento recebido. encerrando servidor...")
+
+	// Contexto com timeout para encerramento gracioso
+	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer shutdownCancel()
+
+	// Encerramento gracioso do servidor
+	if err := server.Shutdown(shutdownCtx); err != nil {
+		log.Printf("❌ erro durante encerramento do servidor: %v", err)
+	} else {
+		log.Println("✅ servidor encerrado com êxito!")
 	}
 }

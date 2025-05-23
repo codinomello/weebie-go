@@ -1,0 +1,186 @@
+package public
+
+import (
+    components "github.com/codinomello/weebie-go/web/components"
+    custom "github.com/codinomello/weebie-go/web/components/custom"
+)
+
+templ SignIn() {
+    <html lang="pt-BR">
+    <head>
+        <!-- Meta Tags -->
+        @components.Meta()
+        <!-- Título -->
+        @components.Title("Weebie - Login")
+        <!-- HTMX e Tailwind CSS -->
+        @components.ScriptHead()
+        <!-- Fonte -->
+        @components.StyleHead()
+        <!-- Flowbite CSS e Ícone -->
+        @components.Link("house_with_garden.png")
+    </head>
+    <body class="bg-gray-100 dark:bg-gray-900">
+        <!-- Header -->
+        @components.Nav("Weebie", "page_facing_up.png")
+        <!-- Formulário de Login -->
+        <main class="flex-grow flex items-center justify-center p-4 pt-8">
+            <div class="w-full max-w-lg mx-auto">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl">
+                    <div class="text-center mb-6">
+                        <h2 class="text-3xl font-bold text-orange dark:text-golden mb-2">📎 Acesse a sua conta</h2>
+                        <p class="text-gray-600 dark:text-gray-300">Faça login para acessar sua conta</p>
+                    </div>
+
+                    <!-- Formulário -->
+                    <form id="email-signin-form" 
+                        hx-post="/users/signin" 
+                        hx-target="#auth-result" 
+                        hx-swap="innerHTML"
+                        class="space-y-5 text-base">
+                        
+                        <!-- E-mail -->
+                        <div class="space-y-2">
+                            <label for="email" class="block text-base font-medium text-gray-700 dark:text-gray-300">E-mail*</label>
+                            <input id="email" name="email" type="email" required
+                                   class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-orange focus:border-transparent transition">
+                        </div>
+
+                        <!-- Senha -->
+                        <div class="space-y-2">
+                            <label for="password" class="block text-base font-medium text-gray-700 dark:text-gray-300">Senha*</label>
+                            <input id="password" name="password" type="password" required
+                                   class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-orange focus:border-transparent transition">
+                            <div class="flex justify-end pt-1">
+                                <a href="/forgot-password" class="text-sm text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">Esqueceu a senha?</a>
+                            </div>
+                        </div>
+
+                        <!-- Resultado da Autenticação -->
+                        <div id="auth-result" class="hidden"></div>
+
+                        <!-- Botão de Ação -->
+                        <button type="submit" 
+                            class="w-full mt-8 px-4 py-3 text-lg bg-gradient-to-r from-orange to-golden text-white font-semibold rounded-lg hover:opacity-90 transition-all duration-300 transform hover:scale-[1.02] shadow-md">
+                            Entrar
+                        </button>
+                    </form>
+
+                    <!-- Divisor -->
+                    <div class="flex items-center my-6">
+                        <div class="flex-1 h-px bg-gray-300 dark:bg-gray-600"></div>
+                        <span class="px-4 text-md text-gray-600 dark:text-gray-300">ou</span>
+                        <div class="flex-1 h-px bg-gray-300 dark:bg-gray-600"></div>
+                    </div>
+
+                    <!-- Botões de OAuth2 -->
+                    @custom.OAuthButtons()
+
+                    <!-- Link para Cadastro -->
+                    <div class="mt-6 text-center">
+                        <p class="text-base text-gray-600 dark:text-gray-300">
+                            Não tem uma conta? 
+                            <a href="/signup" class="text-orange font-medium hover:underline dark:text-golden">Cadastre-se</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <!-- Rodapé -->
+        @components.FooterLogin()
+        <!-- Scripts -->
+        <script>
+            const auth = firebase.auth();
+            const googleProvider = new firebase.auth.GoogleAuthProvider();
+            const facebookProvider = new firebase.auth.FacebookAuthProvider();
+            const githubProvider = new firebase.auth.GithubAuthProvider();
+
+            document.getElementById("email-signin-form").addEventListener("submit", async (e) => {
+                e.preventDefault();
+                
+                const email = document.getElementById("email").value;
+                const password = document.getElementById("password").value;
+
+                if (!email || !password) return alert("Informe email e senha");
+
+                try {
+                    const result = await auth.signInWithEmailAndPassword(email, password);
+                    const idToken = await result.user.getIdToken();
+
+                    const res = await fetch("http://localhost:8080/auth/verify", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ id_token: idToken })
+                    });
+
+                    const data = await res.json();
+                    console.log("Login bem-sucedido. UID:", data.uid);
+                    window.location.href = "/dashboard"; // Redirecionar após login
+                } catch (err) {
+                    console.error(err);
+                    document.getElementById("auth-result").classList.remove("hidden");
+                    document.getElementById("auth-result").innerHTML = `
+                        <div class="p-3 mb-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-200 dark:text-red-800">
+                            Erro no login: ${err.message}
+                        </div>
+                    `;
+                }
+            });
+
+            async function signInWithProvider(provider) {
+                try {
+                    const result = await auth.signInWithPopup(provider);
+                    const user = result.user;
+                    const idToken = await user.getIdToken();
+
+                    const payload = {
+                        name: user.displayName || "",          // Nome completo
+                        email: user.email || "",               // E-mail (obrigatório)
+                        phone: user.phoneNumber || "",         // Telefone
+                        password: "",                          // Vazio para login social
+                        id_token: idToken,                     // Token de autenticação
+                        cpf: "",                               // CPF
+                        rg: "",                                // RG
+                        sex: "none",                           // Padrão: "Prefiro não dizer"
+                        age: 0,                                // Idade padrão
+                        address: "",                           // Endereço
+                        complement: "",                        // Complemento
+                        number: "",                            // Número
+                        neighborhood: "",                      // Bairro
+                        city: "",                              // Cidade
+                        state: "",                             // Estado (UF)
+                        cep: "",                               // CEP
+                        role: "user",                          // Permissão padrão
+                        terms: true                            // Aceite dos termos
+                    };
+
+                    const response = await fetch("http://localhost:8080/api/users/", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.ok) {
+                        window.location.href = "/dashboard"; // Redirecionar após login
+                    } else {
+                        throw new Error("Falha na autenticação com o servidor");
+                    }
+                } catch (err) {
+                    console.error(err);
+                    document.getElementById("auth-result").classList.remove("hidden");
+                    document.getElementById("auth-result").innerHTML = `
+                        <div class="p-3 mb-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-200 dark:text-red-800">
+                            Erro no login social: ${err.message}
+                        </div>
+                    `;
+                }
+            }
+
+            document.getElementById("google-signin")?.addEventListener("click", () => signInWithProvider(googleProvider));
+            document.getElementById("facebook-signin")?.addEventListener("click", () => signInWithProvider(facebookProvider));
+            document.getElementById("github-signin")?.addEventListener("click", () => signInWithProvider(githubProvider));
+        </script>
+        <!-- Animação de Carregamento -->
+        @custom.LoadingAnimations()
+    </body>
+    </html>
+}
