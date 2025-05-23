@@ -106,7 +106,7 @@ templ SignIn() {
                     const result = await auth.signInWithEmailAndPassword(email, password);
                     const idToken = await result.user.getIdToken();
 
-                    const res = await fetch("http://localhost:8080/auth/verify", {
+                    const res = await fetch("/api/auth/verify", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ id_token: idToken })
@@ -132,32 +132,13 @@ templ SignIn() {
                     const user = result.user;
                     const idToken = await user.getIdToken();
 
-                    const payload = {
-                        name: user.displayName || "",          // Nome completo
-                        email: user.email || "",               // E-mail (obrigatório)
-                        phone: user.phoneNumber || "",         // Telefone
-                        password: "",                          // Vazio para login social
-                        id_token: idToken,                     // Token de autenticação
-                        cpf: "",                               // CPF
-                        rg: "",                                // RG
-                        sex: "none",                           // Padrão: "Prefiro não dizer"
-                        age: 0,                                // Idade padrão
-                        address: "",                           // Endereço
-                        complement: "",                        // Complemento
-                        number: "",                            // Número
-                        neighborhood: "",                      // Bairro
-                        city: "",                              // Cidade
-                        state: "",                             // Estado (UF)
-                        cep: "",                               // CEP
-                        role: "user",                          // Permissão padrão
-                        terms: true                            // Aceite dos termos
-                    };
-
-                    const response = await fetch("http://localhost:8080/api/users/", {
+                    const response = await fetch("/api/auth/login", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(payload)
+                        body: JSON.stringify({ id_token: idToken })
                     });
+
+                    const data = await response.json();
 
                     if (response.ok) {
                         window.location.href = "/dashboard"; // Redirecionar após login

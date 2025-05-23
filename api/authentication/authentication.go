@@ -224,6 +224,6 @@ func (fa *FirebaseAuthentication) CreateDefaultAdmin(db *mongo.Database) error {
 		log.Printf("aviso: falha ao definir claims: %v\n", err)
 	}
 
-	log.Println("✔ usuário admin criado com sucesso")
+	log.Println("usuário admin criado com sucesso")
 	return nil
 }

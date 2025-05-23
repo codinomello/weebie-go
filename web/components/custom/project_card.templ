@@ -41,16 +41,16 @@ templ ProjectCard(title string, description string, status string, progress int,
             
             <!-- Tags -->
             <div class="flex flex-wrap gap-2 mb-4">
-                // @for _, category := range categories {
-                //     <span class={ "px-2 py-1 rounded-full text-xs " + getCategoryColorClass(category) }>
-                //         { category }
-                //     </span>
-                // }
-                // @for _, odsNumber := range ods {
-                //     <span class="bg-orange/10 text-orange dark:bg-orange/20 dark:text-orange/80 px-2 py-1 rounded-full text-xs">
-                //         ODS { odsNumber }
-                //     </span>
-                // }
+                for _, category := range categories {
+                     <span class={ "px-2 py-1 rounded-full text-xs " + getCategoryColorClass(category) }>
+                         { category }
+                     </span>
+                 }
+                for _, odsNumber := range ods {
+                     <span class="bg-orange/10 text-orange dark:bg-orange/20 dark:text-orange/80 px-2 py-1 rounded-full text-xs">
+                         ODS { odsNumber }
+                     </span>
+                 }
             </div>
             
             <!-- Descrição -->

@@ -24,7 +24,6 @@ type Project struct {
 }
 
 // CreateProjectRequest define a estrutura da requisição para criar um novo projeto.
-// O OwnerFirebaseUID é o UID do Firebase, que será usado para buscar o ObjectID do usuário.
 type CreateProjectRequest struct {
 	OwnerFirebaseUID string   `json:"owner_firebase_uid"` // UID do Firebase do proprietário
 	Title            string   `json:"title"`
@@ -37,15 +36,12 @@ type CreateProjectRequest struct {
 }
 
 // AddMemberRequest define a estrutura da requisição para adicionar um membro a um projeto.
-// O UserFirebaseUID é o UID do Firebase do usuário a ser adicionado.
 type AddMemberRequest struct {
 	UserFirebaseUID string `json:"user_firebase_uid"` // UID do Firebase do usuário a ser adicionado
 	Role            string `json:"role"`              // Papel do membro no projeto (ex: "member", "editor")
 }
 
 // ProjectUpdate representa os campos que podem ser atualizados em um projeto.
-// Usamos ponteiros para permitir que campos sejam omitidos na requisição JSON,
-// indicando que não devem ser atualizados.
 type ProjectUpdate struct {
 	Title   *string  `json:"title,omitempty" bson:"title,omitempty"`
 	Details *string  `json:"details,omitempty" bson:"details,omitempty"`

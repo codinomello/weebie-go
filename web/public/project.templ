@@ -1,6 +1,10 @@
 package public
 
-import components "github.com/codinomello/weebie-go/web/components"
+import (
+    "time"
+
+    components "github.com/codinomello/weebie-go/web/components"
+)
 
 templ Project() {
     <html lang="pt-BR">
@@ -41,16 +45,19 @@ templ Project() {
                             
                             <!-- Título -->
                             <div class="space-y-2">
-                                <label for="title" class="block text-md font-medium text-gray-700 dark:text-gray-300">Título do Projeto</label>
-                                <input type="text" id="title" name="title" required
-                                       class="w-full px-4 py-2 rounded-lg dark:text-gray-300 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue focus:border-transparent transition">
+                                <label for="title" class="block text-md font-medium text-gray-700 dark:text-gray-300">Título do Projeto*</label>
+                                <input type="text" id="title" name="title" required maxlength="100"
+                                       class="w-full px-4 py-2 rounded-lg dark:text-gray-300 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue focus:border-transparent transition"
+                                       placeholder="Nome do seu projeto">
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Máximo 100 caracteres</p>
                             </div>
 
                             <!-- Ano -->
                             <div class="space-y-2">
-                                <label for="year" class="block text-md font-medium text-gray-700 dark:text-gray-300">Ano</label>
-                                <input type="number" id="year" name="year" min="2000" max="2100" required
-                                       class="w-full px-4 py-2 rounded-lg dark:text-gray-300 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue focus:border-transparent transition">
+                                <label for="year" class="block text-md font-medium text-gray-700 dark:text-gray-300">Ano*</label>
+                                <input type="number" id="year" name="year" min="2000" max="@{currentYear()+5}" required
+                                       class="w-full px-4 py-2 rounded-lg dark:text-gray-300 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue focus:border-transparent transition"
+                                       value="@{currentYear()}">
                             </div>
                         </div>
                     </div>
@@ -64,32 +71,50 @@ templ Project() {
                         <div class="space-y-6">
                             <!-- Descrição -->
                             <div class="space-y-2">
-                                <label for="details" class="block text-md font-medium text-gray-700 dark:text-gray-300">Descrição</label>
-                                <textarea id="details" name="details" rows="4" required
-                                    class="w-full px-4 py-2 rounded-lg dark:text-gray-300 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-pink focus:border-transparent transition"></textarea>
+                                <label for="details" class="block text-md font-medium text-gray-700 dark:text-gray-300">Descrição*</label>
+                                <textarea id="details" name="details" rows="4" required maxlength="1000"
+                                    class="w-full px-4 py-2 rounded-lg dark:text-gray-300 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-pink focus:border-transparent transition"
+                                    placeholder="Descreva seu projeto em detalhes"></textarea>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Máximo 1000 caracteres</p>
                             </div>
 
                             <!-- Impacto -->
                             <div class="space-y-2">
-                                <label for="impact" class="block text-md font-medium text-gray-700 dark:text-gray-300">Impacto Esperado</label>
-                                <textarea id="impact" name="impact" rows="3" required
-                                    class="w-full px-4 py-2 rounded-lg dark:text-gray-300 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-pink focus:border-transparent transition"></textarea>
+                                <label for="impact" class="block text-md font-medium text-gray-700 dark:text-gray-300">Impacto Esperado*</label>
+                                <textarea id="impact" name="impact" rows="3" required maxlength="500"
+                                    class="w-full px-4 py-2 rounded-lg dark:text-gray-300 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-pink focus:border-transparent transition"
+                                    placeholder="Qual impacto positivo seu projeto terá?"></textarea>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Máximo 500 caracteres</p>
                             </div>
 
-                            <!-- Ícone -->
-                            <div class="space-y-2">
-                                <label for="icon" class="block text-md font-medium text-gray-700 dark:text-gray-300">Ícone do Projeto</label>
-                                <select id="icon" name="icon"
-                                    class="w-full px-4 py-2 rounded-lg dark:text-gray-300 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-pink focus:border-transparent transition">
-                                    <option value="">Selecione um ícone</option>
-                                    <option value="🌱">🌱 Sustentabilidade</option>
-                                    <option value="💡">💡 Inovação</option>
-                                    <option value="👥">👥 Comunidade</option>
-                                    <option value="🏥">🏥 Saúde</option>
-                                    <option value="🎓">🎓 Educação</option>
-                                    <option value="🌍">🌍 Meio Ambiente</option>
-                                    <option value="🔧">🔧 Tecnologia</option>
-                                </select>
+                            <!-- Ícone e Status -->
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <!-- Ícone -->
+                                <div class="space-y-2">
+                                    <label for="icon" class="block text-md font-medium text-gray-700 dark:text-gray-300">Ícone do Projeto</label>
+                                    <select id="icon" name="icon"
+                                        class="w-full px-4 py-2 rounded-lg dark:text-gray-300 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-pink focus:border-transparent transition">
+                                        <option value="">Selecione um ícone</option>
+                                        <option value="🌱">🌱 Sustentabilidade</option>
+                                        <option value="💡">💡 Inovação</option>
+                                        <option value="👥">👥 Comunidade</option>
+                                        <option value="🏥">🏥 Saúde</option>
+                                        <option value="🎓">🎓 Educação</option>
+                                        <option value="🌍">🌍 Meio Ambiente</option>
+                                        <option value="🔧">🔧 Tecnologia</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Status -->
+                                <div class="space-y-2">
+                                    <label for="status" class="block text-md font-medium text-gray-700 dark:text-gray-300">Status*</label>
+                                    <select id="status" name="status" required
+                                        class="w-full px-4 py-2 rounded-lg dark:text-gray-300 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-pink focus:border-transparent transition">
+                                        <option value="active" selected>Ativo</option>
+                                        <option value="completed">Concluído</option>
+                                        <option value="archived">Arquivado</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -103,7 +128,7 @@ templ Project() {
                         <div class="grid md:grid-cols-2 gap-6">
                             <!-- Curso -->
                             <div class="space-y-2">
-                                <label for="course" class="block text-md font-medium text-gray-700 dark:text-gray-300">Curso</label>
+                                <label for="course" class="block text-md font-medium text-gray-700 dark:text-gray-300">Curso*</label>
                                 <select id="course" name="course" required
                                     class="w-full px-4 py-2 rounded-lg dark:text-gray-300 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-green focus:border-transparent transition">
                                     <option value="">Selecione um curso</option>
@@ -116,13 +141,21 @@ templ Project() {
                                 </select>
                             </div>
                             
+                            <!-- Outro Curso (condicional) -->
+                            <div id="other-course-container" class="space-y-2 hidden">
+                                <label for="other_course" class="block text-md font-medium text-gray-700 dark:text-gray-300">Especifique o Curso*</label>
+                                <input type="text" id="other_course" name="other_course"
+                                    class="w-full px-4 py-2 rounded-lg dark:text-gray-300 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-green focus:border-transparent transition"
+                                    placeholder="Digite o nome do curso">
+                            </div>
+                            
                             <!-- Membros -->
-                            <div class="space-y-2">
+                            <div class="space-y-2 md:col-span-2">
                                 <label for="members-input" class="block text-md font-medium text-gray-700 dark:text-gray-300">Adicionar Membros</label>
                                 <div class="relative">
-                                    <input type="text" id="members-input" 
+                                    <input type="email" id="members-input" 
                                         class="w-full px-4 py-2 rounded-lg dark:text-gray-300 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-green focus:border-transparent transition pr-10"
-                                        placeholder="Digite e-mails dos membros">
+                                        placeholder="Digite e-mails dos membros (separados por vírgula)">
                                     <button type="button" id="add-member-btn" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-green hover:text-green-700">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -146,18 +179,25 @@ templ Project() {
                             <!-- ODS serão inseridos aqui via JavaScript -->
                         </div>
                         <input type="hidden" id="ods" name="ods">
+                        <p class="text-sm text-gray-600 dark:text-gray-300 mt-4">Selecione os Objetivos de Desenvolvimento Sustentável relacionados ao seu projeto</p>
                     </div>
 
                     <!-- Modal para detalhes do ODS -->
                     <div id="ods-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                         <div class="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6 shadow-2xl">
                             <div class="flex justify-between items-start mb-4">
-                                <h3 id="ods-modal-title" class="text-xl font-bold text-yellow-600 dark:text-yellow-300"></h3>
+                                <div>
+                                    <h3 id="ods-modal-title" class="text-xl font-bold text-yellow-600 dark:text-yellow-300"></h3>
+                                    <p id="ods-modal-number" class="text-sm text-gray-500 dark:text-gray-400"></p>
+                                </div>
                                 <button onclick="closeODSModal()" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                     </svg>
                                 </button>
+                            </div>
+                            <div class="flex justify-center mb-4">
+                                <span id="ods-modal-emoji" class="text-5xl"></span>
                             </div>
                             <p id="ods-modal-description" class="text-gray-700 dark:text-gray-300"></p>
                             <div class="mt-6 flex justify-end">
@@ -167,6 +207,7 @@ templ Project() {
                             </div>
                         </div>
                     </div>
+                    
                     <!-- Datas (automáticas) -->
                     <input type="hidden" name="created_at" id="created-at">
                     <input type="hidden" name="updated_at" id="updated-at">
@@ -175,13 +216,13 @@ templ Project() {
                     <div class="flex flex-col md:flex-row justify-end gap-4 mt-8">
                         <!-- Botão limpar -->
                         <button type="button" id="clear-btn" 
-                            class="px-6 py-3 bg-red text-white font-medium rounded-lg transition-all duration-150 transform hover:scale-[1.025] flex items-center gap-2">
+                            class="px-6 py-3 bg-gray-500 text-white font-medium rounded-lg transition-all duration-150 transform hover:scale-[1.025] flex items-center gap-2 hover:bg-gray-600">
                             <span class="text-xl">🗑️</span> Limpar Campos
                         </button>
 
                         <!-- Botão salvar -->
                         <button type="submit" 
-                            class="px-6 py-3 bg-green text-white font-medium rounded-lg transition-all duration-150 transform hover:scale-[1.025] flex items-center gap-2">
+                            class="px-6 py-3 bg-green text-white font-medium rounded-lg transition-all duration-150 transform hover:scale-[1.025] flex items-center gap-2 hover:bg-green-600">
                             <span class="text-xl">💾</span> Salvar Projeto
                         </button>
                     </div>
@@ -191,13 +232,47 @@ templ Project() {
 
         <!-- Scripts -->
         @components.ScriptBody()
-        @components.ScriptODSList()
         <script>
+            // Lista completa de ODS definida diretamente no template
+            const odsList = [
+                { number: "1", emoji: "❌", title: "Erradicação da Pobreza", description: "Acabar com a pobreza em todas as suas formas, em todos os lugares" },
+                { number: "2", emoji: "🍽️", title: "Fome Zero e Agricultura Sustentável", description: "Acabar com a fome, alcançar a segurança alimentar e melhoria da nutrição e promover a agricultura sustentável" },
+                { number: "3", emoji: "❤️", title: "Saúde e Bem-Estar", description: "Assegurar uma vida saudável e promover o bem-estar para todos, em todas as idades" },
+                { number: "4", emoji: "🎓", title: "Educação de Qualidade", description: "Assegurar a educação inclusiva e equitativa e de qualidade, e promover oportunidades de aprendizagem ao longo da vida para todos" },
+                { number: "5", emoji: "🚺", title: "Igualdade de Gênero", description: "Alcançar a igualdade de gênero e empoderar todas as mulheres e meninas" },
+                { number: "6", emoji: "💧", title: "Água Potável e Saneamento", description: "Assegurar a disponibilidade e gestão sustentável da água e saneamento para todos" },
+                { number: "7", emoji: "⚡", title: "Energia Limpa e Acessível", description: "Assegurar o acesso confiável, sustentável, moderno e a preço acessível à energia para todos" },
+                { number: "8", emoji: "💼", title: "Trabalho Decente e Crescimento Econômico", description: "Promover o crescimento econômico sustentado, inclusivo e sustentável, emprego pleno e produtivo e trabalho decente para todos" },
+                { number: "9", emoji: "🏭", title: "Indústria, Inovação e Infraestrutura", description: "Construir infraestruturas resilientes, promover a industrialização inclusiva e sustentável e fomentar a inovação" },
+                { number: "10", emoji: "↕️", title: "Redução das Desigualdades", description: "Reduzir a desigualdade dentro dos países e entre eles" },
+                { number: "11", emoji: "🏙️", title: "Cidades e Comunidades Sustentáveis", description: "Tornar as cidades e os assentamentos humanos inclusivos, seguros, resilientes e sustentáveis" },
+                { number: "12", emoji: "🔄", title: "Consumo e Produção Responsáveis", description: "Assegurar padrões de produção e de consumo sustentáveis" },
+                { number: "13", emoji: "🌡️", title: "Ação Contra a Mudança Global do Clima", description: "Tomar medidas urgentes para combater a mudança do clima e seus impactos" },
+                { number: "14", emoji: "🐠", title: "Vida na Água", description: "Conservação e uso sustentável dos oceanos, dos mares e dos recursos marinhos para o desenvolvimento sustentável" },
+                { number: "15", emoji: "🌳", title: "Vida Terrestre", description: "Proteger, recuperar e promover o uso sustentável dos ecossistemas terrestres, gerir de forma sustentável as florestas, combater a desertificação, deter e reverter a degradação da terra e deter a perda de biodiversidade" },
+                { number: "16", emoji: "⚖️", title: "Paz, Justiça e Instituições Eficazes", description: "Promover sociedades pacíficas e inclusivas para o desenvolvimento sustentável, proporcionar o acesso à justiça para todos e construir instituições eficazes, responsáveis e inclusivas em todos os níveis" },
+                { number: "17", emoji: "🤝", title: "Parcerias e Meios de Implementação", description: "Fortalecer os meios de implementação e revitalizar a parceria global para o desenvolvimento sustentável" }
+            ];
+
             document.addEventListener('DOMContentLoaded', () => {
                 // Configurar campos automáticos
                 const now = new Date().toISOString();
                 document.getElementById('created-at').value = now;
                 document.getElementById('updated-at').value = now;
+                
+                // Mostrar campo "Outro Curso" quando selecionado
+                const courseSelect = document.getElementById('course');
+                const otherCourseContainer = document.getElementById('other-course-container');
+                
+                courseSelect.addEventListener('change', () => {
+                    if (courseSelect.value === 'Outro') {
+                        otherCourseContainer.classList.remove('hidden');
+                        document.getElementById('other_course').required = true;
+                    } else {
+                        otherCourseContainer.classList.add('hidden');
+                        document.getElementById('other_course').required = false;
+                    }
+                });
                 
                 // Gerenciamento de membros
                 const membersInput = document.getElementById('members-input');
@@ -220,7 +295,7 @@ templ Project() {
                     const email = membersInput.value.trim();
                     
                     // Validar e-mail
-                    if (email && validator.isEmail(email)) {
+                    if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
                         // Verificar se já existe
                         const existingEmails = Array.from(membersContainer.querySelectorAll('.member-tag'))
                             .map(tag => tag.dataset.email.toLowerCase());
@@ -294,6 +369,11 @@ templ Project() {
                         <span class="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300">
                             ${ods.emoji} ODS ${ods.number}
                         </span>
+                        <button type="button" onclick="showODSDetails(${ods.number})" class="ml-auto text-gray-400 hover:text-yellow-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </button>
                     `;
                     
                     odsContainer.appendChild(odsCard);
@@ -315,10 +395,32 @@ templ Project() {
                         membersHidden.value = '';
                         odsHidden.value = '';
                         document.querySelectorAll('.ods-checkbox').forEach(cb => cb.checked = false);
+                        otherCourseContainer.classList.add('hidden');
                     }
                 });
             });
+            
+            // Função para mostrar detalhes do ODS
+            window.showODSDetails = function(odsNumber) {
+                const ods = odsList.find(o => o.number === odsNumber.toString());
+                if (ods) {
+                    document.getElementById('ods-modal-title').textContent = ods.title;
+                    document.getElementById('ods-modal-number').textContent = `ODS ${ods.number}`;
+                    document.getElementById('ods-modal-emoji').textContent = ods.emoji;
+                    document.getElementById('ods-modal-description').textContent = ods.description;
+                    document.getElementById('ods-modal').classList.remove('hidden');
+                }
+            };
+            
+            // Função para fechar modal ODS
+            window.closeODSModal = function() {
+                document.getElementById('ods-modal').classList.add('hidden');
+            };
         </script>
     </body>
     </html>
+}
+
+func currentYear() int {
+    return time.Now().Year()
 }
