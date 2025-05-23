@@ -100,7 +100,7 @@ func (gc *GeocodeClient) GeocodeAddress(ctx context.Context, address string) (st
 }
 
 // geocodeHandler gerencia o endpoint /geocode com processamento concorrente
-func (gc *GeocodeClient) geocodeHandler(w http.ResponseWriter, r *http.Request) {
+func (gc *GeocodeClient) GeocodeHandler(w http.ResponseWriter, r *http.Request) {
 	// Verifica se o método é POST
 	if r.Method != http.MethodPost {
 		http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
