@@ -12,58 +12,65 @@ templ Project() {
         <!-- Meta Tags -->
         @components.Meta()
         <!-- Título -->
-        @components.Title("Weebie - Cadastro de Projetos")
+        @components.Title("Weebie - Cadastro de Projeto")
         <!-- HTMX e Tailwind CSS -->
         @components.ScriptHead()
         <!-- Fonte -->
         @components.StyleHead()
-        <!-- Ícone -->
+        <!-- Flowbite CSS e Ícone -->
         @components.Link("house_with_garden.png")
     </head>
     <body class="bg-gray-100 dark:bg-gray-900 min-h-screen flex flex-col">
-        <!-- Header -->
+        <!-- Navegação -->
         @components.Nav("Cadastro de Projetos", "house_buildings.png")
-        
-        <!-- Formulário -->
-        <main class="flex-grow container mx-auto px-4 py-8 max-w-3xl">
+        <main class="flex-grow container mx-auto px-4 py-8 max-w-4xl">
             <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-xl border border-gray-200 dark:border-gray-700">
                 <h1 class="text-3xl font-bold text-center mb-8 text-orange dark:text-golden">
-                    <span class="text-blue">📋</span> Cadastro de Projeto
+                    <span>📋 Cadastro de Projeto</span>
                 </h1>
-                
                 <form hx-post="/projects" hx-swap="none" class="space-y-8">
                     <!-- Seção de Informações Básicas -->
-                    <div class="p-6 rounded-xl bg-blue bg-opacity-20 border-l-4 border-blue shadow-md">
-                        <h2 class="text-2xl font-bold text-blue mb-6 flex items-center gap-3">
+                    <section class="p-6 rounded-xl bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue shadow-md">
+                        <h2 class="text-3xl font-bold text-blue mb-6 flex items-center gap-3">
                             <span class="text-3xl">📝</span> Informações Básicas
                         </h2>
-                        
                         <div class="grid md:grid-cols-2 gap-6">
-                            <!-- IDs ocultos -->
                             <input type="hidden" name="id" id="project-id">
                             <input type="hidden" name="owner_id" id="owner-id">
-                            
                             <!-- Título -->
                             <div class="space-y-2">
-                                <label for="title" class="block text-md font-medium text-gray-700 dark:text-gray-300">Título do Projeto*</label>
+                                <label for="title" class="block text-lg font-medium dark:text-gray-700">Título do Projeto <span class="text-blue">*</span></label>
                                 <input type="text" id="title" name="title" required maxlength="100"
-                                       class="w-full px-4 py-2 rounded-lg dark:text-gray-300 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue focus:border-transparent transition"
+                                       class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue focus:border-transparent transition"
                                        placeholder="Nome do seu projeto">
-                                <p class="text-xs text-gray-500 dark:text-gray-400">Máximo 100 caracteres</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Máximo 100 caracteres</p>
                             </div>
-
                             <!-- Ano -->
                             <div class="space-y-2">
-                                <label for="year" class="block text-md font-medium text-gray-700 dark:text-gray-300">Ano*</label>
+                                <label for="year" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Ano*</label>
                                 <input type="number" id="year" name="year" min="2000" max="@{currentYear()+5}" required
-                                       class="w-full px-4 py-2 rounded-lg dark:text-gray-300 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue focus:border-transparent transition"
+                                       class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue focus:border-transparent transition"
                                        value="@{currentYear()}">
                             </div>
-                        </div>
-                    </div>
+                            <!-- Novo Campo: Localização -->
+                            <div class="space-y-2">
+                                <label for="location" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Localização*</label>
+                                <input type="text" id="location" name="location" required
+                                       class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue focus:border-transparent transition"
+                                       placeholder="Onde o projeto será realizado">
+                            </div>
 
+                            <!-- Novo Campo: Público-Alvo -->
+                            <div class="space-y-2">
+                                <label for="target_audience" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Público-Alvo*</label>
+                                <input type="text" id="target_audience" name="target_audience" required
+                                       class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue focus:border-transparent transition"
+                                       placeholder="Quem será beneficiado">
+                            </div>
+                        </div>
+                    </section>
                     <!-- Seção de Detalhes -->
-                    <div class="p-6 rounded-xl bg-pink bg-opacity-20 border-l-4 border-pink shadow-md">
+                    <section class="p-6 rounded-xl bg-pink-50 dark:bg-pink-900/20 border-l-4 border-pink shadow-md">
                         <h2 class="text-2xl font-bold text-pink mb-6 flex items-center gap-3">
                             <span class="text-3xl">✨</span> Detalhes do Projeto
                         </h2>
@@ -71,29 +78,35 @@ templ Project() {
                         <div class="space-y-6">
                             <!-- Descrição -->
                             <div class="space-y-2">
-                                <label for="details" class="block text-md font-medium text-gray-700 dark:text-gray-300">Descrição*</label>
+                                <label for="details" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Descrição*</label>
                                 <textarea id="details" name="details" rows="4" required maxlength="1000"
-                                    class="w-full px-4 py-2 rounded-lg dark:text-gray-300 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-pink focus:border-transparent transition"
+                                    class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-pink focus:border-transparent transition"
                                     placeholder="Descreva seu projeto em detalhes"></textarea>
-                                <p class="text-xs text-gray-500 dark:text-gray-400">Máximo 1000 caracteres</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Máximo 1000 caracteres</p>
                             </div>
 
                             <!-- Impacto -->
                             <div class="space-y-2">
-                                <label for="impact" class="block text-md font-medium text-gray-700 dark:text-gray-300">Impacto Esperado*</label>
+                                <label for="impact" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Impacto Esperado*</label>
                                 <textarea id="impact" name="impact" rows="3" required maxlength="500"
-                                    class="w-full px-4 py-2 rounded-lg dark:text-gray-300 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-pink focus:border-transparent transition"
+                                    class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-pink focus:border-transparent transition"
                                     placeholder="Qual impacto positivo seu projeto terá?"></textarea>
-                                <p class="text-xs text-gray-500 dark:text-gray-400">Máximo 500 caracteres</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Máximo 500 caracteres</p>
                             </div>
-
+                            <!-- Novo Campo: Metodologia -->
+                            <div class="space-y-2">
+                                <label for="methodology" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Metodologia*</label>
+                                <textarea id="methodology" name="methodology" rows="3" required
+                                    class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-pink focus:border-transparent transition"
+                                    placeholder="Como o projeto será realizado"></textarea>
+                            </div>
                             <!-- Ícone e Status -->
                             <div class="grid md:grid-cols-2 gap-6">
                                 <!-- Ícone -->
                                 <div class="space-y-2">
-                                    <label for="icon" class="block text-md font-medium text-gray-700 dark:text-gray-300">Ícone do Projeto</label>
+                                    <label for="icon" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Ícone do Projeto</label>
                                     <select id="icon" name="icon"
-                                        class="w-full px-4 py-2 rounded-lg dark:text-gray-300 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-pink focus:border-transparent transition">
+                                        class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-pink focus:border-transparent transition">
                                         <option value="">Selecione um ícone</option>
                                         <option value="🌱">🌱 Sustentabilidade</option>
                                         <option value="💡">💡 Inovação</option>
@@ -104,12 +117,11 @@ templ Project() {
                                         <option value="🔧">🔧 Tecnologia</option>
                                     </select>
                                 </div>
-                                
                                 <!-- Status -->
                                 <div class="space-y-2">
-                                    <label for="status" class="block text-md font-medium text-gray-700 dark:text-gray-300">Status*</label>
+                                    <label for="status" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Status*</label>
                                     <select id="status" name="status" required
-                                        class="w-full px-4 py-2 rounded-lg dark:text-gray-300 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-pink focus:border-transparent transition">
+                                        class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-pink focus:border-transparent transition">
                                         <option value="active" selected>Ativo</option>
                                         <option value="completed">Concluído</option>
                                         <option value="archived">Arquivado</option>
@@ -117,20 +129,18 @@ templ Project() {
                                 </div>
                             </div>
                         </div>
-                    </div>
-
+                    </section>
                     <!-- Seção de Classificação -->
-                    <div class="p-6 rounded-xl bg-green bg-opacity-20 border-l-4 border-green shadow-md">
+                    <section class="p-6 rounded-xl bg-green-50 dark:bg-green-900/20 border-l-4 border-green shadow-md">
                         <h2 class="text-2xl font-bold text-green mb-6 flex items-center gap-3">
                             <span class="text-3xl">🏷️</span> Classificação
                         </h2>
-                        
                         <div class="grid md:grid-cols-2 gap-6">
                             <!-- Curso -->
                             <div class="space-y-2">
-                                <label for="course" class="block text-md font-medium text-gray-700 dark:text-gray-300">Curso*</label>
+                                <label for="course" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Curso*</label>
                                 <select id="course" name="course" required
-                                    class="w-full px-4 py-2 rounded-lg dark:text-gray-300 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-green focus:border-transparent transition">
+                                    class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-green focus:border-transparent transition">
                                     <option value="">Selecione um curso</option>
                                     <option value="Administração">Administração</option>
                                     <option value="Edificações">Edificações</option>
@@ -143,18 +153,44 @@ templ Project() {
                             
                             <!-- Outro Curso (condicional) -->
                             <div id="other-course-container" class="space-y-2 hidden">
-                                <label for="other_course" class="block text-md font-medium text-gray-700 dark:text-gray-300">Especifique o Curso*</label>
+                                <label for="other_course" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Especifique o Curso*</label>
                                 <input type="text" id="other_course" name="other_course"
-                                    class="w-full px-4 py-2 rounded-lg dark:text-gray-300 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-green focus:border-transparent transition"
+                                    class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-green focus:border-transparent transition"
                                     placeholder="Digite o nome do curso">
+                            </div>
+                            
+                            <!-- Novo Campo: Área de Atuação -->
+                            <div class="space-y-2">
+                                <label for="area" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Área de Atuação*</label>
+                                <select id="area" name="area" required
+                                    class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-green focus:border-transparent transition">
+                                    <option value="">Selecione uma área</option>
+                                    <option value="Educação">Educação</option>
+                                    <option value="Saúde">Saúde</option>
+                                    <option value="Meio Ambiente">Meio Ambiente</option>
+                                    <option value="Tecnologia">Tecnologia</option>
+                                    <option value="Social">Social</option>
+                                    <option value="Cultural">Cultural</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Novo Campo: Nível de Complexidade -->
+                            <div class="space-y-2">
+                                <label for="complexity" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Nível de Complexidade*</label>
+                                <select id="complexity" name="complexity" required
+                                    class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-green focus:border-transparent transition">
+                                    <option value="low">Baixo</option>
+                                    <option value="medium" selected>Médio</option>
+                                    <option value="high">Alto</option>
+                                </select>
                             </div>
                             
                             <!-- Membros -->
                             <div class="space-y-2 md:col-span-2">
-                                <label for="members-input" class="block text-md font-medium text-gray-700 dark:text-gray-300">Adicionar Membros</label>
+                                <label for="members-input" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Adicionar Membros</label>
                                 <div class="relative">
                                     <input type="email" id="members-input" 
-                                        class="w-full px-4 py-2 rounded-lg dark:text-gray-300 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-green focus:border-transparent transition pr-10"
+                                        class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-green focus:border-transparent transition pr-10"
                                         placeholder="Digite e-mails dos membros (separados por vírgula)">
                                     <button type="button" id="add-member-btn" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-green hover:text-green-700">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -164,13 +200,12 @@ templ Project() {
                                 </div>
                                 <input type="hidden" id="members" name="members">
                                 <div id="members-container" class="flex flex-wrap gap-2 mt-2"></div>
-                                <p class="text-sm text-gray-600 dark:text-gray-300">Digite o e-mail e pressione Enter ou clique no botão +</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Digite o e-mail e pressione Enter ou clique no botão +</p>
                             </div>
                         </div>
-                    </div>
-
+                    </section>
                     <!-- Seção ODS -->
-                    <div class="p-6 rounded-xl bg-yellow-600 bg-opacity-20 border-l-4 border-yellow-500 shadow-md">
+                    <section class="p-6 rounded-xl bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 shadow-md">
                         <h2 class="text-2xl font-bold text-yellow-600 dark:text-yellow-300 mb-6 flex items-center gap-3">
                             <span class="text-3xl">🌎</span> ODS Relacionados
                         </h2>
@@ -179,78 +214,112 @@ templ Project() {
                             <!-- ODS serão inseridos aqui via JavaScript -->
                         </div>
                         <input type="hidden" id="ods" name="ods">
-                        <p class="text-sm text-gray-600 dark:text-gray-300 mt-4">Selecione os Objetivos de Desenvolvimento Sustentável relacionados ao seu projeto</p>
-                    </div>
-
-                    <!-- Modal para detalhes do ODS -->
-                    <div id="ods-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                        <div class="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6 shadow-2xl">
-                            <div class="flex justify-between items-start mb-4">
-                                <div>
-                                    <h3 id="ods-modal-title" class="text-xl font-bold text-yellow-600 dark:text-yellow-300"></h3>
-                                    <p id="ods-modal-number" class="text-sm text-gray-500 dark:text-gray-400"></p>
-                                </div>
-                                <button onclick="closeODSModal()" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                    </svg>
-                                </button>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-4">Selecione os Objetivos de Desenvolvimento Sustentável relacionados ao seu projeto</p>
+                    </section>
+                    <!-- Seção de Recursos -->
+                    <section class="p-6 rounded-xl bg-purple-50 dark:bg-purple-900/20 border-l-4 border-purple-500 shadow-md">
+                        <h2 class="text-2xl font-bold text-purple-600 dark:text-purple-300 mb-6 flex items-center gap-3">
+                            <span class="text-3xl">💼</span> Recursos Necessários
+                        </h2>
+                        
+                        <div class="space-y-6">
+                            <!-- Novo Campo: Orçamento Estimado -->
+                            <div class="space-y-2">
+                                <label for="budget" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Orçamento Estimado (R$)</label>
+                                <input type="number" id="budget" name="budget" min="0" step="0.01"
+                                       class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+                                       placeholder="Valor estimado">
                             </div>
-                            <div class="flex justify-center mb-4">
-                                <span id="ods-modal-emoji" class="text-5xl"></span>
+                            
+                            <!-- Novo Campo: Recursos Materiais -->
+                            <div class="space-y-2">
+                                <label for="materials" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Recursos Materiais Necessários</label>
+                                <textarea id="materials" name="materials" rows="3"
+                                    class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+                                    placeholder="Liste os materiais necessários"></textarea>
                             </div>
-                            <p id="ods-modal-description" class="text-gray-700 dark:text-gray-300"></p>
-                            <div class="mt-6 flex justify-end">
-                                <button onclick="closeODSModal()" class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition">
-                                    Fechar
-                                </button>
+                            
+                            <!-- Novo Campo: Parcerias -->
+                            <div class="space-y-2">
+                                <label for="partnerships" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Parcerias Existentes ou Potenciais</label>
+                                <textarea id="partnerships" name="partnerships" rows="2"
+                                    class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+                                    placeholder="Liste organizações parceiras"></textarea>
                             </div>
                         </div>
-                    </div>
-                    
+                    </section>
+                    <!-- Seção de Termos e Condições -->
+                    <section class="p-6 rounded-xl bg-gray-50 dark:bg-gray-800 border-l-4 border-gray-500 shadow-md">
+                        <h2 class="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-6 flex items-center gap-3">
+                            <span class="text-3xl">📜</span> Termos e Condições
+                        </h2>
+                        
+                        <div class="space-y-4">
+                            <!-- Checkbox Termos de Uso -->
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5">
+                                    <input id="terms" name="terms" type="checkbox" required
+                                           class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                </div>
+                                <label for="terms" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                                    Aceito os <a href="#" class="text-blue-600 hover:underline dark:text-blue-500">Termos de Uso</a> e <a href="#" class="text-blue-600 hover:underline dark:text-blue-500">Política de Privacidade</a> <span class="text-red-500">*</span>
+                                </label>
+                            </div>
+                            
+                            <!-- Checkbox Dados Públicos -->
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5">
+                                    <input id="public_data" name="public_data" type="checkbox"
+                                           class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                </div>
+                                <label for="public_data" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                                    Concordo em tornar os dados do projeto públicos na plataforma
+                                </label>
+                            </div>
+                        </div>
+                    </section>
                     <!-- Datas (automáticas) -->
                     <input type="hidden" name="created_at" id="created-at">
                     <input type="hidden" name="updated_at" id="updated-at">
-
                     <!-- Botões -->
                     <div class="flex flex-col md:flex-row justify-end gap-4 mt-8">
                         <!-- Botão limpar -->
                         <button type="button" id="clear-btn" 
-                            class="px-6 py-3 bg-gray-500 text-white font-medium rounded-lg transition-all duration-150 transform hover:scale-[1.025] flex items-center gap-2 hover:bg-gray-600">
-                            <span class="text-xl">🗑️</span> Limpar Campos
+                            class="px-6 py-3 bg-gray-500 text-white font-medium rounded-lg transition-all duration-150 hover:bg-gray-600 flex items-center justify-center gap-2 text-lg">
+                            <span>🗑️</span> Limpar Campos
                         </button>
 
                         <!-- Botão salvar -->
                         <button type="submit" 
-                            class="px-6 py-3 bg-green text-white font-medium rounded-lg transition-all duration-150 transform hover:scale-[1.025] flex items-center gap-2 hover:bg-green-600">
-                            <span class="text-xl">💾</span> Salvar Projeto
+                            class="px-6 py-3 bg-green text-white font-medium rounded-lg transition-all duration-150 hover:bg-green-600 flex items-center justify-center gap-2 text-lg">
+                            <span>💾</span> Salvar Projeto
                         </button>
                     </div>
                 </form>
             </div>
         </main>
-        <!-- Footer -->
+        <!-- Rodapé -->
         @components.FooterLogin()
         <script>
             // Lista completa de ODS definida diretamente no template
             const odsList = [
-                { number: 1, emoji: '🍽️', name: 'Erradicação da Pobreza', description: 'Acabar com a pobreza em todas as suas formas, em todos os lugares.' },
-                { number: 2, emoji: '🌱', name: 'Fome Zero e Agricultura Sustentável', description: 'Acabar com a fome, alcançar a segurança alimentar e promover a agricultura sustentável.' },
-                { number: 3, emoji: '💊', name: 'Saúde e Bem-Estar', description: 'Assegurar uma vida saudável e promover o bem-estar para todos.' },
-                { number: 4, emoji: '📚', name: 'Educação de Qualidade', description: 'Garantir educação inclusiva e equitativa de qualidade.' },
-                { number: 5, emoji: '👩‍❤️‍👨', name: 'Igualdade de Gênero', description: 'Alcançar a igualdade de gênero e empoderar todas as mulheres e meninas.' },
-                { number: 6, emoji: '💧', name: 'Água Potável e Saneamento', description: 'Garantir disponibilidade e manejo sustentável da água.' },
-                { number: 7, emoji: '⚡', name: 'Energia Limpa e Acessível', description: 'Garantir acesso à energia acessível, confiável e sustentável.' },
-                { number: 8, emoji: '💼', name: 'Trabalho Decente e Crescimento Econômico', description: 'Promover o crescimento econômico sustentado e o trabalho decente.' },
-                { number: 9, emoji: '🏭', name: 'Indústria, Inovação e Infraestrutura', description: 'Construir infraestrutura resiliente e promover a industrialização sustentável.' },
-                { number: 10, emoji: '⚖️', name: 'Redução das Desigualdades', description: 'Reduzir a desigualdade dentro e entre os países.' },
-                { number: 11, emoji: '🌆', name: 'Cidades e Comunidades Sustentáveis', description: 'Tornar as cidades e os assentamentos humanos inclusivos, seguros e sustentáveis.' },
-                { number: 12, emoji: '♻️', name: 'Consumo e Produção Responsáveis', description: 'Garantir padrões de consumo e produção sustentáveis.' },
-                { number: 13, emoji: '🌡️', name: 'Ação Contra a Mudança Global do Clima', description: 'Tomar medidas urgentes para combater a mudança climática.' },
-                { number: 14, emoji: '🐟', name: 'Vida na Água', description: 'Conservar e usar de forma sustentável os oceanos e recursos marinhos.' },
-                { number: 15, emoji: '🌳', name: 'Vida Terrestre', description: 'Proteger, restaurar e promover o uso sustentável dos ecossistemas terrestres.' },
-                { number: 16, emoji: '🕊️', name: 'Paz, Justiça e Instituições Eficazes', description: 'Promover sociedades pacíficas e inclusivas para o desenvolvimento sustentável.' },
-                { number: 17, emoji: '🤝', name: 'Parcerias e Meios de Implementação', description: 'Fortalecer os meios de implementação e revitalizar a parceria global.' }
+                { number: 1, emoji: '🍽️', title: 'Erradicação da Pobreza', description: 'Acabar com a pobreza em todas as suas formas, em todos os lugares.' },
+                { number: 2, emoji: '🌱', title: 'Fome Zero e Agricultura Sustentável', description: 'Acabar com a fome, alcançar a segurança alimentar e promover a agricultura sustentável.' },
+                { number: 3, emoji: '💊', title: 'Saúde e Bem-Estar', description: 'Assegurar uma vida saudável e promover o bem-estar para todos.' },
+                { number: 4, emoji: '📚', title: 'Educação de Qualidade', description: 'Garantir educação inclusiva e equitativa de qualidade.' },
+                { number: 5, emoji: '👩‍❤️‍👨', title: 'Igualdade de Gênero', description: 'Alcançar a igualdade de gênero e empoderar todas as mulheres e meninas.' },
+                { number: 6, emoji: '💧', title: 'Água Potável e Saneamento', description: 'Garantir disponibilidade e manejo sustentável da água.' },
+                { number: 7, emoji: '⚡', title: 'Energia Limpa e Acessível', description: 'Garantir acesso à energia acessível, confiável e sustentável.' },
+                { number: 8, emoji: '💼', title: 'Trabalho Decente e Crescimento Econômico', description: 'Promover o crescimento econômico sustentado e o trabalho decente.' },
+                { number: 9, emoji: '🏭', title: 'Indústria, Inovação e Infraestrutura', description: 'Construir infraestrutura resiliente e promover a industrialização sustentável.' },
+                { number: 10, emoji: '⚖️', title: 'Redução das Desigualdades', description: 'Reduzir a desigualdade dentro e entre os países.' },
+                { number: 11, emoji: '🌆', title: 'Cidades e Comunidades Sustentáveis', description: 'Tornar as cidades e os assentamentos humanos inclusivos, seguros e sustentáveis.' },
+                { number: 12, emoji: '♻️', title: 'Consumo e Produção Responsáveis', description: 'Garantir padrões de consumo e produção sustentáveis.' },
+                { number: 13, emoji: '🌡️', title: 'Ação Contra a Mudança Global do Clima', description: 'Tomar medidas urgentes para combater a mudança climática.' },
+                { number: 14, emoji: '🐟', title: 'Vida na Água', description: 'Conservar e usar de forma sustentável os oceanos e recursos marinhos.' },
+                { number: 15, emoji: '🌳', title: 'Vida Terrestre', description: 'Proteger, restaurar e promover o uso sustentável dos ecossistemas terrestres.' },
+                { number: 16, emoji: '🕊️', title: 'Paz, Justiça e Instituições Eficazes', description: 'Promover sociedades pacíficas e inclusivas para o desenvolvimento sustentável.' },
+                { number: 17, emoji: '🤝', title: 'Parcerias e Meios de Implementação', description: 'Fortalecer os meios de implementação e revitalizar a parceria global.' }
             ];
 
             document.addEventListener('DOMContentLoaded', () => {
@@ -279,6 +348,44 @@ templ Project() {
                 const membersContainer = document.getElementById('members-container');
                 const addMemberBtn = document.getElementById('add-member-btn');
                 
+                function addMember() {
+                    const email = membersInput.value.trim();
+                    
+                    // Validar e-mail
+                    if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                        // Verificar se já existe
+                        const existingEmails = Array.from(membersContainer.querySelectorAll('.member-tag'))
+                            .map(tag => tag.dataset.email.toLowerCase());
+                            
+                        if (existingEmails.includes(email.toLowerCase())) {
+                            alert('Este e-mail já foi adicionado');
+                            return;
+                        }
+                        
+                        // Criar tag do membro
+                        const memberTag = document.createElement('div');
+                        memberTag.className = 'member-tag flex items-center bg-green-100 dark:bg-green-900 px-3 py-1 rounded-full text-base';
+                        memberTag.dataset.email = email;
+                        memberTag.innerHTML = `
+                            <span class="text-green-800 dark:text-green-200">${email}</span>
+                            <button type="button" class="ml-2 text-green-600 dark:text-green-300 hover:text-green-800 dark:hover:text-green-100" onclick="this.parentElement.remove(); updateMembersHidden()">
+                                ×
+                            </button>
+                        `;
+                        
+                        membersContainer.appendChild(memberTag);
+                        membersInput.value = '';
+                        updateMembersHidden();
+                    } else {
+                        alert('Por favor, insira um e-mail válido');
+                    }
+                }
+                
+                function updateMembersHidden() {
+                    const emails = Array.from(membersContainer.querySelectorAll('.member-tag')).map(tag => tag.dataset.email);
+                    membersHidden.value = JSON.stringify(emails);
+                }
+
                 // Adicionar membro ao pressionar Enter ou vírgula
                 membersInput.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter' || e.key === ',') {
@@ -290,70 +397,6 @@ templ Project() {
                 // Adicionar membro ao clicar no botão +
                 addMemberBtn.addEventListener('click', addMember);
                 
-                function addMember() {
-                    const email = membersInput.value.trim();
-                    
-                    // Validar e-mail
-                    if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                        // Verificar se já existe
-                        const existingEmails = Array.from(membersContainer.querySelectorAll('.member-tag'))
-                            .map(tag => tag.dataset.email.toLowerCase());
-                            
-                        if (existingEmails.includes(email.toLowerCase())) {
-                            showError('Este e-mail já foi adicionado');
-                            return;
-                        }
-                        
-                        // Criar tag do membro
-                        const memberTag = document.createElement('div');
-                        memberTag.className = 'member-tag flex items-center bg-green-100 dark:bg-green-900 px-3 py-1 rounded-full text-sm';
-                        memberTag.dataset.email = email;
-                        memberTag.innerHTML = `
-                            <span class="text-green-800 dark:text-green-200">${email}</span>
-                            <button type="button" class="ml-2 text-green-600 dark:text-green-300 hover:text-green-800 dark:hover:text-green-100" onclick="removeMember(this)">
-                                ×
-                            </button>
-                        `;
-                        
-                        membersContainer.appendChild(memberTag);
-                        membersInput.value = '';
-                        updateMembersHidden();
-                    } else {
-                        showError('Por favor, insira um e-mail válido');
-                    }
-                }
-                
-                // Função global para remover membros
-                window.removeMember = function(button) {
-                    button.parentElement.remove();
-                    updateMembersHidden();
-                };
-                
-                function updateMembersHidden() {
-                    const emails = Array.from(membersContainer.querySelectorAll('.member-tag')).map(tag => tag.dataset.email);
-                    membersHidden.value = JSON.stringify(emails);
-                }
-                
-                function showError(message) {
-                    // Remover erros anteriores
-                    const existingError = document.getElementById('email-error');
-                    if (existingError) existingError.remove();
-                    
-                    // Criar elemento de erro
-                    const errorElement = document.createElement('p');
-                    errorElement.id = 'email-error';
-                    errorElement.className = 'text-red-500 text-xs mt-1';
-                    errorElement.textContent = message;
-                    
-                    // Inserir após o input
-                    membersInput.parentNode.insertBefore(errorElement, membersInput.nextSibling);
-                    
-                    // Remover após 3 segundos
-                    setTimeout(() => {
-                        errorElement.remove();
-                    }, 3000);
-                }
-
                 // Gerenciamento de ODS
                 const odsContainer = document.getElementById('ods-container');
                 const odsHidden = document.getElementById('ods');
@@ -365,7 +408,7 @@ templ Project() {
                     odsCard.innerHTML = `
                         <input type="checkbox" name="ods_checkbox" value="${ods.number}" 
                                class="ods-checkbox w-5 h-5 text-yellow-600 border-yellow-300 rounded focus:ring-yellow-500 dark:bg-gray-800 dark:border-gray-600">
-                        <span class="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <span class="ml-3 text-base font-medium text-gray-700 dark:text-gray-300">
                             ${ods.emoji} ODS ${ods.number}
                         </span>
                         <button type="button" onclick="showODSDetails(${ods.number})" class="ml-auto text-gray-400 hover:text-yellow-600">
@@ -401,19 +444,36 @@ templ Project() {
             
             // Função para mostrar detalhes do ODS
             window.showODSDetails = function(odsNumber) {
-                const ods = odsList.find(o => o.number === odsNumber.toString());
+                const ods = odsList.find(o => o.number === odsNumber);
                 if (ods) {
-                    document.getElementById('ods-modal-title').textContent = ods.title;
-                    document.getElementById('ods-modal-number').textContent = `ODS ${ods.number}`;
-                    document.getElementById('ods-modal-emoji').textContent = ods.emoji;
-                    document.getElementById('ods-modal-description').textContent = ods.description;
-                    document.getElementById('ods-modal').classList.remove('hidden');
+                    const modal = document.createElement('div');
+                    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+                    modal.innerHTML = `
+                        <div class="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6 shadow-2xl">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h3 class="text-xl font-bold text-yellow-600 dark:text-yellow-300">${ods.title}</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">ODS ${ods.number}</p>
+                                </div>
+                                <button onclick="this.parentElement.parentElement.parentElement.remove()" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="flex justify-center mb-4">
+                                <span class="text-5xl">${ods.emoji}</span>
+                            </div>
+                            <p class="text-gray-700 dark:text-gray-300">${ods.description}</p>
+                            <div class="mt-6 flex justify-end">
+                                <button onclick="this.parentElement.parentElement.parentElement.remove()" class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition">
+                                    Fechar
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    document.body.appendChild(modal);
                 }
-            };
-            
-            // Função para fechar modal ODS
-            window.closeODSModal = function() {
-                document.getElementById('ods-modal').classList.add('hidden');
             };
         </script>
     </body>
