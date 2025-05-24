@@ -83,19 +83,11 @@ func Index() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = components.FooterIndex().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = components.FooterMain().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<!-- Scripts -->")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = components.ScriptBody().Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<!-- Animações adicionais --><script>\r\n            // Animação para elementos quando entram na viewport\r\n            document.addEventListener('DOMContentLoaded', function() {\r\n                const observer = new IntersectionObserver((entries) => {\r\n                    entries.forEach(entry => {\r\n                        if (entry.isIntersecting) {\r\n                            entry.target.classList.add('animate__animated', 'animate__fadeInUp');\r\n                            observer.unobserve(entry.target);\r\n                        }\r\n                    });\r\n                }, { threshold: 0.1 });\r\n                \r\n                document.querySelectorAll('section').forEach(section => {\r\n                    observer.observe(section);\r\n                });\r\n            });\r\n        </script></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<!-- Animações adicionais --><script>\r\n            // Animação para elementos quando entram na viewport\r\n            document.addEventListener('DOMContentLoaded', function() {\r\n                const observer = new IntersectionObserver((entries) => {\r\n                    entries.forEach(entry => {\r\n                        if (entry.isIntersecting) {\r\n                            entry.target.classList.add('animate__animated', 'animate__fadeInUp');\r\n                            observer.unobserve(entry.target);\r\n                        }\r\n                    });\r\n                }, { threshold: 0.1 });\r\n                \r\n                document.querySelectorAll('section').forEach(section => {\r\n                    observer.observe(section);\r\n                });\r\n            });\r\n        </script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

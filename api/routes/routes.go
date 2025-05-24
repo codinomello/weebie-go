@@ -45,8 +45,11 @@ func SetupRoutes(
 	handlers.HandleTemplPrivateRoutes(staticRouter)
 
 	// Serve arquivos estáticos (imagens e JS)
-	fileServer := http.FileServer(http.Dir("../images"))
-	staticRouter.Handle("/images/", http.StripPrefix("/images/", fileServer))
+	imagesFileServer := http.FileServer(http.Dir("../images"))
+	staticRouter.Handle("/images/", http.StripPrefix("/images/", imagesFileServer))
+
+	scriptsFileServer := http.FileServer(http.Dir("../scripts"))
+	staticRouter.Handle("/scripts/", http.StripPrefix("/scripts/", scriptsFileServer))
 
 	// 2. Rotas de API
 	apiRouter := http.NewServeMux()

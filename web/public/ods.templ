@@ -1,10 +1,8 @@
 package public
 
-import (
-    components "github.com/codinomello/weebie-go/web/components"
-)
+import components "github.com/codinomello/weebie-go/web/components"
 
-templ ODSListPage() {
+templ Ods() {
     <html lang="pt-BR">
     <head>
         @components.Meta()
@@ -73,9 +71,8 @@ templ ODSListPage() {
                 </div>
             </div>
         </main>
-
-        <!-- Scripts -->
-        @components.ScriptBody()
+        <!-- Footer -->
+        @components.FooterMain()
         <script>
             document.addEventListener('DOMContentLoaded', () => {
                 // Carregar ODS do endpoint

@@ -8,9 +8,7 @@ package public
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import (
-	components "github.com/codinomello/weebie-go/web/components"
-)
+import components "github.com/codinomello/weebie-go/web/components"
 
 func Explore() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
@@ -93,7 +91,7 @@ func Explore() templ.Component {
 			var templ_7745c5c3_Var2 string
 			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(i)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/public/explore.templ`, Line: 107, Col: 102}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/public/explore.templ`, Line: 105, Col: 102}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
@@ -128,19 +126,11 @@ func Explore() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = components.FooterIndex().Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = components.FooterMain().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<!-- Scripts -->")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = components.ScriptBody().Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<script>\r\n            // Toggle advanced filters\r\n            document.getElementById('advanced-filters').addEventListener('click', function() {\r\n                const panel = document.getElementById('advanced-filters-panel');\r\n                panel.classList.toggle('hidden');\r\n                this.querySelector('svg').classList.toggle('rotate-180');\r\n                \r\n                // Animate when showing\r\n                if (!panel.classList.contains('hidden')) {\r\n                    panel.classList.add('animate__animated', 'animate__fadeIn');\r\n                }\r\n            });\r\n\r\n            // Theme detection\r\n            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {\r\n                document.documentElement.classList.add('dark');\r\n            } else {\r\n                document.documentElement.classList.remove('dark');\r\n            }\r\n        </script></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<script>\r\n            // Toggle advanced filters\r\n            document.getElementById('advanced-filters').addEventListener('click', function() {\r\n                const panel = document.getElementById('advanced-filters-panel');\r\n                panel.classList.toggle('hidden');\r\n                this.querySelector('svg').classList.toggle('rotate-180');\r\n                \r\n                // Animate when showing\r\n                if (!panel.classList.contains('hidden')) {\r\n                    panel.classList.add('animate__animated', 'animate__fadeIn');\r\n                }\r\n            });\r\n\r\n            // Theme detection\r\n            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {\r\n                document.documentElement.classList.add('dark');\r\n            } else {\r\n                document.documentElement.classList.remove('dark');\r\n            }\r\n        </script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -15,6 +15,19 @@ templ SignOut() {
         @components.StyleHead()
         <!-- Flowbite CSS e Ícone -->
         @components.Link("house_with_garden.png")
+        <script> 
+            const firebaseConfig = {
+                apiKey: "AIzaSyAI0Tc7GssKwWwtVdrz6OaK6KFACx58N5U",
+                authDomain: "weebie-go.firebaseapp.com",
+                projectId: "weebie-go",
+                storageBucket: "weebie-go.appspot.com",
+                messagingSenderId: "321509944065",
+                appId: "1:321509944065:web:199a546b7055f461ec4900",
+                measurementId: "G-S5CG0CLRVS"
+            };
+            firebase.initializeApp(firebaseConfig);
+            const auth = firebase.auth();
+        </script>
     </head>
     <body class="bg-gray-100 dark:bg-gray-900">
         <!-- Header -->
@@ -53,9 +66,6 @@ templ SignOut() {
         </main>
         <!-- Rodapé -->
         @components.FooterLogin()
-
-        <!-- Scripts -->
-        @components.ScriptBody()
         <script>
             document.addEventListener('DOMContentLoaded', () => {
                 // Redirecionamento automático
