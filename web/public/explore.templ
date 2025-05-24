@@ -1,8 +1,6 @@
 package public
 
-import  (
-    components "github.com/codinomello/weebie-go/web/components"
-)
+import components "github.com/codinomello/weebie-go/web/components"
 
 templ Explore() {
     <html lang="pt-BR" class="scroll-smooth">
@@ -404,13 +402,8 @@ templ Explore() {
                 </div>
             </div>
         </section>
-
         <!-- Rodapé -->
-        @components.FooterIndex()
-
-        <!-- Scripts -->
-        @components.ScriptBody()
-        
+        @components.FooterMain()
         <script>
             // Toggle advanced filters
             document.getElementById('advanced-filters').addEventListener('click', function() {

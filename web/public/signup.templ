@@ -1,9 +1,6 @@
 package public
 
-import (
-    components "github.com/codinomello/weebie-go/web/components"
-    custom "github.com/codinomello/weebie-go/web/components/custom"
-)
+import components "github.com/codinomello/weebie-go/web/components"
 
 templ SignUp() {
     <html lang="pt-BR">
@@ -18,6 +15,123 @@ templ SignUp() {
         @components.StyleHead()
         <!-- Flowbite CSS e Ícone -->
         @components.Link("house_with_garden.png")
+        <!-- Firebase SDK -->
+        <script type="module">
+            // Import the functions you need from the SDKs you need
+            import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js';
+            import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+            
+            // Your web app's Firebase configuration
+            const firebaseConfig = {
+                apiKey: "AIzaSyAI0Tc7GssKwWwtVdrz6OaK6KFACx58N5U",
+                authDomain: "weebie-go.firebaseapp.com",
+                projectId: "weebie-go",
+                storageBucket: "weebie-go.appspot.com",
+                messagingSenderId: "321509944065",
+                appId: "1:321509944065:web:199a546b7055f461ec4900",
+                measurementId: "G-S5CG0CLRVS"
+            };
+
+            // Initialize Firebase
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+
+            const signupForm = document.getElementById("email-signup-form");
+            
+            signupForm?.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                
+                // Get form data
+                const formData = new FormData(signupForm);
+                const userData = Object.fromEntries(formData.entries());
+                
+                // Basic validation
+                if (!userData.email || !userData.password) {
+                    showMessage("Por favor, preencha e-mail e senha", "error");
+                    return;
+                }
+
+                try {
+                    // Create user with Firebase Auth
+                    const userCredential = await createUserWithEmailAndPassword(
+                        auth,
+                        userData.email,
+                        userData.password
+                    );
+                    
+                    // Get Firebase ID token
+                    const idToken = await userCredential.user.getIdToken();
+                    
+                    // Prepare complete user data
+                    const completeUserData = {
+                        ...userData,
+                        id_token: idToken,
+                        uid: userCredential.user.uid,
+                        role: "user",
+                        status: "active"
+                    };
+
+                    // Send to backend
+                    const response = await fetch("/api/auth/register", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${idToken}`
+                        },
+                        body: JSON.stringify(completeUserData)
+                    });
+
+                    if (!response.ok) {
+                        // If backend fails, delete the Firebase user
+                        await userCredential.user.delete();
+                        throw new Error(await response.text());
+                    }
+
+                    // Success - redirect
+                    showMessage("Cadastro realizado com sucesso!", "success");
+                    setTimeout(() => window.location.href = "/", 2000);
+                } catch (error) {
+                    console.error("Erro no cadastro:", error);
+                    showMessage(parseAuthError(error), "error");
+                }
+            });
+
+            // Helper function to parse auth errors
+            function parseAuthError(error) {
+                if (error.code) {
+                    switch (error.code) {
+                        case 'auth/email-already-in-use':
+                            return 'Este e-mail já está cadastrado.';
+                        case 'auth/invalid-email':
+                            return 'E-mail inválido.';
+                        case 'auth/weak-password':
+                            return 'Senha muito fraca (mínimo 6 caracteres).';
+                        case 'auth/operation-not-allowed':
+                            return 'Operação não permitida.';
+                        default:
+                            return `Erro: ${error.message}`;
+                    }
+                }
+                return error.message || 'Ocorreu um erro desconhecido.';
+            }
+
+            // Function to show messages
+            function showMessage(message, type) {
+                const authResult = document.getElementById("auth-result");
+                if (!authResult) return;
+
+                authResult.innerHTML = `
+                    <div class="p-3 mb-4 text-sm rounded-lg ${
+                        type === 'success' 
+                            ? 'bg-green-100 text-green-700 dark:bg-green-200 dark:text-green-800' 
+                            : 'bg-red-100 text-red-700 dark:bg-red-200 dark:text-red-800'
+                    }">
+                        ${message}
+                    </div>
+                `;
+                authResult.classList.remove("hidden");
+            }
+        </script>
     </head>
     <body class="bg-gray-100 dark:bg-gray-900">
         <!-- Header -->
@@ -285,138 +399,8 @@ templ SignUp() {
         </main>
         <!-- Rodapé -->
         @components.FooterLogin()
-        <!-- Scripts -->
-        <script>
-            const signupForm = document.getElementById("email-signup-form");
-            signupForm?.addEventListener("submit", async (e) => {
-                e.preventDefault();
-                
-                // 1. Autenticação básica
-                const email = document.getElementById("email").value;
-                const password = document.getElementById("password").value;
-                const name = document.getElementById("name").value;
-                const phone = document.getElementById("phone").value;
-                const cpf = document.getElementById("cpf").value;
-                const rg = document.getElementById("rg").value;
-                const sex = document.getElementById("sex").value;
-                const age = document.getElementById("age").value;
-                const address = document.getElementById("address").value;
-                const complement = document.getElementById("complement").value;
-                const number = document.getElementById("number").value;
-                const neighborhood = document.getElementById("neighborhood").value;
-                const city = document.getElementById("city").value;
-                const state = document.getElementById("state").value;
-                const cep = document.getElementById("cep").value;
-
-                if (!email || !password) {
-                    showError("Informe email e senha");
-                    return;
-                }
-
-                try {
-                    // 2. Login com Firebase
-                    const userCredential = await auth.signInWithEmailAndPassword(email, password);
-                    const user = userCredential.user;
-
-                    // 2. Obtém o ID Token do Firebase
-                    const idToken = await user.getIdToken();
-
-                    // 4. Montar payload completa
-                    const userData = {
-                        id_token: idToken,
-                        email: email,
-                        password: password, // Enviar a senha atual
-                        uid: user.uid || "",
-                        name: name || "",
-                        phone: phone || "",
-                        cpf: cpf || "",
-                        rg: rg || "",
-                        sex: sex || "none",
-                        age: age || 0,
-                        address: address || "",
-                        complement: complement || "",
-                        number: number || "",
-                        neighborhood: neighborhood || "",
-                        city: city || "",
-                        state: state || "",
-                        cep: cep || "",
-                        role: "user",
-                        status: "active",
-                        terms: true // Usuário já aceitou os termos ao se cadastrar
-                    };
-
-                    // 5. Enviar para o endpoint de login
-                    const backendResponse = await fetch("http://localhost:8080/api/auth/register", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(userData)
-                    });
-
-                    if (backendResponse.ok) {
-                        const result = await backendResponse.json();
-                        showMessage('Usuário registrado com sucesso!', 'success');
-                        console.log('Backend response:', result);
-                        signupForm.reset();
-                        // Redirecionar para a página inicial
-                        window.location.href = "/";
-                    } else {
-                        const errorData = await backendResponse.json();
-                        showMessage(`Erro ao registrar usuário no backend: ${errorData.message || backendResponse.statusText}`, 'error');
-                        console.error('Backend error:', errorData);
-                    }
-                } catch (err) {
-                    let errorMessage = 'Ocorreu um erro desconhecido.';
-                    if (err.code) {
-                        switch (err.code) {
-                            case 'auth/email-already-in-use':
-                                errorMessage = 'Este e-mail já está em uso.';
-                                break;
-                            case 'auth/invalid-email':
-                                errorMessage = 'O formato do e-mail é inválido.';
-                                break;
-                            case 'auth/weak-password':
-                                errorMessage = 'A senha é muito fraca (mínimo 6 caracteres).';
-                                break;
-                            case 'auth/network-request-failed':
-                                errorMessage = 'Erro de rede. Verifique sua conexão.';
-                                break;
-                            default:
-                                errorMessage = `Erro do Firebase: ${err.message}`;
-                        }
-                    } else {
-                        errorMessage = `Erro: ${err.message}`;
-                    }
-                    showError(errorMessage);
-                    console.error('Registration error:', err);
-                }
-            });
-
-            // Função auxiliar para exibir erros
-            function showError(message) {
-                const authResult = document.getElementById("auth-result");
-                authResult.classList.remove("hidden");
-                authResult.innerHTML = `
-                    <div class="p-3 mb-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-200 dark:text-red-800">
-                        ${message}
-                    </div>
-                `;
-            }
-
-            // Função auxiliar para exibir mensagens
-            function showMessage(message, type) {
-                const authResult = document.getElementById("auth-result");
-                authResult.classList.remove("hidden");
-                const bgColor = type === 'success' ? 'bg-green-100 dark:bg-green-200' : 'bg-red-100 dark:bg-red-200';
-                const textColor = type === 'success' ? 'text-green-700 dark:text-green-800' : 'text-red-700 dark:text-red-800';
-                authResult.innerHTML = `
-                    <div class="p-3 mb-4 text-sm ${textColor} ${bgColor} rounded-lg">
-                        ${message}
-                    </div>
-                `;
-            }
-        </script>
         <!-- Animações -->
-        @custom.Animations()
+        @components.ScriptAnimations()
     </body>
     </html>
 }

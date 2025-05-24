@@ -1,9 +1,6 @@
 package public
 
-import (
-    components "github.com/codinomello/weebie-go/web/components"
-    custom "github.com/codinomello/weebie-go/web/components/custom"
-)
+import components "github.com/codinomello/weebie-go/web/components"
 
 templ SignIn() {
     <html lang="pt-BR">
@@ -18,6 +15,219 @@ templ SignIn() {
         @components.StyleHead()
         <!-- Flowbite CSS e Ícone -->
         @components.Link("house_with_garden.png")
+        <!-- Firebase SDK v11.8.1 -->
+        <script type="module">
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+            import { 
+                getAuth, 
+                signInWithEmailAndPassword, 
+                createUserWithEmailAndPassword, 
+                GoogleAuthProvider, 
+                GithubAuthProvider, 
+                FacebookAuthProvider, 
+                signInWithPopup, 
+                linkWithCredential, 
+                OAuthProvider 
+            } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+
+            // Configuração do Firebase
+            const firebaseConfig = {
+                apiKey: "AIzaSyAI0Tc7GssKwWwtVdrz6OaK6KFACx58N5U",
+                authDomain: "weebie-go.firebaseapp.com",
+                projectId: "weebie-go",
+                storageBucket: "weebie-go.appspot.com",
+                messagingSenderId: "321509944065",
+                appId: "1:321509944065:web:199a546b7055f461ec4900",
+                measurementId: "G-S5CG0CLRVS"
+            };
+
+            // Inicializa o Firebase
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+
+            // Inicializa provedores
+            const providers = {
+                google: new GoogleAuthProvider(),
+                github: new GithubAuthProvider(),
+                facebook: new FacebookAuthProvider()
+            };
+
+            // Função para lidar com login social
+            async function handleProviderLogin(provider) {
+                console.log(`Tentando login com provedor: ${provider}`);
+                try {
+                    const providerInstance = providers[provider];
+                    if (!providerInstance) {
+                        throw new Error(`Provedor ${provider} não suportado`);
+                    }
+
+                    const result = await signInWithPopup(auth, providerInstance);
+                    const user = result.user;
+                    const idToken = await user.getIdToken();
+
+                    console.log("Usuário autenticado:", user.uid);
+
+                    const response = await fetch("/api/auth/social-login", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${idToken}`
+                        },
+                        body: JSON.stringify({
+                            id_token: idToken,
+                            provider: provider,
+                            uid: user.uid,
+                            email: user.email,
+                            name: user.displayName
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(await response.text());
+                    }
+
+                    showMessage("Login social realizado com sucesso!", "success");
+                    setTimeout(() => window.location.href = "/", 2000);
+                } catch (error) {
+                    console.error("Erro no login social:", error);
+                    if (error.code === "auth/account-exists-with-different-credential") {
+                        const pendingCred = OAuthProvider.credentialFromError(error);
+                        showMessage("Este e-mail já está registrado com outro método. Faça login com e-mail/senha para vincular sua conta.", "error");
+                        localStorage.setItem("pendingCred", JSON.stringify(pendingCred));
+                        localStorage.setItem("pendingProvider", provider);
+                    } else {
+                        showMessage(parseAuthError(error), "error");
+                    }
+                }
+            }
+
+            // Função auxiliar para tratar erros de autenticação
+            function parseAuthError(error) {
+                if (error.code) {
+                    switch (error.code) {
+                        case "auth/email-already-in-use":
+                            return "Este e-mail já está cadastrado.";
+                        case "auth/invalid-email":
+                            return "E-mail inválido.";
+                        case "auth/weak-password":
+                            return "Senha muito fraca (mínimo 6 caracteres).";
+                        case "auth/popup-closed-by-user":
+                            return "Login cancelado pelo usuário.";
+                        case "auth/wrong-password":
+                            return "Senha incorreta.";
+                        case "auth/user-not-found":
+                            return "Usuário não encontrado.";
+                        case "auth/too-many-requests":
+                            return "Muitas tentativas. Tente novamente mais tarde.";
+                        case "auth/popup-blocked":
+                            return "Popup de login bloqueado pelo navegador.";
+                        case "auth/account-exists-with-different-credential":
+                            return "Este e-mail já está registrado com outro método. Faça login para vincular.";
+                        default:
+                            return `Erro: ${error.message}`;
+                    }
+                }
+                return error.message || "Ocorreu um erro desconhecido.";
+            }
+
+            // Função para exibir mensagens
+            function showMessage(message, type) {
+                const authResult = document.getElementById("auth-result");
+                if (!authResult) return;
+
+                authResult.innerHTML = `
+                    <div class="p-3 mb-4 text-sm rounded-lg ${
+                        type === "success" 
+                            ? "bg-green-100 text-green-700 dark:bg-green-200 dark:text-green-800" 
+                            : "bg-red-100 text-red-700 dark:bg-red-200 dark:text-red-800"
+                    }">
+                        ${message}
+                    </div>
+                `;
+                authResult.classList.remove("hidden");
+            }
+
+            // Formulário de login
+            const signinForm = document.getElementById("email-signin-form");
+            if (signinForm) {
+                signinForm.addEventListener("submit", async (e) => {
+                    e.preventDefault();
+
+                    const formData = new FormData(signinForm);
+                    const userData = Object.fromEntries(formData.entries());
+
+                    if (!userData.email || !userData.password) {
+                        showMessage("Por favor, preencha e-mail e senha", "error");
+                        return;
+                    }
+
+                    try {
+                        const userCredential = await signInWithEmailAndPassword(auth, userData.email, userData.password);
+                        const idToken = await userCredential.user.getIdToken();
+
+                        // Verifica se há uma credencial pendente para vinculação
+                        const pendingCred = localStorage.getItem("pendingCred");
+                        const pendingProvider = localStorage.getItem("pendingProvider");
+
+                        if (pendingCred && pendingProvider) {
+                            const credential = JSON.parse(pendingCred);
+                            await linkWithCredential(userCredential.user, OAuthProvider.credentialFromJSON(credential));
+                            localStorage.removeItem("pendingCred");
+                            localStorage.removeItem("pendingProvider");
+
+                            const response = await fetch("/api/auth/social-login", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "Authorization": `Bearer ${idToken}`
+                                },
+                                body: JSON.stringify({
+                                    id_token: idToken,
+                                    provider: pendingProvider,
+                                    uid: userCredential.user.uid,
+                                    email: userCredential.user.email,
+                                    name: userCredential.user.displayName
+                                })
+                            });
+
+                            if (!response.ok) {
+                                throw new Error(await response.text());
+                            }
+
+                            showMessage("Conta vinculada com sucesso!", "success");
+                            setTimeout(() => window.location.href = "/", 2000);
+                            return;
+                        }
+
+                        // Login normal
+                        const response = await fetch("/api/auth/login", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${idToken}`
+                            },
+                            body: JSON.stringify({
+                                id_token: idToken,
+                                uid: userCredential.user.uid
+                            })
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(await response.text());
+                        }
+
+                        showMessage("Login realizado com sucesso!", "success");
+                        setTimeout(() => window.location.href = "/", 2000);
+                    } catch (error) {
+                        console.error("Erro no login:", error);
+                        showMessage(parseAuthError(error), "error");
+                    }
+                });
+            }
+
+            // Expor handleProviderLogin globalmente
+            window.handleProviderLogin = handleProviderLogin;
+        </script>
     </head>
     <body class="bg-gray-100 dark:bg-gray-900">
         <!-- Header -->
@@ -32,12 +242,7 @@ templ SignIn() {
                     </div>
 
                     <!-- Formulário -->
-                    <form id="email-signin-form" 
-                        hx-post="/users/signin" 
-                        hx-target="#auth-result" 
-                        hx-swap="innerHTML"
-                        class="space-y-5 text-base">
-                        
+                    <form id="email-signin-form" class="space-y-4">
                         <!-- E-mail -->
                         <div class="space-y-2">
                             <label for="email" class="block text-base font-medium text-gray-700 dark:text-gray-300">E-mail*</label>
@@ -73,7 +278,20 @@ templ SignIn() {
                     </div>
 
                     <!-- Botões de OAuth2 -->
-                    @custom.OAuthButtons()
+                    <div class="space-y-3">
+                        <button id="google-signin" onclick="handleProviderLogin('google')" class="w-full flex items-center justify-center px-6 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-300 transform hover:scale-[1.02]">
+                            <img src="https://www.google.com/favicon.ico" alt="Google" class="w-5 h-5 mr-2">
+                            <span class="text-md font-medium text-gray-700 dark:text-gray-300">Continuar com Google</span>
+                        </button>
+                        <button id="github-signin" onclick="handleProviderLogin('github')" class="w-full flex items-center justify-center px-6 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-300 transform hover:scale-[1.02]">
+                            <img src="https://github.com/favicon.ico" alt="GitHub" class="w-5 h-5 mr-2">
+                            <span class="text-md font-medium text-gray-700 dark:text-gray-300">Continuar com GitHub</span>
+                        </button>
+                        <button id="facebook-signin" onclick="handleProviderLogin('facebook')" class="w-full flex items-center justify-center px-6 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-300 transform hover:scale-[1.02]">
+                            <img src="https://www.facebook.com/favicon.ico" alt="Facebook" class="w-5 h-5 mr-2">
+                            <span class="text-md font-medium text-gray-700 dark:text-gray-300">Continuar com Facebook</span>
+                        </button>
+                    </div>
 
                     <!-- Link para Cadastro -->
                     <div class="mt-6 text-center">
@@ -88,80 +306,244 @@ templ SignIn() {
         <!-- Rodapé -->
         @components.FooterLogin()
         <!-- Scripts -->
-        <script>
-            const auth = firebase.auth();
-            const googleProvider = new firebase.auth.GoogleAuthProvider();
-            const facebookProvider = new firebase.auth.FacebookAuthProvider();
-            const githubProvider = new firebase.auth.GithubAuthProvider();
+        <script type="module">
+            import { 
+                signInWithEmailAndPassword, 
+                createUserWithEmailAndPassword, 
+                signInWithPopup, 
+                linkWithCredential, 
+                OAuthProvider 
+            } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
 
-            document.getElementById("email-signin-form").addEventListener("submit", async (e) => {
-                e.preventDefault();
-                
-                const email = document.getElementById("email").value;
-                const password = document.getElementById("password").value;
+            // Obtém instância do auth e provedores do escopo global
+            const { auth, providers } = window.firebaseAuth || {};
 
-                if (!email || !password) return alert("Informe email e senha");
+            if (!auth) {
+                console.error("Firebase Auth não inicializado");
+                showMessage("Erro de inicialização do Firebase", "error");
+                return;
+            }
 
+            // Formulário de login
+            const signinForm = document.getElementById("email-signin-form");
+            if (signinForm) {
+                signinForm.addEventListener("submit", async (e) => {
+                    e.preventDefault();
+
+                    const formData = new FormData(signinForm);
+                    const userData = Object.fromEntries(formData.entries());
+
+                    if (!userData.email || !userData.password) {
+                        showMessage("Por favor, preencha e-mail e senha", "error");
+                        return;
+                    }
+
+                    try {
+                        const userCredential = await signInWithEmailAndPassword(auth, userData.email, userData.password);
+                        const idToken = await userCredential.user.getIdToken();
+
+                        // Verifica se há uma credencial pendente para vinculação
+                        const pendingCred = localStorage.getItem("pendingCred");
+                        const pendingProvider = localStorage.getItem("pendingProvider");
+
+                        if (pendingCred && pendingProvider) {
+                            const credential = JSON.parse(pendingCred);
+                            await linkWithCredential(userCredential.user, OAuthProvider.credentialFromJSON(credential));
+                            localStorage.removeItem("pendingCred");
+                            localStorage.removeItem("pendingProvider");
+
+                            const response = await fetch("/api/auth/social-login", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "Authorization": `Bearer ${idToken}`
+                                },
+                                body: JSON.stringify({
+                                    id_token: idToken,
+                                    provider: pendingProvider,
+                                    uid: userCredential.user.uid,
+                                    email: userCredential.user.email,
+                                    name: userCredential.user.displayName
+                                })
+                            });
+
+                            if (!response.ok) {
+                                throw new Error(await response.text());
+                            }
+
+                            showMessage("Conta vinculada com sucesso!", "success");
+                            setTimeout(() => window.location.href = "/", 2000);
+                            return;
+                        }
+
+                        // Login normal
+                        const response = await fetch("/api/auth/login", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${idToken}`
+                            },
+                            body: JSON.stringify({
+                                id_token: idToken,
+                                uid: userCredential.user.uid
+                            })
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(await response.text());
+                        }
+
+                        showMessage("Login realizado com sucesso!", "success");
+                        setTimeout(() => window.location.href = "/", 2000);
+                    } catch (error) {
+                        console.error("Erro no login:", error);
+                        showMessage(parseAuthError(error), "error");
+                    }
+                });
+            }
+
+            // Formulário de cadastro
+            const signupForm = document.getElementById("email-signup-form");
+            if (signupForm) {
+                signupForm.addEventListener("submit", async (e) => {
+                    e.preventDefault();
+
+                    const formData = new FormData(signupForm);
+                    const userData = Object.fromEntries(formData.entries());
+
+                    if (!userData.email || !userData.password) {
+                        showMessage("Por favor, preencha e-mail e senha", "error");
+                        return;
+                    }
+
+                    try {
+                        const userCredential = await createUserWithEmailAndPassword(auth, userData.email, userData.password);
+                        const idToken = await userCredential.user.getIdToken();
+
+                        const response = await fetch("/api/auth/register", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${idToken}`
+                            },
+                            body: JSON.stringify({
+                                ...userData,
+                                id_token: idToken,
+                                uid: userCredential.user.uid
+                            })
+                        });
+
+                        if (!response.ok) {
+                            await userCredential.user.delete();
+                            throw new Error(await response.text());
+                        }
+
+                        showMessage("Cadastro realizado com sucesso!", "success");
+                        setTimeout(() => window.location.href = "/", 2000);
+                    } catch (error) {
+                        console.error("Erro no cadastro:", error);
+                        showMessage(parseAuthError(error), "error");
+                    }
+                });
+            }
+
+            // Função para lidar com login social
+            async function handleProviderLogin(provider) {
                 try {
-                    const result = await auth.signInWithEmailAndPassword(email, password);
-                    const idToken = await result.user.getIdToken();
+                    const providerInstance = providers[provider];
+                    if (!providerInstance) {
+                        throw new Error("Provedor não suportado");
+                    }
 
-                    const res = await fetch("/api/auth/verify", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ id_token: idToken })
-                    });
-
-                    const data = await res.json();
-                    console.log("Login bem-sucedido. UID:", data.uid);
-                    window.location.href = "/dashboard"; // Redirecionar após login
-                } catch (err) {
-                    console.error(err);
-                    document.getElementById("auth-result").classList.remove("hidden");
-                    document.getElementById("auth-result").innerHTML = `
-                        <div class="p-3 mb-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-200 dark:text-red-800">
-                            Erro no login: ${err.message}
-                        </div>
-                    `;
-                }
-            });
-
-            async function signInWithProvider(provider) {
-                try {
-                    const result = await auth.signInWithPopup(provider);
+                    const result = await signInWithPopup(auth, providerInstance);
                     const user = result.user;
                     const idToken = await user.getIdToken();
 
-                    const response = await fetch("/api/auth/login", {
+                    const response = await fetch("/api/auth/social-login", {
                         method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ id_token: idToken })
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${idToken}`
+                        },
+                        body: JSON.stringify({
+                            id_token: idToken,
+                            provider: provider,
+                            uid: user.uid,
+                            email: user.email,
+                            name: user.displayName
+                        })
                     });
 
-                    const data = await response.json();
-
-                    if (response.ok) {
-                        window.location.href = "/dashboard"; // Redirecionar após login
-                    } else {
-                        throw new Error("Falha na autenticação com o servidor");
+                    if (!response.ok) {
+                        throw new Error(await response.text());
                     }
-                } catch (err) {
-                    console.error(err);
-                    document.getElementById("auth-result").classList.remove("hidden");
-                    document.getElementById("auth-result").innerHTML = `
-                        <div class="p-3 mb-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-200 dark:text-red-800">
-                            Erro no login social: ${err.message}
-                        </div>
-                    `;
+
+                    showMessage("Login social realizado com sucesso!", "success");
+                    setTimeout(() => window.location.href = "/", 2000);
+                } catch (error) {
+                    if (error.code === "auth/account-exists-with-different-credential") {
+                        const pendingCred = OAuthProvider.credentialFromError(error);
+                        showMessage("Este e-mail já está registrado com outro método. Faça login com e-mail/senha para vincular sua conta.", "error");
+
+                        // Armazena a credencial pendente no localStorage
+                        localStorage.setItem("pendingCred", JSON.stringify(pendingCred));
+                        localStorage.setItem("pendingProvider", provider);
+                    } else {
+                        console.error("Erro no login social:", error);
+                        showMessage(parseAuthError(error), "error");
+                    }
                 }
             }
 
-            document.getElementById("google-signin")?.addEventListener("click", () => signInWithProvider(googleProvider));
-            document.getElementById("facebook-signin")?.addEventListener("click", () => signInWithProvider(facebookProvider));
-            document.getElementById("github-signin")?.addEventListener("click", () => signInWithProvider(githubProvider));
+            // Função auxiliar para tratar erros de autenticação
+            function parseAuthError(error) {
+                if (error.code) {
+                    switch (error.code) {
+                        case "auth/email-already-in-use":
+                            return "Este e-mail já está cadastrado.";
+                        case "auth/invalid-email":
+                            return "E-mail inválido.";
+                        case "auth/weak-password":
+                            return "Senha muito fraca (mínimo 6 caracteres).";
+                        case "auth/popup-closed-by-user":
+                            return "Login cancelado pelo usuário.";
+                        case "auth/wrong-password":
+                            return "Senha incorreta.";
+                        case "auth/user-not-found":
+                            return "Usuário não encontrado.";
+                        case "auth/too-many-requests":
+                            return "Muitas tentativas. Tente novamente mais tarde.";
+                        case "auth/account-exists-with-different-credential":
+                            return "Este e-mail já está registrado com outro método. Faça login para vincular.";
+                        default:
+                            return `Erro: ${error.message}`;
+                    }
+                }
+                return error.message || "Ocorreu um erro desconhecido.";
+            }
+
+            // Função para exibir mensagens
+            function showMessage(message, type) {
+                const authResult = document.getElementById("auth-result");
+                if (!authResult) return;
+
+                authResult.innerHTML = `
+                    <div class="p-3 mb-4 text-sm rounded-lg ${
+                        type === "success" 
+                            ? "bg-green-100 text-green-700 dark:bg-green-200 dark:text-green-800" 
+                            : "bg-red-100 text-red-700 dark:bg-red-200 dark:text-red-800"
+                    }">
+                        ${message}
+                    </div>
+                `;
+                authResult.classList.remove("hidden");
+            }
+
+            // Disponibiliza handleProviderLogin globalmente para botões OAuth
+            window.handleProviderLogin = handleProviderLogin;
         </script>
         <!-- Animação de Carregamento -->
-        @custom.LoadingAnimations()
+        @components.ScriptAnimations()
     </body>
     </html>
 }

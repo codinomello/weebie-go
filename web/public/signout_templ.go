@@ -71,7 +71,7 @@ func SignOut() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</head><body class=\"bg-gray-100 dark:bg-gray-900\"><!-- Header -->")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<script> \r\n            const firebaseConfig = {\r\n                apiKey: \"AIzaSyAI0Tc7GssKwWwtVdrz6OaK6KFACx58N5U\",\r\n                authDomain: \"weebie-go.firebaseapp.com\",\r\n                projectId: \"weebie-go\",\r\n                storageBucket: \"weebie-go.appspot.com\",\r\n                messagingSenderId: \"321509944065\",\r\n                appId: \"1:321509944065:web:199a546b7055f461ec4900\",\r\n                measurementId: \"G-S5CG0CLRVS\"\r\n            };\r\n            firebase.initializeApp(firebaseConfig);\r\n            const auth = firebase.auth();\r\n        </script></head><body class=\"bg-gray-100 dark:bg-gray-900\"><!-- Header -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -87,15 +87,7 @@ func SignOut() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<!-- Scripts -->")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = components.ScriptBody().Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<script>\r\n            document.addEventListener('DOMContentLoaded', () => {\r\n                // Redirecionamento automático\r\n                let seconds = 5;\r\n                const countdownElement = document.getElementById('countdown');\r\n                const countdownInterval = setInterval(() => {\r\n                    seconds--;\r\n                    countdownElement.textContent = seconds;\r\n                    \r\n                    if (seconds <= 0) {\r\n                        clearInterval(countdownInterval);\r\n                        window.location.href = '/signin';\r\n                    }\r\n                }, 1000);\r\n            });\r\n        </script></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<script>\r\n            document.addEventListener('DOMContentLoaded', () => {\r\n                // Redirecionamento automático\r\n                let seconds = 5;\r\n                const countdownElement = document.getElementById('countdown');\r\n                const countdownInterval = setInterval(() => {\r\n                    seconds--;\r\n                    countdownElement.textContent = seconds;\r\n                    \r\n                    if (seconds <= 0) {\r\n                        clearInterval(countdownInterval);\r\n                        window.location.href = '/signin';\r\n                    }\r\n                }, 1000);\r\n            });\r\n        </script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

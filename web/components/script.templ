@@ -6,10 +6,6 @@ templ ScriptHead() {
     @ScriptHeadTailwindCSS()
 }
 
-templ ScriptBody() {
-    @ScriptBodyFirebaseAuth()
-}
-
 templ ScriptHeadSource() {
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -22,22 +18,6 @@ templ ScriptHeadSource() {
 
     <!-- Biblioteca para validação de e-mail -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/validator/13.11.0/validator.min.js"></script>
-
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyAI0Tc7GssKwWwtVdrz6OaK6KFACx58N5U",
-            authDomain: "weebie-go.firebaseapp.com",
-            projectId: "weebie-go",
-            storageBucket: "weebie-go.appspot.com",
-            messagingSenderId: "321509944065",
-            appId: "1:321509944065:web:199a546b7055f461ec4900",
-            measurementId: "G-S5CG0CLRVS"
-        };
-        firebase.initializeApp(firebaseConfig);
-    </script>
 }
 
 templ ScriptHeadTheme() {
@@ -68,11 +48,11 @@ templ ScriptHeadTheme() {
 
                 // Alterna o tema
                 if (document.documentElement.classList.contains('dark')) {
-                document.documentElement.classList.remove('dark');
-                localStorage.setItem('color-theme', 'light');
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('color-theme', 'light');
                 } else {
-                document.documentElement.classList.add('dark');
-                localStorage.setItem('color-theme', 'dark');
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('color-theme', 'dark');
                 }
             });
         });
@@ -107,156 +87,44 @@ templ ScriptHeadTailwindCSS() {
     </script>
 }
 
-templ ScriptODSList() {
-    <script>
-        const odsList = [
-            { number: 1, emoji: '🍽️', name: 'Erradicação da Pobreza', description: 'Acabar com a pobreza em todas as suas formas, em todos os lugares.' },
-            { number: 2, emoji: '🌱', name: 'Fome Zero e Agricultura Sustentável', description: 'Acabar com a fome, alcançar a segurança alimentar e promover a agricultura sustentável.' },
-            { number: 3, emoji: '💊', name: 'Saúde e Bem-Estar', description: 'Assegurar uma vida saudável e promover o bem-estar para todos.' },
-            { number: 4, emoji: '📚', name: 'Educação de Qualidade', description: 'Garantir educação inclusiva e equitativa de qualidade.' },
-            { number: 5, emoji: '👩‍❤️‍👨', name: 'Igualdade de Gênero', description: 'Alcançar a igualdade de gênero e empoderar todas as mulheres e meninas.' },
-            { number: 6, emoji: '💧', name: 'Água Potável e Saneamento', description: 'Garantir disponibilidade e manejo sustentável da água.' },
-            { number: 7, emoji: '⚡', name: 'Energia Limpa e Acessível', description: 'Garantir acesso à energia acessível, confiável e sustentável.' },
-            { number: 8, emoji: '💼', name: 'Trabalho Decente e Crescimento Econômico', description: 'Promover o crescimento econômico sustentado e o trabalho decente.' },
-            { number: 9, emoji: '🏭', name: 'Indústria, Inovação e Infraestrutura', description: 'Construir infraestrutura resiliente e promover a industrialização sustentável.' },
-            { number: 10, emoji: '⚖️', name: 'Redução das Desigualdades', description: 'Reduzir a desigualdade dentro e entre os países.' },
-            { number: 11, emoji: '🌆', name: 'Cidades e Comunidades Sustentáveis', description: 'Tornar as cidades e os assentamentos humanos inclusivos, seguros e sustentáveis.' },
-            { number: 12, emoji: '♻️', name: 'Consumo e Produção Responsáveis', description: 'Garantir padrões de consumo e produção sustentáveis.' },
-            { number: 13, emoji: '🌡️', name: 'Ação Contra a Mudança Global do Clima', description: 'Tomar medidas urgentes para combater a mudança climática.' },
-            { number: 14, emoji: '🐟', name: 'Vida na Água', description: 'Conservar e usar de forma sustentável os oceanos e recursos marinhos.' },
-            { number: 15, emoji: '🌳', name: 'Vida Terrestre', description: 'Proteger, restaurar e promover o uso sustentável dos ecossistemas terrestres.' },
-            { number: 16, emoji: '🕊️', name: 'Paz, Justiça e Instituições Eficazes', description: 'Promover sociedades pacíficas e inclusivas para o desenvolvimento sustentável.' },
-            { number: 17, emoji: '🤝', name: 'Parcerias e Meios de Implementação', description: 'Fortalecer os meios de implementação e revitalizar a parceria global.' }
-        ];
-    </script>
-}
-
-templ ScriptBodyFirebaseAuth() {
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script>
-        // 1. Configuração do Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyAI0Tc7GssKwWwtVdrz6OaK6KFACx58N5U",
-            authDomain: "weebie-go.firebaseapp.com",
-            projectId: "weebie-go",
-            storageBucket: "weebie-go.firebasestorage.app",
-            messagingSenderId: "321509944065",
-            appId: "1:321509944065:web:199a546b7055f461ec4900",
-            measurementId: "G-S5CG0CLRVS"
-        };
-
-        // 2. Inicialize o Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-
-        // 3. Inicialize os provedores DEPOIS do Firebase estar configurado
-        const googleProvider = new firebase.auth.GoogleAuthProvider();
-        const facebookProvider = new firebase.auth.FacebookAuthProvider();
-        const githubProvider = new firebase.auth.GithubAuthProvider();
-
-        // 4. Configurar os listeners de clique DEPOIS das inicializações
-        document.getElementById("google-signin").addEventListener("click", () => {
-        auth.signInWithPopup(googleProvider)
-            .then((result) => {
-            console.log("Login com Google bem-sucedido:", result.user);
-            })
-            .catch((error) => {
-            console.error("Erro no login Google:", error);
-            });
-        });
-
-        document.getElementById("facebook-signin").addEventListener("click", () => {
-        auth.signInWithPopup(facebookProvider)
-            .then((result) => {
-            console.log("Login com Facebook bem-sucedido:", result.user);
-            })
-            .catch((error) => {
-            console.error("Erro no login Facebook:", error);
-            });
-        });
-
-        document.getElementById("github-signin").addEventListener("click", () => {
-        auth.signInWithPopup(githubProvider)
-            .then((result) => {
-            console.log("Login com GitHub bem-sucedido:", result.user);
-            })
-            .catch((error) => {
-            console.error("Erro no login GitHub:", error);
-            });
-        });
-    </script>
-}
-
-templ ScriptBodyODSList() {
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const themeToggle = document.getElementById('theme-toggle');
-            const html = document.documentElement;
-            const odsContainer = document.getElementById('ods-container');
-            const odsPopover = document.getElementById('ods-popover');
-            const odsTitle = document.getElementById('ods-title');
-            const odsDescription = document.getElementById('ods-description');
-
-            // Tema
-            themeToggle.addEventListener('click', () => {
-                html.classList.toggle('dark');
-                localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
-            });
-
-            if (localStorage.getItem('theme') === 'dark') html.classList.add('dark');
-
-            // Gerar ODS
-            odsList.forEach(ods => {
-                const odsItem = document.createElement('div');
-                odsItem.className = 'flex items-center justify-between p-2 rounded-lg bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600';
-                odsItem.innerHTML = `
-                    <label class="flex items-center gap-2 flex-1">
-                        <input type="checkbox" name="ods" value="${ods.number}" 
-                                class="w-4 h-4 border-golden rounded focus:ring-golden dark:bg-gray-900">
-                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                            ${ods.emoji} ODS ${ods.number}
-                        </span>
-                    </label>
-                    <button type="button" class="text-golden hover:text-golden/80 px-2 ods-info" 
-                            data-number="${ods.number}">+</button>`;
-                odsContainer.appendChild(odsItem);
-            });
-
-            // Popover ODS
-            document.querySelectorAll('.ods-info').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const odsNumber = parseInt(e.target.dataset.number);
-                    const ods = odsList.find(o => o.number === odsNumber);
-                    
-                    // Posicionar popover
-                    const rect = e.target.getBoundingClientRect();
-                    odsPopover.style.top = `${rect.top + window.scrollY}px`;
-                    odsPopover.style.left = `${rect.left + rect.width + 10}px`;
-                    
-                    // Atualizar conteúdo
-                    odsTitle.textContent = ods.name;
-                    odsDescription.textContent = ods.description;
-                    odsPopover.classList.remove('hidden');
-                });
-            });
-
-            // Fechar popover
-            document.addEventListener('click', (e) => {
-                if (!e.target.closest('.ods-info') && !e.target.closest('#ods-popover')) {
-                    odsPopover.classList.add('hidden');
-                }
-            });
-        });
-    </script>
-}
-
 templ ScriptGetCurrentYear() {
     <script>
         // Ano atual
         var years = document.getElementsByClassName("current-year");
         Array.from(years).forEach(year => {
             year.innerHTML = new Date().getFullYear();
+        });
+    </script>
+}
+
+templ ScriptAnimations() {
+    <script>
+        // Adiciona animação de carregamento suave
+        document.addEventListener('DOMContentLoaded', () => {
+            const signUpForm = document.getElementById('email-signup-form');
+            if (signUpForm) {
+                signUpForm.addEventListener('submit', () => {
+                    const button = signUpForm.querySelector('button[type="submit"]');
+                    if (button) {
+                        button.innerHTML = '<span class="inline-block animate-spin">⏳</span> Processando...';
+                        button.disabled = true;
+                    }
+                });
+            }
+        });
+
+        // Adiciona animação de carregamento suave
+        document.addEventListener('DOMContentLoaded', () => {
+            const signInForm = document.getElementById('email-signin-form');
+            if (signInForm) {
+                signInForm.addEventListener('submit', () => {
+                    const button = signInForm.querySelector('button[type="submit"]');
+                    if (button) {
+                        button.innerHTML = '<span class="inline-block animate-spin">⏳</span> Processando...';
+                        button.disabled = true;
+                    }
+                });
+            }
         });
     </script>
 }
