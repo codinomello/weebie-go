@@ -1,10 +1,6 @@
 package public
 
-import (
-    "time"
-
-    components "github.com/codinomello/weebie-go/web/components"
-)
+import components "github.com/codinomello/weebie-go/web/components"
 
 templ Project() {
     <html lang="pt-BR">
@@ -19,6 +15,86 @@ templ Project() {
         @components.StyleHead()
         <!-- Flowbite CSS e Ícone -->
         @components.Link("house_with_garden.png")
+        <!-- Firebase SDK -->
+        <script type="module">
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+            import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+            const firebaseConfig = {
+                apiKey: "AIzaSyAI0Tc7GssKwWwtVdrz6OaK6KFACx58N5U",
+                authDomain: "weebie-go.firebaseapp.com",
+                projectId: "weebie-go",
+                storageBucket: "weebie-go.appspot.com",
+                messagingSenderId: "321509944065",
+                appId: "1:321509944065:web:199a546b7055f461ec4900",
+                measurementId: "G-S5CG0CLRVS"
+            };
+
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+
+            let currentUID = null;
+
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    currentUID = user.uid;
+                    console.log("Usuário logado:", user.email);
+                } else {
+                    alert("Você precisa estar logado para enviar projetos.");
+                    window.location.href = "/signin"; // redirecione se necessário
+                }
+            });
+
+            window.enviarProjeto = async function (event) {
+            event.preventDefault();
+
+            if (!currentUID) {
+                alert("UID do usuário não disponível.");
+                return;
+            }
+
+            const projectData = {
+                title: document.getElementById("title").value,
+                year: parseInt(document.getElementById("year").value),
+                location: document.getElementById("location").value,
+                target_audience: document.getElementById("target_audience").value,
+                details: document.getElementById("details").value,
+                impact: document.getElementById("impact").value,
+                methodology: document.getElementById("methodology").value,
+                icon: document.getElementById("icon").value,
+                status: document.getElementById("status").value,
+                course: document.getElementById("course").value,
+                area: document.getElementById("area").value,
+                complexity: document.getElementById("complexity").value,
+                ods: JSON.parse(document.getElementById("ods").value || "[]"),
+                budget: parseFloat(document.getElementById("budget").value),
+                materials: document.getElementById("materials").value,
+                partnerships: document.getElementById("partnerships").value,
+                terms_accepted: document.getElementById("terms").checked,
+                public_data: document.getElementById("public_data").checked,
+                member_emails: JSON.parse(document.getElementById("members").value || "[]")
+            };
+
+            try {
+                const response = await fetch("/api/project/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-User-UID": currentUID
+                },
+                    body: JSON.stringify(projectData)
+                });
+                if (!response.ok) {
+                    const msg = await response.text();
+                    alert("Erro: " + msg);
+                } else {
+                    alert("Projeto criado com sucesso!");
+                }
+                } catch (erro) {
+                    alert("Erro ao enviar: " + erro);
+                }
+            }
+        </script>
     </head>
     <body class="bg-gray-100 dark:bg-gray-900 min-h-screen flex flex-col">
         <!-- Navegação -->
@@ -28,10 +104,13 @@ templ Project() {
                 <h1 class="text-3xl font-bold text-center mb-8 text-orange dark:text-golden">
                     <span>📋 Cadastro de Projeto</span>
                 </h1>
-                <form hx-post="/projects" hx-swap="none" class="space-y-8">
+                <form id="project-form"
+                      method="POST"
+                      action="/api/project" 
+                      class="space-y-8">
                     <!-- Seção de Informações Básicas -->
-                    <section class="p-6 rounded-xl bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue shadow-md">
-                        <h2 class="text-3xl font-bold text-blue mb-6 flex items-center gap-3">
+                    <section class="p-6 rounded-xl bg-blue/10 dark:bg-blue/20 border-l-4 border-blue shadow-md">
+                        <h2 class="text-2xl font-bold text-blue mb-6 flex items-center gap-3">
                             <span class="text-3xl">📝</span> Informações Básicas
                         </h2>
                         <div class="grid md:grid-cols-2 gap-6">
@@ -39,74 +118,68 @@ templ Project() {
                             <input type="hidden" name="owner_id" id="owner-id">
                             <!-- Título -->
                             <div class="space-y-2">
-                                <label for="title" class="block text-lg font-medium dark:text-gray-700">Título do Projeto <span class="text-blue">*</span></label>
+                                <label for="title" class="block text-md font-medium text-gray-700 dark:text-gray-300">Título do Projeto <span class="text-blue">*</span></label>
                                 <input type="text" id="title" name="title" required maxlength="100"
-                                       class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue focus:border-transparent transition"
+                                       class="w-full px-4 py-3 text-md font-medium text-gray-700 dark:text-gray-300 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue focus:border-transparent transition"
                                        placeholder="Nome do seu projeto">
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Máximo 100 caracteres</p>
                             </div>
                             <!-- Ano -->
                             <div class="space-y-2">
-                                <label for="year" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Ano*</label>
+                                <label for="year" class="block text-md font-medium text-gray-700 dark:text-gray-300">Ano <span class="text-blue">*</span></label>
                                 <input type="number" id="year" name="year" min="2000" max="@{currentYear()+5}" required
-                                       class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue focus:border-transparent transition"
-                                       value="@{currentYear()}">
+                                       class="w-full px-4 py-3 text-md font-medium text-gray-700 dark:text-gray-300 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue focus:border-transparent transition"
+                                       placeholder="Ano de início do projeto">
                             </div>
-                            <!-- Novo Campo: Localização -->
+                            <!-- Localização -->
                             <div class="space-y-2">
-                                <label for="location" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Localização*</label>
+                                <label for="location" class="block text-md font-medium text-gray-700 dark:text-gray-300">Localização <span class="text-blue">*</span></label>
                                 <input type="text" id="location" name="location" required
-                                       class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue focus:border-transparent transition"
+                                       class="w-full px-4 py-3 text-md font-medium text-gray-700 dark:text-gray-300 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue focus:border-transparent transition"
                                        placeholder="Onde o projeto será realizado">
                             </div>
-
-                            <!-- Novo Campo: Público-Alvo -->
+                            <!-- Público-Alvo -->
                             <div class="space-y-2">
-                                <label for="target_audience" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Público-Alvo*</label>
+                                <label for="target_audience" class="block text-md font-medium text-gray-700 dark:text-gray-300">Público-Alvo <span class="text-blue">*</span></label>
                                 <input type="text" id="target_audience" name="target_audience" required
-                                       class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue focus:border-transparent transition"
+                                       class="w-full px-4 py-3 text-md font-medium text-gray-700 dark:text-gray-300 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue focus:border-transparent transition"
                                        placeholder="Quem será beneficiado">
                             </div>
                         </div>
                     </section>
                     <!-- Seção de Detalhes -->
-                    <section class="p-6 rounded-xl bg-pink-50 dark:bg-pink-900/20 border-l-4 border-pink shadow-md">
+                    <section class="p-6 rounded-xl bg-pink/10 dark:bg-pink/20 border-l-4 border-pink shadow-md">
                         <h2 class="text-2xl font-bold text-pink mb-6 flex items-center gap-3">
                             <span class="text-3xl">✨</span> Detalhes do Projeto
                         </h2>
-                        
                         <div class="space-y-6">
                             <!-- Descrição -->
                             <div class="space-y-2">
-                                <label for="details" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Descrição*</label>
+                                <label for="details" class="block text-md font-medium text-gray-700 dark:text-gray-300">Descrição <span class="text-pink">*</span></label>
                                 <textarea id="details" name="details" rows="4" required maxlength="1000"
-                                    class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-pink focus:border-transparent transition"
+                                    class="w-full px-4 py-3 text-md font-medium text-gray-700 dark:text-gray-300 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-pink focus:border-transparent transition"
                                     placeholder="Descreva seu projeto em detalhes"></textarea>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Máximo 1000 caracteres</p>
                             </div>
-
                             <!-- Impacto -->
                             <div class="space-y-2">
-                                <label for="impact" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Impacto Esperado*</label>
+                                <label for="impact" class="block text-md font-medium text-gray-700 dark:text-gray-300">Impacto Esperado <span class="text-pink">*</span></label>
                                 <textarea id="impact" name="impact" rows="3" required maxlength="500"
-                                    class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-pink focus:border-transparent transition"
+                                    class="w-full px-4 py-3 text-md font-medium text-gray-700 dark:text-gray-300 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-pink focus:border-transparent transition"
                                     placeholder="Qual impacto positivo seu projeto terá?"></textarea>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Máximo 500 caracteres</p>
                             </div>
-                            <!-- Novo Campo: Metodologia -->
+                            <!-- Metodologia -->
                             <div class="space-y-2">
-                                <label for="methodology" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Metodologia*</label>
+                                <label for="methodology" class="block text-md font-medium text-gray-700 dark:text-gray-300">Metodologia <span class="text-pink">*</span></label>
                                 <textarea id="methodology" name="methodology" rows="3" required
-                                    class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-pink focus:border-transparent transition"
+                                    class="w-full px-4 py-3 text-md font-medium text-gray-700 dark:text-gray-300 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-pink focus:border-transparent transition"
                                     placeholder="Como o projeto será realizado"></textarea>
                             </div>
                             <!-- Ícone e Status -->
                             <div class="grid md:grid-cols-2 gap-6">
                                 <!-- Ícone -->
                                 <div class="space-y-2">
-                                    <label for="icon" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Ícone do Projeto</label>
+                                    <label for="icon" class="block text-md font-medium text-gray-700 dark:text-gray-300">Ícone do Projeto</label>
                                     <select id="icon" name="icon"
-                                        class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-pink focus:border-transparent transition">
+                                        class="w-full px-4 py-3 text-md font-medium text-gray-700 dark:text-gray-300 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-pink focus:border-transparent transition">
                                         <option value="">Selecione um ícone</option>
                                         <option value="🌱">🌱 Sustentabilidade</option>
                                         <option value="💡">💡 Inovação</option>
@@ -119,9 +192,9 @@ templ Project() {
                                 </div>
                                 <!-- Status -->
                                 <div class="space-y-2">
-                                    <label for="status" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Status*</label>
+                                    <label for="status" class="block text-md font-medium text-gray-700 dark:text-gray-300">Status <span class="text-pink">*</span></label>
                                     <select id="status" name="status" required
-                                        class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-pink focus:border-transparent transition">
+                                        class="w-full px-4 py-3 text-md font-medium text-gray-700 dark:text-gray-300 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-pink focus:border-transparent transition">
                                         <option value="active" selected>Ativo</option>
                                         <option value="completed">Concluído</option>
                                         <option value="archived">Arquivado</option>
@@ -131,16 +204,16 @@ templ Project() {
                         </div>
                     </section>
                     <!-- Seção de Classificação -->
-                    <section class="p-6 rounded-xl bg-green-50 dark:bg-green-900/20 border-l-4 border-green shadow-md">
+                    <section class="p-6 rounded-xl bg-green/10 dark:bg-green/20 border-l-4 border-green shadow-md">
                         <h2 class="text-2xl font-bold text-green mb-6 flex items-center gap-3">
                             <span class="text-3xl">🏷️</span> Classificação
                         </h2>
                         <div class="grid md:grid-cols-2 gap-6">
                             <!-- Curso -->
                             <div class="space-y-2">
-                                <label for="course" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Curso*</label>
+                                <label for="course" class="block text-md font-medium text-gray-700 dark:text-gray-300">Curso <span class="text-green">*</span></label>
                                 <select id="course" name="course" required
-                                    class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-green focus:border-transparent transition">
+                                    class="w-full px-4 py-3 text-md font-medium text-gray-700 dark:text-gray-300 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-green focus:border-transparent transition">
                                     <option value="">Selecione um curso</option>
                                     <option value="Administração">Administração</option>
                                     <option value="Edificações">Edificações</option>
@@ -150,20 +223,20 @@ templ Project() {
                                     <option value="Outro">Outro</option>
                                 </select>
                             </div>
-                            
                             <!-- Outro Curso (condicional) -->
                             <div id="other-course-container" class="space-y-2 hidden">
-                                <label for="other_course" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Especifique o Curso*</label>
-                                <input type="text" id="other_course" name="other_course"
-                                    class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-green focus:border-transparent transition"
+                                <label for="other_course" class="block text-md font-medium text-gray-700 dark:text-gray-300">Especifique o Curso <span class="text-green">*</span></label>
+                                <input type="text" 
+                                    id="other_course" 
+                                    name="other_course"
+                                    class="w-full px-4 py-3 text-md font-medium text-gray-700 dark:text-gray-300 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-green focus:border-transparent transition"
                                     placeholder="Digite o nome do curso">
                             </div>
-                            
-                            <!-- Novo Campo: Área de Atuação -->
+                            <!-- Área de Atuação -->
                             <div class="space-y-2">
-                                <label for="area" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Área de Atuação*</label>
+                                <label for="area" class="block text-md font-medium text-gray-700 dark:text-gray-300">Área de Atuação <span class="text-green">*</span></label>
                                 <select id="area" name="area" required
-                                    class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-green focus:border-transparent transition">
+                                    class="w-full px-4 py-3 text-md font-medium text-gray-700 dark:text-gray-300 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-green focus:border-transparent transition">
                                     <option value="">Selecione uma área</option>
                                     <option value="Educação">Educação</option>
                                     <option value="Saúde">Saúde</option>
@@ -173,24 +246,22 @@ templ Project() {
                                     <option value="Cultural">Cultural</option>
                                 </select>
                             </div>
-                            
-                            <!-- Novo Campo: Nível de Complexidade -->
+                            <!-- Nível de Complexidade -->
                             <div class="space-y-2">
-                                <label for="complexity" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Nível de Complexidade*</label>
+                                <label for="complexity" class="block text-md font-medium text-gray-700 dark:text-gray-300">Nível de Complexidade <span class="text-green">*</span></label>
                                 <select id="complexity" name="complexity" required
-                                    class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-green focus:border-transparent transition">
+                                    class="w-full px-4 py-3 text-md font-medium text-gray-700 dark:text-gray-300 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-green focus:border-transparent transition">
                                     <option value="low">Baixo</option>
                                     <option value="medium" selected>Médio</option>
                                     <option value="high">Alto</option>
                                 </select>
                             </div>
-                            
                             <!-- Membros -->
                             <div class="space-y-2 md:col-span-2">
-                                <label for="members-input" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Adicionar Membros</label>
+                                <label for="members-input" class="block text-md font-medium text-gray-700 dark:text-gray-300">Adicionar Membros</label>
                                 <div class="relative">
                                     <input type="email" id="members-input" 
-                                        class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-green focus:border-transparent transition pr-10"
+                                        class="w-full px-4 py-3 text-md font-medium text-gray-700 dark:text-gray-300 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-green focus:border-transparent transition pr-10"
                                         placeholder="Digite e-mails dos membros (separados por vírgula)">
                                     <button type="button" id="add-member-btn" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-green hover:text-green-700">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -200,81 +271,184 @@ templ Project() {
                                 </div>
                                 <input type="hidden" id="members" name="members">
                                 <div id="members-container" class="flex flex-wrap gap-2 mt-2"></div>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Digite o e-mail e pressione Enter ou clique no botão +</p>
                             </div>
                         </div>
                     </section>
                     <!-- Seção ODS -->
-                    <section class="p-6 rounded-xl bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 shadow-md">
-                        <h2 class="text-2xl font-bold text-yellow-600 dark:text-yellow-300 mb-6 flex items-center gap-3">
+                    <section class="p-6 rounded-xl bg-yellow/5 dark:bg-yellow/10 border-l-4 border-golden shadow-md">
+                        <h2 class="text-2xl font-bold text-yellow-300 mb-6 flex items-center gap-3">
                             <span class="text-3xl">🌎</span> ODS Relacionados
                         </h2>
-                        
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="ods-container">
                             <!-- ODS serão inseridos aqui via JavaScript -->
                         </div>
                         <input type="hidden" id="ods" name="ods">
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-4">Selecione os Objetivos de Desenvolvimento Sustentável relacionados ao seu projeto</p>
                     </section>
                     <!-- Seção de Recursos -->
-                    <section class="p-6 rounded-xl bg-purple-50 dark:bg-purple-900/20 border-l-4 border-purple-500 shadow-md">
-                        <h2 class="text-2xl font-bold text-purple-600 dark:text-purple-300 mb-6 flex items-center gap-3">
+                    <section class="p-6 rounded-xl bg-purple/10 dark:bg-purple/20 border-l-4 border-purple shadow-md">
+                        <h2 class="text-2xl font-bold text-purple dark:text-purple-600 mb-6 flex items-center gap-3">
                             <span class="text-3xl">💼</span> Recursos Necessários
                         </h2>
-                        
                         <div class="space-y-6">
-                            <!-- Novo Campo: Orçamento Estimado -->
-                            <div class="space-y-2">
-                                <label for="budget" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Orçamento Estimado (R$)</label>
-                                <input type="number" id="budget" name="budget" min="0" step="0.01"
-                                       class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
-                                       placeholder="Valor estimado">
+                            <!-- Orçamento Estimado -->
+                            <label for="budget" class="block text-md font-medium text-gray-700 dark:text-gray-300">
+                                Orçamento Estimado (R$) <span class="text-purple-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-3 text-gray-500 dark:text-gray-400">R$</span>
+                                <input 
+                                    type="text" 
+                                    id="budget" 
+                                    name="budget"
+                                    class="w-full pl-10 pr-4 py-3 text-md text-gray-900 dark:text-white rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+                                    placeholder="Exemplo: 1.234,56"
+                                    inputmode="decimal"
+                                    required
+                                >
                             </div>
-                            
-                            <!-- Novo Campo: Recursos Materiais -->
+                            <script>
+                                const input = document.getElementById('budget');
+
+                                input.addEventListener('input', function () {
+                                    let value = this.value;
+
+                                    // Remove tudo que não é número ou vírgula
+                                    value = value.replace(/[^\d,]/g, '');
+
+                                    // Só permite uma vírgula
+                                    const parts = value.split(',');
+                                    if (parts.length > 2) {
+                                        value = parts[0] + ',' + parts[1];
+                                    }
+
+                                    // Reais (antes da vírgula)
+                                    let reais = parts[0].replace(/^0+(?=\d)/, ''); // remove zeros à esquerda
+                                    reais = reais.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+                                    // Centavos (depois da vírgula)
+                                    let cents = parts[1] || '';
+                                    if (cents.length > 2) {
+                                        cents = cents.slice(0, 2);
+                                    }
+
+                                    this.value = cents ? `${reais},${cents}` : reais;
+                                });
+
+                                // Converte para float antes do envio
+                                document.querySelector('form')?.addEventListener('submit', function () {
+                                    const input = document.getElementById('budget');
+                                    if (input.value) {
+                                        input.value = input.value.replace(/\./g, '').replace(',', '.');
+                                    }
+                                });
+                            </script>
+                            <!-- Recursos Materiais -->
                             <div class="space-y-2">
-                                <label for="materials" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Recursos Materiais Necessários</label>
+                                <label for="materials" class="block text-md font-medium text-gray-700 dark:text-gray-300">Recursos Materiais Necessários <span class="text-purple">*</span></label>
                                 <textarea id="materials" name="materials" rows="3"
-                                    class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
-                                    placeholder="Liste os materiais necessários"></textarea>
+                                    class="w-full px-4 py-3 text-md text-gray-900 dark:text-gray-300 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+                                    placeholder="Liste os materiais necessários"
+                                    required></textarea>
                             </div>
-                            
-                            <!-- Novo Campo: Parcerias -->
+                            <!-- Parcerias -->
                             <div class="space-y-2">
-                                <label for="partnerships" class="block text-lg font-medium text-gray-700 dark:text-gray-300">Parcerias Existentes ou Potenciais</label>
-                                <textarea id="partnerships" name="partnerships" rows="2"
-                                    class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
-                                    placeholder="Liste organizações parceiras"></textarea>
+                                <label for="partnerships" class="block text-md font-medium text-gray-700 dark:text-gray-300">Parcerias Existentes ou Potenciais <span class="text-purple">*</span></label>
+                                <textarea id="partnerships" name="partnerships" rows="1"
+                                    class="w-full px-4 py-3 text-md text-gray-900 dark:text-gray-300 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+                                    placeholder="Liste organizações parceiras"
+                                    required></textarea>
                             </div>
                         </div>
                     </section>
                     <!-- Seção de Termos e Condições -->
-                    <section class="p-6 rounded-xl bg-gray-50 dark:bg-gray-800 border-l-4 border-gray-500 shadow-md">
-                        <h2 class="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-6 flex items-center gap-3">
+                    <section class="p-6 rounded-xl bg-coral/15 dark:bg-coral/10 border-l-4 border-coral shadow-md">
+                        <h2 class="text-2xl font-bold text-coral dark:text-coral mb-6 flex items-center gap-3">
                             <span class="text-3xl">📜</span> Termos e Condições
                         </h2>
-                        
                         <div class="space-y-4">
                             <!-- Checkbox Termos de Uso -->
                             <div class="flex items-start">
                                 <div class="flex items-center h-5">
                                     <input id="terms" name="terms" type="checkbox" required
-                                           class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                           class="w-4 h-4 text-coral bg-gray-100 border-gray-300 rounded focus:ring-coral-500 dark:focus:ring-coral-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                                 </div>
-                                <label for="terms" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                                    Aceito os <a href="#" class="text-blue-600 hover:underline dark:text-blue-500">Termos de Uso</a> e <a href="#" class="text-blue-600 hover:underline dark:text-blue-500">Política de Privacidade</a> <span class="text-red-500">*</span>
+                                <label for="terms" class="ms-2 text-md font-medium text-gray-900 dark:text-gray-300">
+                                    Aceito os <a href="#" class="text-coral hover:underline">Termos de Uso</a> e <a href="#" class="text-coral hover:underline">Política de Privacidade</a> <span class="text-red-500">*</span>
                                 </label>
                             </div>
-                            
                             <!-- Checkbox Dados Públicos -->
                             <div class="flex items-start">
                                 <div class="flex items-center h-5">
                                     <input id="public_data" name="public_data" type="checkbox"
-                                           class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                           class="w-4 h-4 text-coral bg-gray-100 border-gray-300 rounded focus:ring-coral-500 dark:focus:ring-coral-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                                 </div>
-                                <label for="public_data" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-                                    Concordo em tornar os dados do projeto públicos na plataforma
+                                <label for="public_data" class="ms-2 text-md font-medium text-gray-900 dark:text-gray-300">
+                                    Concordo em tornar os dados do projeto <a href="#" class="text-coral hover:underline">públicos</a> na plataforma
                                 </label>
+                            </div>
+                        </div>
+                    </section>
+                    <!-- Seção de Resultado -->
+                    <section id="result-container" class="hidden">
+                        <div class="text-center py-8">
+                            <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 dark:bg-green-900">
+                                <svg class="h-10 w-10 text-green-600 dark:text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                            <h2 class="mt-4 text-3xl font-bold text-green-600 dark:text-green-300">Projeto Cadastrado com Sucesso!</h2>
+                            <p class="mt-2 text-lg text-gray-600 dark:text-gray-300">Seu projeto foi registrado em nosso sistema.</p>
+                            <div class="mt-8 bg-gray-50 dark:bg-gray-700 rounded-lg p-6 text-left">
+                                <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Resumo do Projeto</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Título</p>
+                                        <p id="result-title" class="text-lg font-medium text-gray-900 dark:text-white"></p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Ano</p>
+                                        <p id="result-year" class="text-lg font-medium text-gray-900 dark:text-white"></p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Status</p>
+                                        <p id="result-status" class="text-lg font-medium text-gray-900 dark:text-white"></p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Código do Projeto</p>
+                                        <p id="result-id" class="text-lg font-medium text-gray-900 dark:text-white"></p>
+                                    </div>
+                                </div>
+                                <div class="mt-6">
+                                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Próximos Passos</p>
+                                    <ul class="mt-2 space-y-2">
+                                        <li class="flex items-start">
+                                            <span class="flex-shrink-0 text-green-500">•</span>
+                                            <span class="ml-2 text-gray-700 dark:text-gray-300">Você receberá um e-mail de confirmação</span>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <span class="flex-shrink-0 text-green-500">•</span>
+                                            <span class="ml-2 text-gray-700 dark:text-gray-300">Acompanhe o progresso na área de projetos</span>
+                                        </li>
+                                        <li class="flex items-start">
+                                            <span class="flex-shrink-0 text-green-500">•</span>
+                                            <span class="ml-2 text-gray-700 dark:text-gray-300">Adicione mais detalhes quando necessário</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4">
+                                <button onclick="window.location.href='/projects/new'" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
+                                    Novo Projeto
+                                </button>
+                                <button onclick="window.location.href='/projects'" class="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition flex items-center justify-center gap-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                    </svg>
+                                    Ver Meus Projetos
+                                </button>
                             </div>
                         </div>
                     </section>
@@ -282,19 +456,33 @@ templ Project() {
                     <input type="hidden" name="created_at" id="created-at">
                     <input type="hidden" name="updated_at" id="updated-at">
                     <!-- Botões -->
-                    <div class="flex flex-col md:flex-row justify-end gap-4 mt-8">
+                    <div class="flex flex-col md:flex-row justify-end gap-4 mt-8 animate-fade-in-up">
                         <!-- Botão limpar -->
-                        <button type="button" id="clear-btn" 
-                            class="px-6 py-3 bg-gray-500 text-white font-medium rounded-lg transition-all duration-150 hover:bg-gray-600 flex items-center justify-center gap-2 text-lg">
-                            <span>🗑️</span> Limpar Campos
+                        <button type="button" id="clear-btn"
+                            class="px-6 py-3 bg-red text-gray-100 font-medium rounded-lg transition-all duration-300 ease-in-out hover:bg-red/2 hover:scale-105 hover:ring-4 hover:ring-red/10 flex items-center justify-center gap-2 text-lg shadow-md">
+                            <span class="animate-pulse">🗑️</span> Limpar Campos
                         </button>
-
                         <!-- Botão salvar -->
-                        <button type="submit" 
-                            class="px-6 py-3 bg-green text-white font-medium rounded-lg transition-all duration-150 hover:bg-green-600 flex items-center justify-center gap-2 text-lg">
-                            <span>💾</span> Salvar Projeto
+                        <button type="submit"
+                            class="px-6 py-3 bg-green text-gray-100 font-medium rounded-lg transition-all duration-300 ease-in-out hover:bg-green/2 hover:scale-105 hover:ring-4 hover:ring-green/10 flex items-center justify-center gap-2 text-lg shadow-md">
+                            <span class="animate-bounce">💾</span> Salvar Projeto
                         </button>
                     </div>
+                    <style>
+                        @keyframes fade-in-up {
+                            from {
+                                opacity: 0;
+                                transform: translateY(20px);
+                            }
+                            to {
+                                opacity: 1;
+                                transform: translateY(0);
+                            }
+                        }
+                        .animate-fade-in-up {
+                            animation: fade-in-up 0.6s ease-out both;
+                        }
+                    </style>
                 </form>
             </div>
         </main>
@@ -367,7 +555,7 @@ templ Project() {
                         memberTag.className = 'member-tag flex items-center bg-green-100 dark:bg-green-900 px-3 py-1 rounded-full text-base';
                         memberTag.dataset.email = email;
                         memberTag.innerHTML = `
-                            <span class="text-green-800 dark:text-green-200">${email}</span>
+                            <span class="py-2 text-green dark:text-green-200 hover:bg-green/2 hover:scale-105 hover:ring-4 hover:ring-green/10">${email}</span>
                             <button type="button" class="ml-2 text-green-600 dark:text-green-300 hover:text-green-800 dark:hover:text-green-100" onclick="this.parentElement.remove(); updateMembersHidden()">
                                 ×
                             </button>
@@ -411,9 +599,11 @@ templ Project() {
                         <span class="ml-3 text-base font-medium text-gray-700 dark:text-gray-300">
                             ${ods.emoji} ODS ${ods.number}
                         </span>
-                        <button type="button" onclick="showODSDetails(${ods.number})" class="ml-auto text-gray-400 hover:text-yellow-600">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <button type="button" onclick="showODSDetails(${ods.number})" class="ml-auto text-gray-300 hover:text-golden">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M12 8.5v0m0 3.5v5"/>
+                                <circle cx="12" cy="8.5" r="0.8" fill="currentColor"/>
                             </svg>
                         </button>
                     `;
@@ -452,8 +642,8 @@ templ Project() {
                         <div class="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6 shadow-2xl">
                             <div class="flex justify-between items-start mb-4">
                                 <div>
-                                    <h3 class="text-xl font-bold text-yellow-600 dark:text-yellow-300">${ods.title}</h3>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">ODS ${ods.number}</p>
+                                    <h3 class="text-2xl font-bold text-yellow-300">${ods.title}</h3>
+                                    <p class="text-md text-gray-700 dark:text-gray-300">ODS ${ods.number}</p>
                                 </div>
                                 <button onclick="this.parentElement.parentElement.parentElement.remove()" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -466,7 +656,7 @@ templ Project() {
                             </div>
                             <p class="text-gray-700 dark:text-gray-300">${ods.description}</p>
                             <div class="mt-6 flex justify-end">
-                                <button onclick="this.parentElement.parentElement.parentElement.remove()" class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition">
+                                <button onclick="this.parentElement.parentElement.parentElement.remove()" class="px-4 py-2 bg-golden hover:bg-golden-300 text-white rounded-lg transition">
                                     Fechar
                                 </button>
                             </div>
@@ -475,11 +665,50 @@ templ Project() {
                     document.body.appendChild(modal);
                 }
             };
+
+            // Manipulação do formulário tradicional
+            document.getElementById('project-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                try {
+                    // Converter campos necessários (como o orçamento)
+                    const budgetInput = document.getElementById('budget');
+                    if (budgetInput.value) {
+                        budgetInput.value = budgetInput.value.replace(/\./g, '').replace(',', '.');
+                    }
+                    
+                    // Enviar o formulário via fetch
+                    const formData = new FormData(this);
+                    const response = await fetch(this.action, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (!response.ok) throw new Error('Erro no servidor');
+                    
+                    const data = await response.json();
+                    
+                    // Preencher os dados do resultado
+                    document.getElementById('result-title').textContent = data.title || 'Não informado';
+                    document.getElementById('result-year').textContent = data.year || 'Não informado';
+                    document.getElementById('result-status').textContent = 
+                        data.status === 'active' ? 'Ativo' : 
+                        data.status === 'completed' ? 'Concluído' : 'Arquivado';
+                    document.getElementById('result-id').textContent = data.id || 'Não disponível';
+                    
+                    // Mostrar resultado e esconder formulário
+                    this.style.display = 'none';
+                    document.getElementById('result-container').classList.remove('hidden');
+                    
+                    // Rolagem suave para o topo
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    
+                } catch (error) {
+                    console.error('Erro:', error);
+                    alert('Ocorreu um erro ao enviar o formulário. Por favor, tente novamente.');
+                }
+            });
         </script>
     </body>
     </html>
-}
-
-func currentYear() int {
-    return time.Now().Year()
 }

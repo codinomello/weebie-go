@@ -17,9 +17,9 @@ import (
 type ProjectRepository interface {
 	CreateProject(ctx context.Context, project *models.Project) (*models.Project, error)
 	GetProjectByID(ctx context.Context, id primitive.ObjectID) (*models.Project, error)
-	GetProjectsByOwnerUID(ctx context.Context, ownerUID primitive.ObjectID) ([]models.Project, error)                     // Busca por ObjectID do dono
-	GetProjectsByMemberUserID(ctx context.Context, userID primitive.ObjectID) ([]models.Project, error)                   // Novo: busca projetos onde o usuário é membro
-	UpdateProject(ctx context.Context, id primitive.ObjectID, updates *models.ProjectUpdate) (*mongo.UpdateResult, error) // Aceita ProjectUpdate
+	GetProjectsByOwnerUID(ctx context.Context, ownerUID primitive.ObjectID) ([]models.Project, error)                            // Busca por ObjectID do dono
+	GetProjectsByMemberUserID(ctx context.Context, userID primitive.ObjectID) ([]models.Project, error)                          // Novo: busca projetos onde o usuário é membro
+	UpdateProject(ctx context.Context, id primitive.ObjectID, updates *models.UpdateProjectRequest) (*mongo.UpdateResult, error) // Aceita ProjectUpdate
 	DeleteProject(ctx context.Context, id primitive.ObjectID) (*mongo.DeleteResult, error)
 	AddMemberToProject(ctx context.Context, projectID, userID primitive.ObjectID) error
 	RemoveMemberFromProject(ctx context.Context, projectID, userID primitive.ObjectID) error
@@ -108,7 +108,7 @@ func (r *MongoDBProjectRepository) GetProjectsByMemberUserID(ctx context.Context
 }
 
 // UpdateProject atualiza os campos de um projeto no MongoDB.
-func (r *MongoDBProjectRepository) UpdateProject(ctx context.Context, id primitive.ObjectID, updates *models.ProjectUpdate) (*mongo.UpdateResult, error) {
+func (r *MongoDBProjectRepository) UpdateProject(ctx context.Context, id primitive.ObjectID, updates *models.UpdateProjectRequest) (*mongo.UpdateResult, error) {
 	// Converte a struct ProjectUpdate para um BSON M para usar no $set
 	updateBSON := bson.M{}
 

@@ -75,7 +75,7 @@ func SignOut() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = components.Nav("Sair da Conta", "house_with_garden.png").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = components.Nav("Sair da conta", "broken_heart.png").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

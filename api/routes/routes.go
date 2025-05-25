@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/codinomello/weebie-go/api/controllers"
@@ -33,7 +34,7 @@ func SetupRoutes(
 	// Inicializa handlers
 	authHandler := handlers.NewAuthHandler(authCtrl)
 	userHandler := handlers.NewUserHandler(userCtrl)
-	//projectHandler := handlers.NewProjectHandler(projectCtrl)
+	projectHandler := handlers.NewProjectHandler(projectCtrl)
 	//memberHandler := handlers.NewMemberHandler(memberCtrl)
 
 	// Cria router principal
@@ -51,33 +52,28 @@ func SetupRoutes(
 	scriptsFileServer := http.FileServer(http.Dir("../scripts"))
 	staticRouter.Handle("/scripts/", http.StripPrefix("/scripts/", scriptsFileServer))
 
-	// 2. Rotas de API
-	apiRouter := http.NewServeMux()
-
-	// 2.1 Rotas de autenticação (/api/auth) - SEM MIDDLEWARE DE AUTH
+	// 2. Rotas de autenticação (/api/auth)
 	authRouter := http.NewServeMux()
 
 	// Registrar rotas de autenticação diretamente no authRouter
 	authRouter.HandleFunc("/register", MethodSwitch{
 		Post: authHandler.RegisterUser(),
 	}.ServeHTTP)
-
 	authRouter.HandleFunc("/login", MethodSwitch{
 		Post: authHandler.LoginWithToken(),
 	}.ServeHTTP)
-
+	authRouter.HandleFunc("/social", MethodSwitch{
+		Post: authHandler.LoginWithSocial(),
+	}.ServeHTTP)
 	authRouter.HandleFunc("/token", MethodSwitch{
 		Post: authHandler.CreateToken(),
 	}.ServeHTTP)
-
 	authRouter.HandleFunc("/verify", MethodSwitch{
 		Post: authHandler.VerifyToken(),
 	}.ServeHTTP)
-
 	authRouter.HandleFunc("/session", MethodSwitch{
 		Delete: authHandler.RevokeSession(),
 	}.ServeHTTP)
-
 	authRouter.HandleFunc("/refresh", MethodSwitch{
 		Post: authHandler.RefreshToken(),
 	}.ServeHTTP)
@@ -85,6 +81,9 @@ func SetupRoutes(
 	// Aplica middlewares às rotas de autenticação (CORS e JSON apenas)
 	authWithMiddlewares := middleware.CORS(authRouter)
 	authWithMiddlewares = middleware.JSONContentType(authWithMiddlewares)
+
+	// 2.1 Rotas de API
+	apiRouter := http.NewServeMux()
 
 	// Monta as rotas de auth no apiRouter
 	apiRouter.Handle("/auth/", http.StripPrefix("/auth", authWithMiddlewares))
@@ -98,12 +97,14 @@ func SetupRoutes(
 	}.ServeHTTP)
 
 	protectedRouter.HandleFunc("/project/{uid}", MethodSwitch{
-		//Get:  projectHandler.GetProjects(),
-		//Post: projectHandler.CreateProject(),
+		Get:    projectHandler.GetProject(),
+		Post:   projectHandler.CreateProject(),
+		Put:    projectHandler.UpdateProject(),
+		Delete: projectHandler.DeleteProject(),
 	}.ServeHTTP)
 
 	protectedRouter.HandleFunc("/member/{uid}", MethodSwitch{
-		//Get: memberHandler.GetMembers(),
+		//Get: memberHandler.GetMember(),
 	}.ServeHTTP)
 
 	// Aplica middleware de autenticação nas rotas protegidas
@@ -146,5 +147,31 @@ func (m MethodSwitch) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	http.Error(w, "método não permitido", http.StatusMethodNotAllowed)
+	http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
+}
+
+func LogAvailableRoutes() {
+	// Rotas de autenticação (/api/auth)
+	log.Println("🛣️ rotas disponíveis:")
+	log.Println(" ➕ POST   /api/auth/register") // Registrar novo usuário
+	log.Println(" ➕ POST   /api/auth/login")    // Login com token Firebase
+	log.Println(" ➕ POST   /api/auth/social")   // Login social (Google/GitHub)
+	log.Println(" ➕ POST   /api/auth/token")    // Criar token JWT
+	log.Println(" 🔍 POST   /api/auth/verify")   // Verificar token
+	log.Println(" ❌ DELETE /api/auth/session")  // Revogar sessão (logout)
+	log.Println(" 🔄 POST   /api/auth/refresh")  // Refresh token
+
+	// Rotas protegidas de usuários (/api/user)
+	log.Println(" 🔍 GET    /api/user/{uid}")   // Obter usuário
+	log.Println(" ✏️  PUT    /api/user/{uid}") // Atualizar usuário
+	log.Println(" ❌ DELETE /api/user/{uid}")   // Deletar usuário
+
+	// Rotas protegidas de projetos (/api/project)
+	log.Println(" 🔍 GET    /api/project/{uid}")   // Obter projeto
+	log.Println(" ➕ POST   /api/project/{uid}")   // Criar projeto
+	log.Println(" ✏️  PUT    /api/project/{uid}") // Atualizar projeto
+	log.Println(" ❌ DELETE /api/project/{uid}")   // Deletar projeto
+
+	// Rotas protegidas de membros (/api/member)
+	log.Println(" 🔍 GET    /api/member/{uid}") // Obter membro (comentado no código)
 }

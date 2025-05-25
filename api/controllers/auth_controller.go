@@ -26,14 +26,13 @@ func NewAuthController(userRepo repositories.UserRepository) *AuthController {
 
 // RegisterUser cria um novo usuário
 func (c *AuthController) RegisterUser(w http.ResponseWriter, r *http.Request) {
-	var request models.UserCreateRequest
+	var request models.CreateUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		log.Printf("Erro ao decodificar JSON: %v", err)
 		http.Error(w, "JSON inválido", http.StatusBadRequest)
 		return
 	}
-
-	log.Printf("Dados recebidos: %+v", request)
+	log.Printf("🎲 dados recebidos: %+v", request)
 
 	// Validação básica
 	if request.Name == "" || request.IDToken == "" || request.Email == "" {
@@ -48,23 +47,6 @@ func (c *AuthController) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	if age < 0 || age > 150 {
 		http.Error(w, "Idade deve ser um valor válido", http.StatusBadRequest)
 		return
-	}
-
-	// Converte sex string para rune
-	var sex rune = ' '
-	if request.Sex != "" {
-		switch request.Sex {
-		case "male":
-			sex = 'M'
-		case "female":
-			sex = 'F'
-		case "other":
-			sex = 'O'
-		case "none":
-			sex = 'N'
-		default:
-			sex = ' '
-		}
 	}
 
 	// Inicializa cliente Firebase
@@ -82,8 +64,7 @@ func (c *AuthController) RegisterUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Token inválido", http.StatusUnauthorized)
 		return
 	}
-
-	log.Printf("Token verificado para UID: %s", token.UID)
+	log.Printf("🪙  token verificado para uid: %s", token.UID)
 
 	// Verifica se o usuário já existe no MongoDB
 	existingUser, err := c.UserRepository.GetUserByUID(context.Background(), token.UID)
@@ -111,6 +92,22 @@ func (c *AuthController) RegisterUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Verifica se tem senha (pode não ter se foi criado apenas via Firebase)
+	if request.Password == "" {
+		log.Printf("Usuário sem senha cadastrada: %s", request.Email)
+		http.Error(w, "Use o login com Firebase", http.StatusBadRequest)
+		return
+	}
+
+	// Verifica senha
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
+	if err != nil {
+		log.Printf("Erro ao hashear senha: %v", err)
+		http.Error(w, "Erro interno ao salvar senha", http.StatusInternalServerError)
+		return
+	}
+	request.Password = string(hashedPassword)
+
 	// Monta o endereço completo
 	fullAddress := request.Address
 	if request.Number != "" {
@@ -131,23 +128,32 @@ func (c *AuthController) RegisterUser(w http.ResponseWriter, r *http.Request) {
 
 	// Cria o modelo User
 	user := &models.User{
-		UID:     token.UID,
-		Name:    request.Name,
-		Email:   email,
-		Phone:   request.Phone,
-		Age:     age, // Agora usa diretamente o int
-		Address: fullAddress,
-		CPF:     request.CPF,
-		RG:      request.RG,
-		Sex:     sex,      // Usando o rune convertido
-		Role:    "user",   // Força role como "user" por segurança
-		Status:  "active", // Força status como "active"
+		UID:          token.UID,
+		Name:         request.Name,
+		Email:        email,
+		Password:     request.Password,
+		Phone:        request.Phone,
+		CPF:          request.CPF,
+		RG:           request.RG,
+		Sex:          request.Sex,
+		Age:          age,
+		Address:      request.Address,
+		Number:       request.Number,
+		Complement:   request.Complement,
+		Neighborhood: request.Neighborhood,
+		City:         request.City,
+		State:        request.State,
+		CEP:          request.CEP,
+		Role:         "user",   // Força role como "user" por segurança
+		Status:       "active", // Força status como "active"
+		Terms:        request.Terms,
+		CreatedAt:    request.CreatedAt,
+		UpdatedAt:    request.UpdatedAt,
 	}
 
 	// Define valores padrão
 	user.SetDefaults()
-
-	log.Printf("Criando usuário no MongoDB: %+v", user)
+	log.Printf("📩 criando usuário no mongodb: %+v", user)
 
 	// Salva no MongoDB
 	newUser, err := c.UserRepository.CreateUser(context.Background(), user)
@@ -157,7 +163,7 @@ func (c *AuthController) RegisterUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("Usuário criado com sucesso: %s", newUser.UID)
+	log.Printf("👤 usuário criado com sucesso: %s", newUser.UID)
 
 	// Retorna resposta
 	response := map[string]interface{}{
@@ -237,7 +243,110 @@ func (c *AuthController) LoginWithToken(w http.ResponseWriter, r *http.Request) 
 	json.NewEncoder(w).Encode(response)
 }
 
-// CreateToken (Login tradicional - opcional, caso queira manter)
+// LoginWithSocial - Login usando provedor social (Google, Facebook, etc.)
+func (c *AuthController) LoginWithSocial(w http.ResponseWriter, r *http.Request) {
+	var request struct {
+		IDToken  string `json:"id_token"`
+		Provider string `json:"provider"`
+		Email    string `json:"email"`
+		Name     string `json:"name"`
+		UID      string `json:"uid"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		log.Printf("Erro ao decodificar JSON: %v", err)
+		http.Error(w, "JSON inválido", http.StatusBadRequest)
+		return
+	}
+
+	log.Printf("Tentativa de login social com provedor: %s", request.Provider)
+
+	// Inicializa cliente Firebase
+	client, err := c.AuthenticationService.Initialize()
+	if err != nil {
+		log.Printf("Erro ao inicializar Firebase: %v", err)
+		http.Error(w, "Erro ao inicializar autenticação", http.StatusInternalServerError)
+		return
+	}
+
+	// Verifica o ID Token
+	token, err := client.VerifyIDToken(context.Background(), request.IDToken)
+	if err != nil {
+		log.Printf("Erro ao verificar ID Token: %v", err)
+		http.Error(w, "Token inválido", http.StatusUnauthorized)
+		return
+	}
+
+	log.Printf("Token verificado para UID: %s", token.UID)
+
+	// Busca usuário no MongoDB
+	user, err := c.UserRepository.GetUserByUID(context.Background(), token.UID)
+	if err != nil {
+		log.Printf("Erro ao buscar usuário: %v", err)
+		http.Error(w, "Erro interno do servidor", http.StatusInternalServerError)
+		return
+	}
+
+	// Se usuário não existe, cria um novo
+	if user == nil {
+		log.Printf("Usuário não encontrado, criando novo para UID: %s", token.UID)
+
+		email := request.Email
+		if email == "" && token.Claims["email"] != nil {
+			email = token.Claims["email"].(string)
+		}
+
+		name := request.Name
+		if name == "" && token.Claims["name"] != nil {
+			name = token.Claims["name"].(string)
+		}
+
+		// Cria usuário básico
+		newUser := &models.User{
+			UID:      token.UID,
+			Name:     name,
+			Email:    email,
+			Role:     "user",
+			Status:   "active",
+			Provider: request.Provider,
+		}
+
+		// Define valores padrão
+		newUser.SetDefaults()
+
+		// Salva no MongoDB
+		user, err = c.UserRepository.CreateUser(context.Background(), newUser)
+		if err != nil {
+			log.Printf("Erro ao criar usuário no MongoDB: %v", err)
+			http.Error(w, "Erro ao criar usuário", http.StatusInternalServerError)
+			return
+		}
+
+		log.Printf("Novo usuário criado via login social: %s", user.UID)
+	}
+
+	// Verifica se usuário está ativo
+	if user.Status != "active" {
+		log.Printf("Usuário inativo: %s", user.UID)
+		http.Error(w, "Conta inativa", http.StatusForbidden)
+		return
+	}
+
+	log.Printf("Login social realizado com sucesso para: %s", user.Email)
+
+	// Retorna dados do usuário
+	response := map[string]interface{}{
+		"message":  "Login social realizado com sucesso",
+		"user":     user.ToResponse(),
+		"uid":      user.UID,
+		"id_token": request.IDToken,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
+
+// CreateToken cria um token JWT para login tradicional
 func (c *AuthController) CreateToken(w http.ResponseWriter, r *http.Request) {
 	var credentials struct {
 		Email    string `json:"email"`

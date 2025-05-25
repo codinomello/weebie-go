@@ -2,21 +2,25 @@ package controllers
 
 import (
 	"context"
-	"errors" // Necessário para http.Error, mas o controller não deveria ter isso
+	"encoding/json"
+	"errors"
+	"fmt"
+	"net/http"
+	"strconv"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 
-	"github.com/codinomello/weebie-go/api/models"       // Certifique-se de que o caminho do módulo está correto
-	"github.com/codinomello/weebie-go/api/repositories" // Certifique-se de que o caminho do módulo está correto
+	"github.com/codinomello/weebie-go/api/models"
+	"github.com/codinomello/weebie-go/api/repositories"
 )
 
 // ProjectController define a estrutura do controlador de projetos.
 type ProjectController struct {
 	ProjectRepository repositories.ProjectRepository
-	UserRepository    repositories.UserRepository   // Para buscar dados do usuário
-	MemberRepository  repositories.MemberRepository // Para gerenciar relações de membros
+	UserRepository    repositories.UserRepository
+	MemberRepository  repositories.MemberRepository
 }
 
 // NewProjectController cria uma nova instância de ProjectController.
@@ -28,15 +32,254 @@ func NewProjectController(projectRepo repositories.ProjectRepository, userRepo r
 	}
 }
 
-// CreateProject lida com a lógica de criação de um novo projeto.
-// Recebe o CreateProjectRequest e o UID do Firebase do proprietário (do contexto de autenticação).
-func (c *ProjectController) CreateProject(ctx context.Context, req *models.CreateProjectRequest, ownerFirebaseUID string) (*models.Project, error) {
-	// 1. Verifica se o UID do proprietário é válido
+// GetProject busca um projeto pelo seu ID
+func (c *ProjectController) GetProject(w http.ResponseWriter, r *http.Request) {
+	projectIDStr := r.PathValue("id")
+	if projectIDStr == "" {
+		http.Error(w, "ID do projeto é obrigatório", http.StatusBadRequest)
+		return
+	}
+
+	projectID, err := primitive.ObjectIDFromHex(projectIDStr)
+	if err != nil {
+		http.Error(w, "ID do projeto inválido", http.StatusBadRequest)
+		return
+	}
+
+	project, err := c.ProjectRepository.GetProjectByID(context.Background(), projectID)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			http.Error(w, "Projeto não encontrado", http.StatusNotFound)
+			return
+		}
+		http.Error(w, "Erro interno ao buscar projeto", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(project)
+}
+
+// CreateProject cria um novo projeto
+func (c *ProjectController) CreateProject(w http.ResponseWriter, r *http.Request) {
+	// Parse do formulário
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Erro ao processar formulário", http.StatusBadRequest)
+		return
+	}
+
+	ownerFirebaseUID := r.Header.Get("X-User-UID")
+	if ownerFirebaseUID == "" {
+		http.Error(w, "UID do proprietário é obrigatório", http.StatusUnauthorized)
+		return
+	}
+
+	// Criar a requisição a partir dos dados do formulário
+	req, err := c.ParseProjectRequest(r)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Erro ao processar dados do formulário: %v", err), http.StatusBadRequest)
+		return
+	}
+
+	project, err := c.CreateProjectLogic(context.Background(), req, ownerFirebaseUID)
+	if err != nil {
+		if err.Error() == "usuário proprietário não encontrado" {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(project)
+}
+
+// CreateProjectJSON cria um novo projeto a partir de JSON (para API)
+func (c *ProjectController) CreateProjectJSON(w http.ResponseWriter, r *http.Request) {
+	var req models.CreateProjectRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "JSON inválido", http.StatusBadRequest)
+		return
+	}
+
+	ownerFirebaseUID := r.Header.Get("X-User-UID")
+	if ownerFirebaseUID == "" {
+		http.Error(w, "UID do proprietário é obrigatório", http.StatusUnauthorized)
+		return
+	}
+
+	project, err := c.CreateProjectLogic(context.Background(), &req, ownerFirebaseUID)
+	if err != nil {
+		if err.Error() == "usuário proprietário não encontrado" {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(project)
+}
+
+// UpdateProject atualiza os dados de um projeto
+func (c *ProjectController) UpdateProject(w http.ResponseWriter, r *http.Request) {
+	projectIDStr := r.PathValue("id")
+	if projectIDStr == "" {
+		http.Error(w, "ID do projeto é obrigatório", http.StatusBadRequest)
+		return
+	}
+
+	projectID, err := primitive.ObjectIDFromHex(projectIDStr)
+	if err != nil {
+		http.Error(w, "ID do projeto inválido", http.StatusBadRequest)
+		return
+	}
+
+	var updates models.UpdateProjectRequest
+	if err := json.NewDecoder(r.Body).Decode(&updates); err != nil {
+		http.Error(w, "JSON inválido", http.StatusBadRequest)
+		return
+	}
+
+	updatedProject, err := c.UpdateProjectLogic(context.Background(), projectID, &updates)
+	if err != nil {
+		if err.Error() == "projeto não encontrado para atualização" {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(updatedProject)
+}
+
+// DeleteProject deleta um projeto
+func (c *ProjectController) DeleteProject(w http.ResponseWriter, r *http.Request) {
+	projectIDStr := r.PathValue("id")
+	if projectIDStr == "" {
+		http.Error(w, "ID do projeto é obrigatório", http.StatusBadRequest)
+		return
+	}
+
+	projectID, err := primitive.ObjectIDFromHex(projectIDStr)
+	if err != nil {
+		http.Error(w, "ID do projeto inválido", http.StatusBadRequest)
+		return
+	}
+
+	err = c.DeleteProjectLogic(context.Background(), projectID)
+	if err != nil {
+		if err.Error() == "projeto não encontrado para exclusão" {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+// ParseProjectRequest converte dados do formulário HTML em CreateProjectRequest
+func (c *ProjectController) ParseProjectRequest(r *http.Request) (*models.CreateProjectRequest, error) {
+	// Parse year
+	year, err := strconv.Atoi(r.FormValue("year"))
+	if err != nil {
+		return nil, errors.New("ano inválido")
+	}
+
+	// Parse budget
+	var budget float64
+	if budgetStr := r.FormValue("budget"); budgetStr != "" {
+		budget, err = strconv.ParseFloat(budgetStr, 64)
+		if err != nil {
+			return nil, errors.New("orçamento inválido")
+		}
+	}
+
+	// Parse members from JSON string
+	var memberEmails []string
+	if membersStr := r.FormValue("members"); membersStr != "" {
+		if err := json.Unmarshal([]byte(membersStr), &memberEmails); err != nil {
+			return nil, errors.New("lista de membros inválida")
+		}
+	}
+
+	// Parse ODS from JSON string
+	var odsNumbers []string
+	if odsStr := r.FormValue("ods"); odsStr != "" {
+		if err := json.Unmarshal([]byte(odsStr), &odsNumbers); err != nil {
+			return nil, errors.New("lista de ODS inválida")
+		}
+	}
+
+	// Parse boolean fields
+	termsAccepted := r.FormValue("terms") == "on"
+	publicData := r.FormValue("public_data") == "on"
+
+	// Handle course field
+	course := r.FormValue("course")
+	if course == "Outro" {
+		if otherCourse := r.FormValue("other_course"); otherCourse != "" {
+			course = otherCourse
+		}
+	}
+
+	req := &models.CreateProjectRequest{
+		// Informações Básicas
+		Title:          r.FormValue("title"),
+		Year:           year,
+		Location:       r.FormValue("location"),
+		TargetAudience: r.FormValue("target_audience"),
+
+		// Detalhes do Projeto
+		Details:     r.FormValue("details"),
+		Impact:      r.FormValue("impact"),
+		Methodology: r.FormValue("methodology"),
+		Icon:        r.FormValue("icon"),
+		Status:      r.FormValue("status"),
+
+		// Classificação
+		Course:     course,
+		Area:       r.FormValue("area"),
+		Complexity: r.FormValue("complexity"),
+
+		// ODS
+		ODS: odsNumbers,
+
+		// Recursos
+		Budget:       budget,
+		Materials:    r.FormValue("materials"),
+		Partnerships: r.FormValue("partnerships"),
+
+		// Termos
+		TermsAccepted: termsAccepted,
+		PublicData:    publicData,
+
+		// Membros (emails que serão processados depois)
+		MemberEmails: memberEmails,
+	}
+
+	return req, nil
+}
+
+// Métodos de lógica de negócio (extraídos dos métodos originais)
+func (c *ProjectController) CreateProjectLogic(ctx context.Context, req *models.CreateProjectRequest, ownerFirebaseUID string) (*models.Project, error) {
 	if ownerFirebaseUID == "" {
 		return nil, errors.New("UID do proprietário é obrigatório")
 	}
 
-	// 2. Busca o usuário proprietário no banco de dados pelo UID do Firebase
+	// Validações básicas
+	if err := c.ValidateProjectRequest(req); err != nil {
+		return nil, err
+	}
+
 	user, err := c.UserRepository.GetUserByUID(ctx, ownerFirebaseUID)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -50,64 +293,125 @@ func (c *ProjectController) CreateProject(ctx context.Context, req *models.Creat
 
 	now := time.Now()
 	project := &models.Project{
-		OwnerUID:  user.ID,                       // Usa o ObjectID do usuário encontrado
-		Members:   []primitive.ObjectID{user.ID}, // O proprietário é automaticamente um membro
-		Title:     req.Title,
-		Details:   req.Details,
-		Impact:    req.Impact,
-		Year:      req.Year,
-		Course:    req.Course,
-		ODS:       req.ODS,
-		Icon:      req.Icon,
-		Status:    "active", // Status padrão para novos projetos
+		// Identificação
+		OwnerUID: user.ID,
+
+		// Informações Básicas
+		Title:          req.Title,
+		Year:           req.Year,
+		Location:       req.Location,
+		TargetAudience: req.TargetAudience,
+
+		// Detalhes do Projeto
+		Details:     req.Details,
+		Impact:      req.Impact,
+		Methodology: req.Methodology,
+		Icon:        req.Icon,
+		Status:      req.Status,
+
+		// Classificação
+		Course:     req.Course,
+		Area:       req.Area,
+		Complexity: req.Complexity,
+
+		// ODS
+		ODS: req.ODS,
+
+		// Recursos
+		Budget:       req.Budget,
+		Materials:    req.Materials,
+		Partnerships: req.Partnerships,
+
+		// Termos
+		TermsAccepted: req.TermsAccepted,
+		PublicData:    req.PublicData,
+
+		// Metadados
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
 
-	// 3. Cria o projeto no repositório
+	// Se status não foi fornecido, definir como ativo
+	if project.Status == "" {
+		project.Status = "active"
+	}
+
 	createdProject, err := c.ProjectRepository.CreateProject(ctx, project)
 	if err != nil {
 		return nil, errors.New("erro ao criar projeto no banco de dados")
 	}
 
-	// 4. Cria a relação de membro para o proprietário na coleção de membros
-	member := &models.Member{
+	// Criar relação de membro para o proprietário
+	ownerMember := &models.Member{
 		ProjectID: createdProject.ID,
 		UserID:    user.ID,
-		Role:      "owner", // Define o papel como proprietário
+		Role:      "owner",
 		JoinedAt:  now,
 		Status:    "active",
+		CreatedAt: now,
+		UpdatedAt: now,
 	}
 
-	_, err = c.MemberRepository.CreateMember(ctx, member)
+	_, err = c.MemberRepository.CreateMember(ctx, ownerMember)
 	if err != nil {
-		// Se falhar ao criar o membro, tenta fazer um rollback do projeto
-		_, err = c.ProjectRepository.DeleteProject(ctx, createdProject.ID) // Ignora erro no rollback
-		if err != nil {
-			// Logar erro de rollback se necessário
-		}
-		// Retorna erro original
+		c.ProjectRepository.DeleteProject(ctx, createdProject.ID)
 		return nil, errors.New("erro ao criar relação de membro para o proprietário")
 	}
 
 	return createdProject, nil
 }
 
-// GetProject busca um projeto pelo seu ID.
-func (c *ProjectController) GetProject(ctx context.Context, projectID primitive.ObjectID) (*models.Project, error) {
-	project, err := c.ProjectRepository.GetProjectByID(ctx, projectID)
-	if err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, errors.New("projeto não encontrado")
-		}
-		return nil, errors.New("erro interno ao buscar projeto")
+func (c *ProjectController) ValidateProjectRequest(req *models.CreateProjectRequest) error {
+	if req.Title == "" {
+		return errors.New("título é obrigatório")
 	}
-	return project, nil
+	if req.Details == "" {
+		return errors.New("descrição é obrigatória")
+	}
+	if req.Impact == "" {
+		return errors.New("impacto esperado é obrigatório")
+	}
+	if req.Year == 0 {
+		return errors.New("ano é obrigatório")
+	}
+	if req.Location == "" {
+		return errors.New("localização é obrigatória")
+	}
+	if req.TargetAudience == "" {
+		return errors.New("público-alvo é obrigatório")
+	}
+	if req.Methodology == "" {
+		return errors.New("metodologia é obrigatória")
+	}
+	if req.Course == "" {
+		return errors.New("curso é obrigatório")
+	}
+	if req.Area == "" {
+		return errors.New("área de atuação é obrigatória")
+	}
+	if req.Complexity == "" {
+		return errors.New("nível de complexidade é obrigatório")
+	}
+	if !req.TermsAccepted {
+		return errors.New("é necessário aceitar os termos de uso")
+	}
+
+	// Validar ano
+	currentYear := time.Now().Year()
+	if req.Year < 2000 || req.Year > currentYear+5 {
+		return errors.New("ano deve estar entre 2000 e " + strconv.Itoa(currentYear+5))
+	}
+
+	// Validar orçamento
+	if req.Budget < 0 {
+		return errors.New("orçamento não pode ser negativo")
+	}
+
+	return nil
 }
 
-// UpdateProject atualiza os dados de um projeto.
-func (c *ProjectController) UpdateProject(ctx context.Context, projectID primitive.ObjectID, updates *models.ProjectUpdate) (*models.Project, error) {
-	// 1. Verifica se o projeto existe
+// UpdateProjectLogic atualiza os dados de um projeto
+func (c *ProjectController) UpdateProjectLogic(ctx context.Context, projectID primitive.ObjectID, updates *models.UpdateProjectRequest) (*models.Project, error) {
 	_, err := c.ProjectRepository.GetProjectByID(ctx, projectID)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -116,7 +420,9 @@ func (c *ProjectController) UpdateProject(ctx context.Context, projectID primiti
 		return nil, errors.New("erro interno ao buscar projeto para atualização")
 	}
 
-	// 2. Realiza a atualização no repositório
+	// Atualizar timestamp
+	updates.UpdatedAt = time.Now()
+
 	result, err := c.ProjectRepository.UpdateProject(ctx, projectID, updates)
 	if err != nil {
 		return nil, errors.New("erro ao atualizar projeto no banco de dados")
@@ -129,7 +435,6 @@ func (c *ProjectController) UpdateProject(ctx context.Context, projectID primiti
 		return nil, errors.New("nenhum dado foi modificado no projeto")
 	}
 
-	// 3. Retorna o projeto atualizado (buscando-o novamente para ter os dados mais recentes)
 	updatedProject, err := c.ProjectRepository.GetProjectByID(ctx, projectID)
 	if err != nil {
 		return nil, errors.New("erro ao buscar projeto atualizado")
@@ -137,9 +442,8 @@ func (c *ProjectController) UpdateProject(ctx context.Context, projectID primiti
 	return updatedProject, nil
 }
 
-// DeleteProject deleta um projeto e seus membros associados.
-func (c *ProjectController) DeleteProject(ctx context.Context, projectID primitive.ObjectID) error {
-	// 1. Verifica se o projeto existe
+// DeleteProjectLogic deleta um projeto
+func (c *ProjectController) DeleteProjectLogic(ctx context.Context, projectID primitive.ObjectID) error {
 	_, err := c.ProjectRepository.GetProjectByID(ctx, projectID)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -148,13 +452,11 @@ func (c *ProjectController) DeleteProject(ctx context.Context, projectID primiti
 		return errors.New("erro interno ao buscar projeto para exclusão")
 	}
 
-	// 2. Deleta todos os membros associados a este projeto primeiro
 	_, err = c.MemberRepository.DeleteMembersByProjectID(ctx, projectID)
 	if err != nil {
 		return errors.New("erro ao deletar membros do projeto")
 	}
 
-	// 3. Deleta o projeto
 	result, err := c.ProjectRepository.DeleteProject(ctx, projectID)
 	if err != nil {
 		return errors.New("erro ao deletar projeto do banco de dados")
@@ -167,9 +469,8 @@ func (c *ProjectController) DeleteProject(ctx context.Context, projectID primiti
 	return nil
 }
 
-// AddMember adiciona um usuário como membro a um projeto.
+// AddMember adiciona um membro a um projeto
 func (c *ProjectController) AddMember(ctx context.Context, projectID primitive.ObjectID, req *models.AddMemberRequest) (*models.Member, error) {
-	// 1. Verifica se o projeto existe
 	_, err := c.ProjectRepository.GetProjectByID(ctx, projectID)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -178,7 +479,6 @@ func (c *ProjectController) AddMember(ctx context.Context, projectID primitive.O
 		return nil, errors.New("erro interno ao buscar projeto")
 	}
 
-	// 2. Busca o usuário a ser adicionado pelo seu UID do Firebase
 	user, err := c.UserRepository.GetUserByUID(ctx, req.UserFirebaseUID)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -190,7 +490,6 @@ func (c *ProjectController) AddMember(ctx context.Context, projectID primitive.O
 		return nil, errors.New("usuário não encontrado para adicionar como membro")
 	}
 
-	// 3. Verifica se o usuário já é membro deste projeto
 	isMember, err := c.MemberRepository.VerifyIfMemberExists(ctx, projectID, user.ID)
 	if err != nil {
 		return nil, errors.New("erro interno ao verificar se usuário já é membro")
@@ -199,15 +498,14 @@ func (c *ProjectController) AddMember(ctx context.Context, projectID primitive.O
 		return nil, errors.New("usuário já é membro deste projeto")
 	}
 
-	// 4. Cria a relação de membro
 	role := req.Role
 	if role == "" {
-		role = "member" // Papel padrão
+		role = "member"
 	}
 
 	member := &models.Member{
 		ProjectID: projectID,
-		UserID:    user.ID, // Usa o ObjectID do usuário
+		UserID:    user.ID,
 		Role:      role,
 		JoinedAt:  time.Now(),
 		Status:    "active",
@@ -218,24 +516,17 @@ func (c *ProjectController) AddMember(ctx context.Context, projectID primitive.O
 		return nil, errors.New("erro ao criar relação de membro")
 	}
 
-	// 5. Adiciona o membro ao array de membros do projeto
 	err = c.ProjectRepository.AddMemberToProject(ctx, projectID, user.ID)
 	if err != nil {
-		// Rollback: tenta deletar a relação de membro recém-criada se falhar ao adicionar ao projeto
-		_, err = c.MemberRepository.DeleteMember(ctx, createdMember.ID)
-		if err != nil {
-			// Ignora erro no rollback, mas logar se necessário
-		}
-		// Retorna erro original
+		c.MemberRepository.DeleteMember(ctx, createdMember.ID)
 		return nil, errors.New("erro ao adicionar membro à lista do projeto")
 	}
 
 	return createdMember, nil
 }
 
-// RemoveMember remove um membro de um projeto.
+// RemoveMember remove um membro de um projeto
 func (c *ProjectController) RemoveMember(ctx context.Context, projectID primitive.ObjectID, userFirebaseUID string) error {
-	// 1. Verifica se o projeto existe
 	project, err := c.ProjectRepository.GetProjectByID(ctx, projectID)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -244,7 +535,6 @@ func (c *ProjectController) RemoveMember(ctx context.Context, projectID primitiv
 		return errors.New("erro interno ao buscar projeto")
 	}
 
-	// 2. Busca o usuário a ser removido pelo seu UID do Firebase
 	user, err := c.UserRepository.GetUserByUID(ctx, userFirebaseUID)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -256,12 +546,10 @@ func (c *ProjectController) RemoveMember(ctx context.Context, projectID primitiv
 		return errors.New("usuário não encontrado para remover")
 	}
 
-	// 3. Impede a remoção do proprietário do projeto
 	if project.OwnerUID == user.ID {
 		return errors.New("não é possível remover o proprietário do projeto")
 	}
 
-	// 4. Verifica se o usuário é realmente um membro do projeto
 	isMember, err := c.MemberRepository.VerifyIfMemberExists(ctx, projectID, user.ID)
 	if err != nil {
 		return errors.New("erro interno ao verificar se usuário é membro")
@@ -270,13 +558,11 @@ func (c *ProjectController) RemoveMember(ctx context.Context, projectID primitiv
 		return errors.New("usuário não é membro deste projeto")
 	}
 
-	// 5. Remove a relação de membro da coleção de membros
 	_, err = c.MemberRepository.DeleteMemberByProjectAndUser(ctx, projectID, user.ID)
 	if err != nil {
 		return errors.New("erro ao remover membro da coleção de membros")
 	}
 
-	// 6. Remove o membro do array de membros do projeto
 	err = c.ProjectRepository.RemoveMemberFromProject(ctx, projectID, user.ID)
 	if err != nil {
 		return errors.New("erro ao remover membro da lista do projeto")
@@ -285,9 +571,8 @@ func (c *ProjectController) RemoveMember(ctx context.Context, projectID primitiv
 	return nil
 }
 
-// GetProjectMembers busca todos os membros de um projeto.
+// GetProjectMembers busca todos os membros de um projeto
 func (c *ProjectController) GetProjectMembers(ctx context.Context, projectID primitive.ObjectID) ([]models.Member, error) {
-	// 1. Verifica se o projeto existe
 	_, err := c.ProjectRepository.GetProjectByID(ctx, projectID)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -296,7 +581,6 @@ func (c *ProjectController) GetProjectMembers(ctx context.Context, projectID pri
 		return nil, errors.New("erro interno ao buscar projeto")
 	}
 
-	// 2. Busca os membros do projeto
 	members, err := c.MemberRepository.GetMembersByProjectID(ctx, projectID)
 	if err != nil {
 		return nil, errors.New("erro ao buscar membros do projeto")
@@ -304,9 +588,8 @@ func (c *ProjectController) GetProjectMembers(ctx context.Context, projectID pri
 	return members, nil
 }
 
-// GetUserProjects busca todos os projetos de um usuário (tanto como proprietário quanto como membro).
+// GetUserProjects busca todos os projetos de um usuário, tanto como proprietário quanto como membro
 func (c *ProjectController) GetUserProjects(ctx context.Context, userFirebaseUID string) ([]models.Project, error) {
-	// 1. Busca o usuário pelo seu UID do Firebase
 	user, err := c.UserRepository.GetUserByUID(ctx, userFirebaseUID)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -318,27 +601,22 @@ func (c *ProjectController) GetUserProjects(ctx context.Context, userFirebaseUID
 		return nil, errors.New("usuário não encontrado")
 	}
 
-	// 2. Busca projetos onde o usuário é proprietário
 	ownerProjects, err := c.ProjectRepository.GetProjectsByOwnerUID(ctx, user.ID)
 	if err != nil {
 		return nil, errors.New("erro ao buscar projetos do proprietário")
 	}
 
-	// 3. Busca projetos onde o usuário é membro (mas não proprietário, para evitar duplicatas)
 	memberProjects, err := c.ProjectRepository.GetProjectsByMemberUserID(ctx, user.ID)
 	if err != nil {
 		return nil, errors.New("erro ao buscar projetos como membro")
 	}
 
-	// Combina e remove duplicatas (se um projeto for retornado tanto como proprietário quanto como membro)
-	// Embora a lógica atual deva evitar duplicatas se OwnerUID também estiver no array Members.
-	// Uma abordagem mais robusta seria usar um mapa para garantir a unicidade.
 	allProjects := make(map[primitive.ObjectID]models.Project)
 	for _, p := range ownerProjects {
 		allProjects[p.ID] = p
 	}
 	for _, p := range memberProjects {
-		allProjects[p.ID] = p // Sobrescreve se já existe, mantendo a unicidade
+		allProjects[p.ID] = p
 	}
 
 	var finalProjects []models.Project
