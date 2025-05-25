@@ -34,15 +34,30 @@ type User struct {
 }
 
 type UserCreateRequest struct {
-	IDToken string `json:"id_token" binding:"required"`
-	Name    string `json:"name" binding:"required"`
-	Phone   string `json:"phone,omitempty"`
-	Age     int    `json:"age,omitempty"`
-	Address string `json:"address,omitempty"`
-	CPF     string `json:"cpf,omitempty"`
-	RG      string `json:"rg,omitempty"`
-	Sex     rune   `json:"sex,omitempty"`
-	Role    string `json:"role,omitempty"`
+	// Dados básicos
+	Name  string `json:"name" binding:"required"`
+	Email string `json:"email" binding:"required,email"`
+	Phone string `json:"phone"`
+	Age   int    `json:"age"`
+	CPF   string `json:"cpf" binding:"required"`
+	RG    string `json:"rg" binding:"required"`
+	Sex   string `json:"sex"`
+
+	// Endereço
+	CEP          string `json:"cep"`
+	Address      string `json:"address"`
+	Number       string `json:"number"`
+	Complement   string `json:"complement"`
+	Neighborhood string `json:"neighborhood"`
+	City         string `json:"city"`
+	State        string `json:"state"`
+
+	// Autenticação
+	Password string `json:"password" binding:"required"`
+	IDToken  string `json:"id_token" binding:"required"`
+	UID      string `json:"uid"`
+	Role     string `json:"role"`
+	Status   string `json:"status"`
 }
 
 // UserUpdateRequest representa os dados que podem ser atualizados

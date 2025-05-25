@@ -23,7 +23,7 @@ func HandleGetODSList(w http.ResponseWriter, r *http.Request) {
 			Title:       "Erradicação da Pobreza",
 			Description: "Acabar com a pobreza em todas as suas formas, em todos os lugares",
 			Emoji:       "❌",
-			ImageURL:    "/static/images/ods/1.jpg",
+			ImageURL:    "/images/assets/ods/1.jpg",
 			Targets: []string{
 				"Até 2030, erradicar a pobreza extrema para todas as pessoas em todos os lugares",
 				"Implementar sistemas de proteção social adequados",

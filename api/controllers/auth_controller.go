@@ -36,9 +36,35 @@ func (c *AuthController) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Dados recebidos: %+v", request)
 
 	// Validação básica
-	if request.Name == "" || request.IDToken == "" {
-		http.Error(w, "Nome e ID Token são obrigatórios", http.StatusBadRequest)
+	if request.Name == "" || request.IDToken == "" || request.Email == "" {
+		http.Error(w, "Nome, email e ID Token são obrigatórios", http.StatusBadRequest)
 		return
+	}
+
+	// Age agora é int diretamente, sem necessidade de conversão
+	age := request.Age
+
+	// Validação opcional da idade
+	if age < 0 || age > 150 {
+		http.Error(w, "Idade deve ser um valor válido", http.StatusBadRequest)
+		return
+	}
+
+	// Converte sex string para rune
+	var sex rune = ' '
+	if request.Sex != "" {
+		switch request.Sex {
+		case "male":
+			sex = 'M'
+		case "female":
+			sex = 'F'
+		case "other":
+			sex = 'O'
+		case "none":
+			sex = 'N'
+		default:
+			sex = ' '
+		}
 	}
 
 	// Inicializa cliente Firebase
@@ -73,16 +99,34 @@ func (c *AuthController) RegisterUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Obtém email do token ou dos claims
-	email := ""
-	if token.Claims["email"] != nil {
+	// Obtém email do token se não foi fornecido
+	email := request.Email
+	if email == "" && token.Claims["email"] != nil {
 		email = token.Claims["email"].(string)
 	}
 
 	if email == "" {
-		log.Printf("Email não encontrado no token")
-		http.Error(w, "Email não encontrado no token", http.StatusBadRequest)
+		log.Printf("Email não encontrado")
+		http.Error(w, "Email é obrigatório", http.StatusBadRequest)
 		return
+	}
+
+	// Monta o endereço completo
+	fullAddress := request.Address
+	if request.Number != "" {
+		fullAddress += ", " + request.Number
+	}
+	if request.Complement != "" {
+		fullAddress += " - " + request.Complement
+	}
+	if request.Neighborhood != "" {
+		fullAddress += ", " + request.Neighborhood
+	}
+	if request.City != "" && request.State != "" {
+		fullAddress += ", " + request.City + " - " + request.State
+	}
+	if request.CEP != "" {
+		fullAddress += " - CEP: " + request.CEP
 	}
 
 	// Cria o modelo User
@@ -91,12 +135,13 @@ func (c *AuthController) RegisterUser(w http.ResponseWriter, r *http.Request) {
 		Name:    request.Name,
 		Email:   email,
 		Phone:   request.Phone,
-		Age:     request.Age,
-		Address: request.Address,
+		Age:     age, // Agora usa diretamente o int
+		Address: fullAddress,
 		CPF:     request.CPF,
 		RG:      request.RG,
-		Sex:     request.Sex,
-		Role:    request.Role,
+		Sex:     sex,      // Usando o rune convertido
+		Role:    "user",   // Força role como "user" por segurança
+		Status:  "active", // Força status como "active"
 	}
 
 	// Define valores padrão
@@ -185,7 +230,7 @@ func (c *AuthController) LoginWithToken(w http.ResponseWriter, r *http.Request) 
 		"message":  "Login realizado com sucesso",
 		"user":     user.ToResponse(),
 		"uid":      user.UID,
-		"id_token": request.IDToken, // Retorna o mesmo token para uso no frontend
+		"id_token": request.IDToken,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -335,5 +380,4 @@ func (c *AuthController) RevokeSession(w http.ResponseWriter, r *http.Request) {
 // RefreshToken renova um token expirado
 func (c *AuthController) RefreshToken(w http.ResponseWriter, r *http.Request) {
 	// Implementação do refresh token
-	// (Depende da sua estratégia de refresh tokens)
 }

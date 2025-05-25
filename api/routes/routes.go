@@ -54,67 +54,70 @@ func SetupRoutes(
 	// 2. Rotas de API
 	apiRouter := http.NewServeMux()
 
-	// 2.1 Rotas de autenticação (/api/auth)
+	// 2.1 Rotas de autenticação (/api/auth) - SEM MIDDLEWARE DE AUTH
 	authRouter := http.NewServeMux()
-	authRouter.HandleFunc("/api/auth/register", MethodSwitch{
+
+	// Registrar rotas de autenticação diretamente no authRouter
+	authRouter.HandleFunc("/register", MethodSwitch{
 		Post: authHandler.RegisterUser(),
 	}.ServeHTTP)
 
-	authRouter.HandleFunc("/api/auth/login", MethodSwitch{
+	authRouter.HandleFunc("/login", MethodSwitch{
 		Post: authHandler.LoginWithToken(),
 	}.ServeHTTP)
 
-	authRouter.HandleFunc("/api/auth/token", MethodSwitch{
+	authRouter.HandleFunc("/token", MethodSwitch{
 		Post: authHandler.CreateToken(),
 	}.ServeHTTP)
 
-	authRouter.HandleFunc("/api/auth/verify", MethodSwitch{
+	authRouter.HandleFunc("/verify", MethodSwitch{
 		Post: authHandler.VerifyToken(),
 	}.ServeHTTP)
 
-	authRouter.HandleFunc("/api/auth/session", MethodSwitch{
+	authRouter.HandleFunc("/session", MethodSwitch{
 		Delete: authHandler.RevokeSession(),
 	}.ServeHTTP)
 
-	authRouter.HandleFunc("/api/auth/refresh", MethodSwitch{
+	authRouter.HandleFunc("/refresh", MethodSwitch{
 		Post: authHandler.RefreshToken(),
 	}.ServeHTTP)
 
-	// Aplica middlewares às rotas de autenticação
+	// Aplica middlewares às rotas de autenticação (CORS e JSON apenas)
 	authWithMiddlewares := middleware.CORS(authRouter)
 	authWithMiddlewares = middleware.JSONContentType(authWithMiddlewares)
-	apiRouter.Handle("/api/auth/", authWithMiddlewares)
+
+	// Monta as rotas de auth no apiRouter
+	apiRouter.Handle("/auth/", http.StripPrefix("/auth", authWithMiddlewares))
 
 	// 2.2 Rotas protegidas
 	protectedRouter := http.NewServeMux()
-	protectedRouter.HandleFunc("/api/user/{uid}", MethodSwitch{
+	protectedRouter.HandleFunc("/user/{uid}", MethodSwitch{
 		Get:    userHandler.GetUser(),
 		Put:    userHandler.UpdateUser(),
 		Delete: userHandler.DeleteUser(),
 	}.ServeHTTP)
 
-	protectedRouter.HandleFunc("/api/project/{uid}", MethodSwitch{
+	protectedRouter.HandleFunc("/project/{uid}", MethodSwitch{
 		//Get:  projectHandler.GetProjects(),
 		//Post: projectHandler.CreateProject(),
 	}.ServeHTTP)
 
-	protectedRouter.HandleFunc("/api/member/{uid}", MethodSwitch{
+	protectedRouter.HandleFunc("/member/{uid}", MethodSwitch{
 		//Get: memberHandler.GetMembers(),
 	}.ServeHTTP)
 
 	// Aplica middleware de autenticação nas rotas protegidas
 	protectedWithAuth := middleware.AuthMiddleware(protectedRouter)
-	apiRouter.Handle("/api/user/", protectedWithAuth)
-	apiRouter.Handle("/api/project/", protectedWithAuth)
-	apiRouter.Handle("/api/member/", protectedWithAuth)
+	protectedWithCORS := middleware.CORS(protectedWithAuth)
+	protectedWithJSON := middleware.JSONContentType(protectedWithCORS)
 
-	// Aplica middlewares gerais da API
-	// apiWithMiddlewares := middleware.CORS(apiRouter)
-	// apiWithMiddlewares = middleware.JSONContentType(apiWithMiddlewares)
+	apiRouter.Handle("/user/", http.StripPrefix("/user", protectedWithJSON))
+	apiRouter.Handle("/project/", http.StripPrefix("/project", protectedWithJSON))
+	apiRouter.Handle("/member/", http.StripPrefix("/member", protectedWithJSON))
 
 	// 3. Monta estrutura final de roteamento
 	mainRouter.Handle("/", staticRouter)
-	apiRouter.Handle("/api/", protectedWithAuth)
+	mainRouter.Handle("/api/", http.StripPrefix("/api", apiRouter))
 
 	// Aplica middleware de logging global
 	return middleware.LoggingMiddleware(mainRouter)
