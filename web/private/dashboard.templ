@@ -105,17 +105,17 @@ templ Dashboard() {
                                 </div>
                                 <div class="mt-3">
                                     <div class="flex items-center gap-2 text-sm mb-2">
-                                        <span>Progresso:</span>
+                                        <span class="bg-orange/10 text-orange px-2 py-1 rounded-full">Progresso:</span>
                                         <div class="flex-1 h-2 bg-gray-200 rounded-full">
                                             <div class="h-2 bg-blue rounded-full w-3/4"></div>
                                         </div>
-                                        <span>75%</span>
+                                        <span class="font-bold text-blue-600 dark:text-blue-300">75%</span>
                                     </div>
                                     <div class="flex gap-2">
                                         <button class="text-sm bg-blue text-white px-3 py-1 rounded hover:bg-blue/80 transition">
                                             Gerenciar
                                         </button>
-                                        <button class="text-sm border border-gray-300 px-3 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                                        <button class="text-sm px-3 py-1 rounded-lg bg-gradient-to-r from-orange to-golden text-white font-semibold hover:opacity-90 transition-all duration-300 transform hover:scale-[1.02] shadow-md">
                                             Detalhes
                                         </button>
                                     </div>
@@ -131,30 +131,34 @@ templ Dashboard() {
                         <h3 class="text-xl font-bold text-orange dark:text-golden mb-6">Atividades Recentes</h3>
                         
                         <div class="space-y-4">
-                            <div class="flex gap-3">
-                                <div class="text-blue text-xl">📢</div>
+                            <!-- Novo Colaborador - Estilo mais vibrante -->
+                            <div class="flex gap-3 p-3 rounded-lg bg-blue-100/80 dark:bg-blue-900/50 hover:bg-blue-200/60 dark:hover:bg-blue-900/60 transition-colors border border-blue-200 dark:border-blue-800/70">
+                                <div class="text-blue-600 dark:text-blue-300 text-xl">📢</div>
                                 <div>
-                                    <p class="text-sm dark:text-gray-300">Novo colaborador no projeto <span class="font-semibold">Biblioteca Livre</span></p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">2 horas atrás</p>
+                                    <p class="text-sm dark:text-gray-200">
+                                        Novo colaborador no projeto <span class="font-semibold text-blue-700 dark:text-blue-200">Biblioteca Livre</span>
+                                    </p>
+                                    <p class="text-xs text-blue-500 dark:text-blue-300/90 mt-1">2 horas atrás</p>
                                 </div>
                             </div>
                             
-                            <div class="flex gap-3">
-                                <div class="text-green text-xl">✅</div>
+                            <!-- Tarefa Concluída - Estilo mais rico -->
+                            <div class="flex gap-3 p-3 rounded-lg bg-green-100/80 dark:bg-green-900/40 hover:bg-green-200/60 dark:hover:bg-green-900/50 transition-colors border border-green-200 dark:border-green-800/60">
+                                <div class="text-green-600 dark:text-green-300 text-xl">✅</div>
                                 <div>
-                                    <p class="text-sm dark:text-gray-300">Tarefa concluída: <span class="font-semibold">Comprar materiais para oficina</span></p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Ontem, 15:32</p>
+                                    <p class="text-sm dark:text-gray-200">
+                                        Tarefa concluída: <span class="font-semibold text-green-700 dark:text-green-200">Comprar materiais para oficina</span>
+                                    </p>
+                                    <p class="text-xs text-green-500 dark:text-green-300/90 mt-1">Ontem, 15:32</p>
                                 </div>
                             </div>
-                            
-                            <!-- Adicione mais atividades seguindo o mesmo padrão -->
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Footer -->
-        @components.FooterMain()
+            <!-- Footer -->
+            @components.FooterMain()
     </body>
     </html>
 }
