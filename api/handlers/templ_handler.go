@@ -47,6 +47,9 @@ func HandleTemplPublicRoutes(router *http.ServeMux) {
 
 	// Rota sobre about.templ
 	SetupRoutesTemplate(router, "/about", HandleTemplAbout)
+
+	// Rota sobre ods.templ
+	SetupRoutesTemplate(router, "/ods", HandleTemplOds)
 }
 
 func HandleTemplMain(w http.ResponseWriter, r *http.Request) error {
@@ -75,6 +78,10 @@ func HandleTemplExplore(w http.ResponseWriter, r *http.Request) error {
 
 func HandleTemplAbout(w http.ResponseWriter, r *http.Request) error {
 	return HandleTemplTemplate(public.About(), w, r)
+}
+
+func HandleTemplOds(w http.ResponseWriter, r *http.Request) error {
+	return HandleTemplTemplate(public.Ods(), w, r)
 }
 
 /* Privados */
