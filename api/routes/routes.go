@@ -14,7 +14,7 @@ type Router struct {
 }
 
 // Utilitário para mapear métodos
-type MethodSwitch struct {
+type HTTPMethod struct {
 	Get    http.HandlerFunc
 	Post   http.HandlerFunc
 	Put    http.HandlerFunc
@@ -36,8 +36,8 @@ func SetupRoutes(
 	authHandler := handlers.NewAuthHandler(authCtrl)
 	userHandler := handlers.NewUserHandler(userCtrl)
 	projectHandler := handlers.NewProjectHandler(projectCtrl)
-	//memberHandler := handlers.NewMemberHandler(memberCtrl)
-	odsHandler := handlers.NewODSHandler(odsCtrl)
+	// memberHandler := handlers.NewMemberHandler(memberCtrl)
+	// odsHandler := handlers.NewODSHandler(odsCtrl)
 
 	// Cria router principal
 	mainRouter := http.NewServeMux()
@@ -58,25 +58,25 @@ func SetupRoutes(
 	authRouter := http.NewServeMux()
 
 	// Registrar rotas de autenticação diretamente no authRouter
-	authRouter.HandleFunc("/register", MethodSwitch{
+	authRouter.HandleFunc("/register", HTTPMethod{
 		Post: authHandler.RegisterUser(),
 	}.ServeHTTP)
-	authRouter.HandleFunc("/login", MethodSwitch{
+	authRouter.HandleFunc("/login", HTTPMethod{
 		Post: authHandler.LoginWithToken(),
 	}.ServeHTTP)
-	authRouter.HandleFunc("/social", MethodSwitch{
+	authRouter.HandleFunc("/social", HTTPMethod{
 		Post: authHandler.LoginWithSocial(),
 	}.ServeHTTP)
-	authRouter.HandleFunc("/token", MethodSwitch{
+	authRouter.HandleFunc("/token", HTTPMethod{
 		Post: authHandler.CreateToken(),
 	}.ServeHTTP)
-	authRouter.HandleFunc("/verify", MethodSwitch{
+	authRouter.HandleFunc("/verify", HTTPMethod{
 		Post: authHandler.VerifyToken(),
 	}.ServeHTTP)
-	authRouter.HandleFunc("/session", MethodSwitch{
+	authRouter.HandleFunc("/session", HTTPMethod{
 		Delete: authHandler.RevokeSession(),
 	}.ServeHTTP)
-	authRouter.HandleFunc("/refresh", MethodSwitch{
+	authRouter.HandleFunc("/refresh", HTTPMethod{
 		Post: authHandler.RefreshToken(),
 	}.ServeHTTP)
 
@@ -94,14 +94,14 @@ func SetupRoutes(
 	protectedRouter := http.NewServeMux()
 
 	// Rotas de usuários
-	protectedRouter.HandleFunc("/user/{uid}", MethodSwitch{
+	protectedRouter.HandleFunc("/user/{uid}", HTTPMethod{
 		Get:    userHandler.GetUser(),
 		Put:    userHandler.UpdateUser(),
 		Delete: userHandler.DeleteUser(),
 	}.ServeHTTP)
 
 	// Rotas de projetos
-	protectedRouter.HandleFunc("/project/{uid}", MethodSwitch{
+	protectedRouter.HandleFunc("/project", HTTPMethod{
 		Get:    projectHandler.GetProject(),
 		Post:   projectHandler.CreateProject(),
 		Put:    projectHandler.UpdateProject(),
@@ -109,13 +109,13 @@ func SetupRoutes(
 	}.ServeHTTP)
 
 	// Rotas de membros
-	protectedRouter.HandleFunc("/member/{uid}", MethodSwitch{
+	protectedRouter.HandleFunc("/member/{uid}", HTTPMethod{
 		// Get: memberHandler.GetMember(),
 	}.ServeHTTP)
 
 	// Rotas de ODS
-	protectedRouter.HandleFunc("/ods/", MethodSwitch{
-		Get: odsHandler.GetAllODS(),
+	protectedRouter.HandleFunc("/ods/", HTTPMethod{
+		// Get: odsHandler.GetAllODS(),
 	}.ServeHTTP)
 
 	// Aplica middleware de autenticação nas rotas protegidas
@@ -136,7 +136,7 @@ func SetupRoutes(
 	return middleware.LoggingMiddleware(mainRouter)
 }
 
-func (m MethodSwitch) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (m HTTPMethod) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		if m.Get != nil {
@@ -164,7 +164,7 @@ func (m MethodSwitch) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func LogAvailableRoutes() {
 	// Rotas de autenticação (/api/auth)
-	log.Println("🛣️ rotas disponíveis:")
+	log.Println("💫 rotas disponíveis:")
 	log.Println(" ➕ POST   /api/auth/register") // Registrar novo usuário
 	log.Println(" ➕ POST   /api/auth/login")    // Login com token Firebase
 	log.Println(" ➕ POST   /api/auth/social")   // Login social (Google/GitHub)

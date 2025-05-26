@@ -26,22 +26,22 @@ func NewAuthController(userRepo repositories.UserRepository) *AuthController {
 
 // RegisterUser cria um novo usuário
 func (c *AuthController) RegisterUser(w http.ResponseWriter, r *http.Request) {
-	var request models.CreateUserRequest
-	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+	var req models.CreateUserRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		log.Printf("Erro ao decodificar JSON: %v", err)
 		http.Error(w, "JSON inválido", http.StatusBadRequest)
 		return
 	}
-	log.Printf("🎲 dados recebidos: %+v", request)
+	log.Printf("🎲 dados recebidos: %+v", req)
 
 	// Validação básica
-	if request.Name == "" || request.IDToken == "" || request.Email == "" {
+	if req.Name == "" || req.IDToken == "" || req.Email == "" {
 		http.Error(w, "Nome, email e ID Token são obrigatórios", http.StatusBadRequest)
 		return
 	}
 
 	// Age agora é int diretamente, sem necessidade de conversão
-	age := request.Age
+	age := req.Age
 
 	// Validação opcional da idade
 	if age < 0 || age > 150 {
@@ -58,13 +58,13 @@ func (c *AuthController) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Verifica o ID Token para obter informações do usuário Firebase
-	token, err := client.VerifyIDToken(context.Background(), request.IDToken)
+	token, err := client.VerifyIDToken(context.Background(), req.IDToken)
 	if err != nil {
 		log.Printf("Erro ao verificar ID Token: %v", err)
 		http.Error(w, "Token inválido", http.StatusUnauthorized)
 		return
 	}
-	log.Printf("🪙  token verificado para uid: %s", token.UID)
+	log.Printf("👛 token verificado para uid: %s", token.UID)
 
 	// Verifica se o usuário já existe no MongoDB
 	existingUser, err := c.UserRepository.GetUserByUID(context.Background(), token.UID)
@@ -81,7 +81,7 @@ func (c *AuthController) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Obtém email do token se não foi fornecido
-	email := request.Email
+	email := req.Email
 	if email == "" && token.Claims["email"] != nil {
 		email = token.Claims["email"].(string)
 	}
@@ -93,62 +93,62 @@ func (c *AuthController) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Verifica se tem senha (pode não ter se foi criado apenas via Firebase)
-	if request.Password == "" {
-		log.Printf("Usuário sem senha cadastrada: %s", request.Email)
+	if req.Password == "" {
+		log.Printf("Usuário sem senha cadastrada: %s", req.Email)
 		http.Error(w, "Use o login com Firebase", http.StatusBadRequest)
 		return
 	}
 
 	// Verifica senha
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		log.Printf("Erro ao hashear senha: %v", err)
 		http.Error(w, "Erro interno ao salvar senha", http.StatusInternalServerError)
 		return
 	}
-	request.Password = string(hashedPassword)
+	req.Password = string(hashedPassword)
 
 	// Monta o endereço completo
-	fullAddress := request.Address
-	if request.Number != "" {
-		fullAddress += ", " + request.Number
+	fullAddress := req.Address
+	if req.Number != "" {
+		fullAddress += ", " + req.Number
 	}
-	if request.Complement != "" {
-		fullAddress += " - " + request.Complement
+	if req.Complement != "" {
+		fullAddress += " - " + req.Complement
 	}
-	if request.Neighborhood != "" {
-		fullAddress += ", " + request.Neighborhood
+	if req.Neighborhood != "" {
+		fullAddress += ", " + req.Neighborhood
 	}
-	if request.City != "" && request.State != "" {
-		fullAddress += ", " + request.City + " - " + request.State
+	if req.City != "" && req.State != "" {
+		fullAddress += ", " + req.City + " - " + req.State
 	}
-	if request.CEP != "" {
-		fullAddress += " - CEP: " + request.CEP
+	if req.CEP != "" {
+		fullAddress += " - CEP: " + req.CEP
 	}
 
 	// Cria o modelo User
 	user := &models.User{
 		UID:          token.UID,
-		Name:         request.Name,
+		Name:         req.Name,
 		Email:        email,
-		Password:     request.Password,
-		Phone:        request.Phone,
-		CPF:          request.CPF,
-		RG:           request.RG,
-		Sex:          request.Sex,
+		Password:     req.Password,
+		Phone:        req.Phone,
+		CPF:          req.CPF,
+		RG:           req.RG,
+		Sex:          req.Sex,
 		Age:          age,
-		Address:      request.Address,
-		Number:       request.Number,
-		Complement:   request.Complement,
-		Neighborhood: request.Neighborhood,
-		City:         request.City,
-		State:        request.State,
-		CEP:          request.CEP,
+		Address:      req.Address,
+		Number:       req.Number,
+		Complement:   req.Complement,
+		Neighborhood: req.Neighborhood,
+		City:         req.City,
+		State:        req.State,
+		CEP:          req.CEP,
 		Role:         "user",   // Força role como "user" por segurança
 		Status:       "active", // Força status como "active"
-		Terms:        request.Terms,
-		CreatedAt:    request.CreatedAt,
-		UpdatedAt:    request.UpdatedAt,
+		Terms:        req.Terms,
+		CreatedAt:    req.CreatedAt,
+		UpdatedAt:    req.UpdatedAt,
 	}
 
 	// Define valores padrão
@@ -187,8 +187,7 @@ func (c *AuthController) LoginWithToken(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "JSON inválido", http.StatusBadRequest)
 		return
 	}
-
-	log.Printf("Tentativa de login com ID Token")
+	log.Printf("🤵‍♂️ tentativa de login com ID Token")
 
 	// Inicializa cliente Firebase
 	client, err := c.AuthenticationService.Initialize()
@@ -205,8 +204,7 @@ func (c *AuthController) LoginWithToken(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Token inválido", http.StatusUnauthorized)
 		return
 	}
-
-	log.Printf("Token verificado para UID: %s", token.UID)
+	log.Printf("👓 token verificado para UID: %s", token.UID)
 
 	// Busca usuário no MongoDB
 	user, err := c.UserRepository.GetUserByUID(context.Background(), token.UID)
@@ -228,8 +226,7 @@ func (c *AuthController) LoginWithToken(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Conta inativa", http.StatusForbidden)
 		return
 	}
-
-	log.Printf("Login realizado com sucesso para: %s", user.Email)
+	log.Printf("🪵 login realizado com sucesso para: %s", user.Email)
 
 	// Retorna dados do usuário
 	response := map[string]interface{}{
@@ -258,8 +255,7 @@ func (c *AuthController) LoginWithSocial(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "JSON inválido", http.StatusBadRequest)
 		return
 	}
-
-	log.Printf("Tentativa de login social com provedor: %s", request.Provider)
+	log.Printf("🧦 tentativa de login social com provedor: %s", request.Provider)
 
 	// Inicializa cliente Firebase
 	client, err := c.AuthenticationService.Initialize()
@@ -276,8 +272,7 @@ func (c *AuthController) LoginWithSocial(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "Token inválido", http.StatusUnauthorized)
 		return
 	}
-
-	log.Printf("Token verificado para UID: %s", token.UID)
+	log.Printf("💼 token verificado para UID: %s", token.UID)
 
 	// Busca usuário no MongoDB
 	user, err := c.UserRepository.GetUserByUID(context.Background(), token.UID)
@@ -332,7 +327,7 @@ func (c *AuthController) LoginWithSocial(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	log.Printf("Login social realizado com sucesso para: %s", user.Email)
+	log.Printf("👋 login social realizado com sucesso para: %s", user.Email)
 
 	// Retorna dados do usuário
 	response := map[string]interface{}{

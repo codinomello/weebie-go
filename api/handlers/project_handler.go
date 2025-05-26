@@ -32,7 +32,7 @@ func (h *ProjectHandler) CreateProject() http.HandlerFunc {
 			http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
 			return
 		}
-		h.ProjectController.CreateProjectJSON(w, r)
+		h.ProjectController.CreateProject(w, r)
 	}
 }
 

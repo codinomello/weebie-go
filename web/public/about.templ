@@ -15,6 +15,59 @@ templ About() {
         @components.StyleHead()
         <!-- Ícone -->
         @components.Link("house_with_garden.png")
+        <!-- Firebase SDK -->
+        <script type="module">
+            import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js';
+            import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js';
+
+            const firebaseConfig = {
+                apiKey: "AIzaSyAI0Tc7GssKwWwtVdrz6OaK6KFACx58N5U",
+                authDomain: "weebie-go.firebaseapp.com",
+                projectId: "weebie-go",
+                storageBucket: "weebie-go.appspot.com",
+                messagingSenderId: "321509944065",
+                appId: "1:321509944065:web:199a546b7055f461ec4900",
+                measurementId: "G-S5CG0CLRVS"
+            };
+
+            console.log('Inicializando Firebase...');
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+            console.log('Firebase inicializado com sucesso');
+
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    console.log('✅ Usuário logado:', {
+                        uid: user.uid,
+                        email: user.email,
+                        displayName: user.displayName,
+                        photoURL: user.photoURL || 'Nenhuma foto de perfil disponível'
+                    });
+
+                    // Verifica se o usuário está autenticado via Google
+                    const isGoogleUser = user.providerData.some(profile => profile.providerId === 'google.com');
+                    if (isGoogleUser && user.photoURL) {
+                        console.log('📸 Foto de perfil do Google:', user.photoURL);
+                    } else if (isGoogleUser) {
+                        console.log('⚠️ Usuário Google sem foto de perfil definida');
+                    } else {
+                        console.log('⚠️ Usuário não autenticado via Google');
+                    }
+                } else {
+                    console.log('❌ Nenhum usuário logado');
+                }
+            });
+
+            window.checkAuth = () => {
+                const user = auth.currentUser;
+                console.log('Usuário atual:', user ? {
+                    uid: user.uid,
+                    email: user.email,
+                    photoURL: user.photoURL || 'Nenhuma foto'
+                } : 'Nenhum');
+            };
+            console.log('💡 Use window.checkAuth() no console para verificar o usuário');
+        </script>
     </head>
     <body class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
         <!-- Header -->
