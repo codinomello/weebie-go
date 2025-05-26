@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/codinomello/weebie-go/api/models"
-	"github.com/codinomello/weebie-go/web/components"
+	components "github.com/codinomello/weebie-go/web/components"
 )
 
 type User *models.User
@@ -38,7 +38,7 @@ func Profile(user User) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<html lang=\"pt-BR\"><head><!-- Meta Tags -->")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<html lang=\"pt-BR\" class=\"scroll-smooth\"><head><!-- Meta Tags -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -78,7 +78,7 @@ func Profile(user User) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</head><body class=\"bg-gray-100 dark:bg-gray-900\"><!-- Navegação  -->")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</head><body class=\"bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 text-gray-900 dark:text-gray-100 transition-colors duration-300\"><!-- Navegação  -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
