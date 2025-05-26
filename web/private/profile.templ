@@ -27,6 +27,7 @@ templ Profile(user User) {
         <!-- Navegação  -->
         @components.Nav("Meu Perfil", "house_with_garden.png")
         
+        <section>
         <!-- Conteúdo Principal -->
         <div class="container mx-auto px-4 py-8">
             <div class="flex flex-col md:flex-row gap-8">
@@ -220,6 +221,7 @@ templ Profile(user User) {
                 </div>
             </div>
         </div>
+        </section>
         <!-- Footer -->
         @components.FooterMain()
     </body>
