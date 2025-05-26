@@ -9,6 +9,36 @@ import (
 	"github.com/codinomello/weebie-go/web/public"
 )
 
+// type TemplHandler struct {
+// 	// Controllers
+// 	ProfileController *controllers.ProfileController
+// 	ODSController     *controllers.ODSController
+
+// 	// Repositories
+// 	UserRepository        repositories.UserRepository
+// 	ProjectRepository     repositories.ProjectRepository
+// 	AuthenticationService *authentication.FirebaseAuthentication
+
+// 	// Base de dados
+// 	DB any // Use o tipo real do seu DB, por exemplo *sql.DB ou *gorm.DB
+// }
+
+// func NewTemplHandler(
+// 	userRepo repositories.UserRepository,
+// 	projectRepo repositories.ProjectRepository,
+// 	authService *authentication.FirebaseAuthentication,
+// 	db , // Use o tipo real do seu DB
+// ) *TemplHandler {
+// 	return &TemplHandler{
+// 		ProfileController:     controllers.NewProfileController(userRepo),
+// 		ODSController:         controllers.NewODSController(),
+// 		UserRepository:        userRepo,
+// 		ProjectRepository:     projectRepo,
+// 		AuthenticationService: authService,
+// 		DB:                    db,
+// 	}
+// }
+
 // Template para renderizar os templates
 func HandleTemplTemplate(template templ.Component, w http.ResponseWriter, r *http.Request) error {
 	return template.Render(r.Context(), w)
@@ -96,6 +126,7 @@ func HandleTemplPrivateRoutes(router *http.ServeMux) {
 
 func HandleTemplProfile(w http.ResponseWriter, r *http.Request) error {
 	var user *models.User
+	// Renderiza o template profile.templ com o usuário autenticado
 	return HandleTemplTemplate(private.Profile(user), w, r)
 }
 

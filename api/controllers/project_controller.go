@@ -7,28 +7,32 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 
+	"github.com/codinomello/weebie-go/api/authentication"
 	"github.com/codinomello/weebie-go/api/models"
 	"github.com/codinomello/weebie-go/api/repositories"
 )
 
 // ProjectController define a estrutura do controlador de projetos.
 type ProjectController struct {
-	ProjectRepository repositories.ProjectRepository
-	UserRepository    repositories.UserRepository
-	MemberRepository  repositories.MemberRepository
+	ProjectRepository     repositories.ProjectRepository
+	UserRepository        repositories.UserRepository
+	MemberRepository      repositories.MemberRepository
+	AuthenticationService *authentication.FirebaseAuthentication
 }
 
 // NewProjectController cria uma nova instância de ProjectController.
 func NewProjectController(projectRepo repositories.ProjectRepository, userRepo repositories.UserRepository, memberRepo repositories.MemberRepository) *ProjectController {
 	return &ProjectController{
-		ProjectRepository: projectRepo,
-		UserRepository:    userRepo,
-		MemberRepository:  memberRepo,
+		ProjectRepository:     projectRepo,
+		UserRepository:        userRepo,
+		MemberRepository:      memberRepo,
+		AuthenticationService: authentication.NewFirebaseAuthentication(),
 	}
 }
 
@@ -60,66 +64,50 @@ func (c *ProjectController) GetProject(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(project)
 }
 
-// CreateProject cria um novo projeto
+// CreateProject cria um novo projeto.
 func (c *ProjectController) CreateProject(w http.ResponseWriter, r *http.Request) {
-	// Parse do formulário
-	if err := r.ParseForm(); err != nil {
-		http.Error(w, "Erro ao processar formulário", http.StatusBadRequest)
+	// Extrai token Bearer do header Authorization
+	authHeader := r.Header.Get("Authorization")
+	idToken := ExtractBearerToken(authHeader)
+	if idToken == "" {
+		http.Error(w, "token de autenticação não fornecido", http.StatusUnauthorized)
 		return
 	}
 
-	ownerFirebaseUID := r.Header.Get("X-User-UID")
-	if ownerFirebaseUID == "" {
-		http.Error(w, "UID do proprietário é obrigatório", http.StatusUnauthorized)
-		return
-	}
-
-	// Criar a requisição a partir dos dados do formulário
-	req, err := c.ParseProjectRequest(r)
+	// Valida token Firebase e obtém UID
+	token, err := c.AuthenticationService.VerifyToken(idToken)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Erro ao processar dados do formulário: %v", err), http.StatusBadRequest)
+		http.Error(w, "token inválido: "+err.Error(), http.StatusUnauthorized)
 		return
 	}
 
-	project, err := c.CreateProjectLogic(context.Background(), req, ownerFirebaseUID)
-	if err != nil {
-		if err.Error() == "usuário proprietário não encontrado" {
-			http.Error(w, err.Error(), http.StatusNotFound)
-			return
-		}
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	// Se o token for válido, extrai o UID do usuário
+	uid := ""
+	if token != nil {
+		uid = token.UID
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(project)
-}
-
-// CreateProjectJSON cria um novo projeto a partir de JSON (para API)
-func (c *ProjectController) CreateProjectJSON(w http.ResponseWriter, r *http.Request) {
+	// Decodifica JSON do corpo da requisição para a struct CreateProjectRequest
 	var req models.CreateProjectRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "JSON inválido", http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("Erro ao decodificar JSON: %v", err), http.StatusBadRequest)
 		return
 	}
 
-	ownerFirebaseUID := r.Header.Get("X-User-UID")
-	if ownerFirebaseUID == "" {
-		http.Error(w, "UID do proprietário é obrigatório", http.StatusUnauthorized)
-		return
-	}
-
-	project, err := c.CreateProjectLogic(context.Background(), &req, ownerFirebaseUID)
+	// Chama a lógica de negócio para criar o projeto
+	project, err := c.CreateProjectLogic(context.Background(), &req, uid)
 	if err != nil {
-		if err.Error() == "usuário proprietário não encontrado" {
+		// Lida com erros específicos, como usuário proprietário não encontrado
+		if strings.Contains(err.Error(), "usuário proprietário não encontrado") {
 			http.Error(w, err.Error(), http.StatusNotFound)
 			return
 		}
+		// Lida com outros erros internos do servidor
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	// Define o cabeçalho Content-Type e retorna o projeto criado com status 201 Created
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(project)
@@ -625,4 +613,13 @@ func (c *ProjectController) GetUserProjects(ctx context.Context, userFirebaseUID
 	}
 
 	return finalProjects, nil
+}
+
+// ExtractBearerToken é uma função auxiliar para extrair o token Bearer de um cabeçalho Authorization.
+func ExtractBearerToken(header string) string {
+	const prefix = "Bearer "
+	if strings.HasPrefix(header, prefix) {
+		return strings.TrimPrefix(header, prefix)
+	}
+	return ""
 }

@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"context"
+	"encoding/json"
 	"net/http"
 	"strings"
 
@@ -12,40 +12,25 @@ import (
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
-		if authHeader == "" {
-			http.Error(w, `{"error": "Token de autorização requerido"}`, http.StatusUnauthorized)
+		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(map[string]string{"error": "Token de autenticação ausente"})
 			return
 		}
 
-		// Extrai o token do header "Bearer <token>"
-		tokenParts := strings.Split(authHeader, " ")
-		if len(tokenParts) != 2 || tokenParts[0] != "Bearer" {
-			http.Error(w, `{"error": "Formato de token inválido"}`, http.StatusUnauthorized)
-			return
-		}
+		// Extrair o token do cabeçalho Authorization
+		token := strings.TrimPrefix(authHeader, "Bearer ")
 
-		token := tokenParts[1]
-
-		// Verifica o token no Firebase
+		// Validar token com Firebase
 		authService := authentication.NewFirebaseAuthentication()
-		client, err := authService.Initialize()
+		_, err := authService.VerifyToken(token)
 		if err != nil {
-			http.Error(w, `{"error": "Erro interno de autenticação"}`, http.StatusInternalServerError)
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(map[string]string{"error": "Token inválido"})
 			return
 		}
-
-		decodedToken, err := client.VerifyIDToken(context.Background(), token)
-		if err != nil {
-			http.Error(w, `{"error": "Token inválido ou expirado"}`, http.StatusUnauthorized)
-			return
-		}
-
-		type contextKey string
-		const userUIDKey contextKey = "uid"
-
-		// Adiciona o UID do usuário ao contexto da requisição
-		ctx := context.WithValue(r.Context(), userUIDKey, decodedToken.UID)
-		r = r.WithContext(ctx)
 
 		next.ServeHTTP(w, r)
 	})

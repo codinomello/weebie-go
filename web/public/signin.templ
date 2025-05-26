@@ -15,7 +15,7 @@ templ SignIn() {
         @components.StyleHead()
         <!-- Flowbite CSS e Ícone -->
         @components.Link("house_with_garden.png")
-        <!-- Firebase SDK v11.8.1 -->
+        <!-- Firebase SDK -->
         <script type="module">
             import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
             import { 
@@ -27,7 +27,8 @@ templ SignIn() {
                 FacebookAuthProvider, 
                 signInWithPopup, 
                 linkWithCredential, 
-                OAuthProvider 
+                OAuthProvider,
+                onAuthStateChanged
             } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
 
             // Configuração do Firebase
@@ -41,9 +42,25 @@ templ SignIn() {
                 measurementId: "G-S5CG0CLRVS"
             };
 
+            // Debug flag - pode ser controlado por variável de ambiente
+            const DEBUG_MODE = true;
+
+            // Função de debug personalizada
+            function debugLog(message, data = null) {
+                if (DEBUG_MODE) {
+                    const timestamp = new Date().toISOString();
+                    console.log(`[${timestamp}] 🔍 DEBUG:`, message);
+                    if (data) {
+                        console.log('📋 Data:', data);
+                    }
+                }
+            }
+
             // Inicializa o Firebase
+            debugLog('Inicializando Firebase App...');
             const app = initializeApp(firebaseConfig);
             const auth = getAuth(app);
+            debugLog('Firebase inicializado com sucesso', { projectId: firebaseConfig.projectId });
 
             // Inicializa provedores
             const providers = {
@@ -51,21 +68,63 @@ templ SignIn() {
                 github: new GithubAuthProvider(),
                 facebook: new FacebookAuthProvider()
             };
+            debugLog('Provedores de autenticação inicializados', Object.keys(providers));
+
+            // Monitor de estado de autenticação
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    debugLog('✅ USUÁRIO LOGADO DETECTADO!', {
+                        uid: user.uid,
+                        email: user.email,
+                        displayName: user.displayName,
+                        emailVerified: user.emailVerified,
+                        providerData: user.providerData.map(p => ({
+                            providerId: p.providerId,
+                            uid: p.uid,
+                            email: p.email
+                        })),
+                        metadata: {
+                            creationTime: user.metadata.creationTime,
+                            lastSignInTime: user.metadata.lastSignInTime
+                        }
+                    });
+                    console.log('🎉 USUÁRIO AUTENTICADO COM SUCESSO!');
+                } else {
+                    debugLog('❌ Usuário não está logado');
+                }
+            });
 
             // Função para lidar com login de provedores sociais
             async function handleProviderLogin(provider) {
-                console.log(`Tentando login com provedor: ${provider}`);
+                debugLog(`Iniciando login social com provedor: ${provider}`);
+                
                 try {
                     const providerInstance = providers[provider];
                     if (!providerInstance) {
                         throw new Error(`Provedor ${provider} não suportado`);
                     }
 
+                    debugLog('Abrindo popup de autenticação...');
                     const result = await signInWithPopup(auth, providerInstance);
                     const user = result.user;
-                    const idToken = await user.getIdToken();
+                    
+                    debugLog('Popup de autenticação concluído com sucesso', {
+                        uid: user.uid,
+                        email: user.email,
+                        displayName: user.displayName
+                    });
 
-                    console.log("Usuário autenticado:", user.uid);
+                    debugLog('Obtendo token de ID...');
+                    const idToken = await user.getIdToken();
+                    debugLog('Token de ID obtido com sucesso');
+
+                    debugLog('🚀 ENVIANDO DADOS PARA O BACKEND...', {
+                        endpoint: '/api/auth/social',
+                        provider: provider,
+                        uid: user.uid,
+                        email: user.email,
+                        hasToken: !!idToken
+                    });
 
                     const response = await fetch("/api/auth/social", {
                         method: "POST",
@@ -82,19 +141,48 @@ templ SignIn() {
                         })
                     });
 
+                    debugLog('Resposta do backend recebida', {
+                        status: response.status,
+                        statusText: response.statusText,
+                        ok: response.ok
+                    });
+
                     if (!response.ok) {
-                        throw new Error(await response.text());
+                        const errorText = await response.text();
+                        debugLog('❌ Erro na resposta do backend', { error: errorText });
+                        throw new Error(errorText);
                     }
 
+                    const responseData = await response.json().catch(() => null);
+                    debugLog('✅ Backend processou login social com sucesso', responseData);
+
                     showMessage("Login social realizado com sucesso!", "success");
-                    setTimeout(() => window.location.href = "/", 2000);
+                    debugLog('Redirecionando para home em 2 segundos...');
+                    setTimeout(() => {
+                        debugLog('Redirecionando agora...');
+                        window.location.href = "/";
+                    }, 2000);
+
                 } catch (error) {
-                    console.error("Erro no login social:", error);
+                    debugLog('❌ ERRO NO LOGIN SOCIAL', {
+                        code: error.code,
+                        message: error.message,
+                        stack: error.stack
+                    });
+
                     if (error.code === "auth/account-exists-with-different-credential") {
+                        debugLog('Detectado conflito de credenciais - salvando para vinculação posterior');
+                        
                         const pendingCred = OAuthProvider.credentialFromError(error);
-                        showMessage("Este e-mail já está registrado com outro método. Faça login com e-mail/senha para vincular sua conta.", "error");
                         localStorage.setItem("pendingCred", JSON.stringify(pendingCred));
                         localStorage.setItem("pendingProvider", provider);
+                        
+                        debugLog('Credenciais pendentes salvas no localStorage', {
+                            provider: provider,
+                            hasPendingCred: !!pendingCred
+                        });
+
+                        showMessage("Este e-mail já está registrado com outro método. Faça login com e-mail/senha para vincular sua conta.", "error");
                     } else {
                         showMessage(parseAuthError(error), "error");
                     }
@@ -103,6 +191,8 @@ templ SignIn() {
 
             // Função auxiliar para tratar erros de autenticação
             function parseAuthError(error) {
+                debugLog('Parseando erro de autenticação', { code: error.code, message: error.message });
+                
                 if (error.code) {
                     switch (error.code) {
                         case "auth/email-already-in-use":
@@ -123,6 +213,10 @@ templ SignIn() {
                             return "Popup de login bloqueado pelo navegador.";
                         case "auth/account-exists-with-different-credential":
                             return "Este e-mail já está registrado com outro método. Faça login para vincular.";
+                        case "auth/network-request-failed":
+                            return "Erro de conexão. Verifique sua internet.";
+                        case "auth/unauthorized-domain":
+                            return "Domínio não autorizado para autenticação.";
                         default:
                             return `Erro: ${error.message}`;
                     }
@@ -132,8 +226,13 @@ templ SignIn() {
 
             // Função para exibir mensagens
             function showMessage(message, type) {
+                debugLog(`Exibindo mensagem: ${type}`, { message });
+                
                 const authResult = document.getElementById("auth-result");
-                if (!authResult) return;
+                if (!authResult) {
+                    debugLog('❌ Elemento auth-result não encontrado no DOM');
+                    return;
+                }
 
                 authResult.innerHTML = `
                     <div class="p-3 mb-4 text-sm rounded-lg ${
@@ -145,61 +244,99 @@ templ SignIn() {
                     </div>
                 `;
                 authResult.classList.remove("hidden");
+                debugLog('Mensagem exibida com sucesso');
             }
 
             // Formulário de login
             const signinForm = document.getElementById("email-signin-form");
             if (signinForm) {
+                debugLog('Formulário de login encontrado - configurando event listener');
+                
                 signinForm.addEventListener("submit", async (e) => {
                     e.preventDefault();
+                    debugLog('Formulário de login submetido');
 
                     const formData = new FormData(signinForm);
                     const userData = Object.fromEntries(formData.entries());
+                    
+                    debugLog('Dados do formulário coletados', {
+                        email: userData.email,
+                        hasPassword: !!userData.password
+                    });
 
                     if (!userData.email || !userData.password) {
+                        debugLog('❌ Validação falhou - campos obrigatórios vazios');
                         showMessage("Por favor, preencha e-mail e senha", "error");
                         return;
                     }
 
                     try {
+                        debugLog('Tentando autenticação com email/senha no Firebase...');
                         const userCredential = await signInWithEmailAndPassword(auth, userData.email, userData.password);
+                        
+                        debugLog('✅ Autenticação Firebase bem-sucedida', {
+                            uid: userCredential.user.uid,
+                            email: userCredential.user.email
+                        });
+
                         const idToken = await userCredential.user.getIdToken();
+                        debugLog('Token de ID obtido para login por email');
 
                         // Verifica se há uma credencial pendente para vinculação
                         const pendingCred = localStorage.getItem("pendingCred");
                         const pendingProvider = localStorage.getItem("pendingProvider");
 
                         if (pendingCred && pendingProvider) {
-                            const credential = JSON.parse(pendingCred);
-                            await linkWithCredential(userCredential.user, OAuthProvider.credentialFromJSON(credential));
-                            localStorage.removeItem("pendingCred");
-                            localStorage.removeItem("pendingProvider");
-
-                            const response = await fetch("/api/auth/social-login", {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                    "Authorization": `Bearer ${idToken}`
-                                },
-                                body: JSON.stringify({
-                                    id_token: idToken,
-                                    provider: pendingProvider,
-                                    uid: userCredential.user.uid,
-                                    email: userCredential.user.email,
-                                    name: userCredential.user.displayName
-                                })
+                            debugLog('Detectadas credenciais pendentes - iniciando vinculação', {
+                                provider: pendingProvider
                             });
 
-                            if (!response.ok) {
-                                throw new Error(await response.text());
-                            }
+                            try {
+                                const credential = JSON.parse(pendingCred);
+                                await linkWithCredential(userCredential.user, OAuthProvider.credentialFromJSON(credential));
+                                
+                                debugLog('✅ Vinculação de credenciais bem-sucedida');
+                                
+                                // Limpa credenciais pendentes
+                                localStorage.removeItem("pendingCred");
+                                localStorage.removeItem("pendingProvider");
 
-                            showMessage("Conta vinculada com sucesso!", "success");
-                            setTimeout(() => window.location.href = "/", 2000);
-                            return;
+                                debugLog('Enviando dados de vinculação para o backend...');
+                                const response = await fetch("/api/auth/social-login", {
+                                    method: "POST",
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                        "Authorization": `Bearer ${idToken}`
+                                    },
+                                    body: JSON.stringify({
+                                        id_token: idToken,
+                                        provider: pendingProvider,
+                                        uid: userCredential.user.uid,
+                                        email: userCredential.user.email,
+                                        name: userCredential.user.displayName
+                                    })
+                                });
+
+                                if (!response.ok) {
+                                    throw new Error(await response.text());
+                                }
+
+                                debugLog('✅ Vinculação processada pelo backend com sucesso');
+                                showMessage("Conta vinculada com sucesso!", "success");
+                                setTimeout(() => {
+                                    debugLog('Redirecionando após vinculação...');
+                                    window.location.href = "/";
+                                }, 2000);
+                                return;
+
+                            } catch (linkError) {
+                                debugLog('❌ Erro na vinculação de credenciais', linkError);
+                                // Continue com login normal se a vinculação falhar
+                            }
                         }
 
                         // Login normal
+                        debugLog('Processando login normal no backend...');
                         const response = await fetch("/api/auth/login", {
                             method: "POST",
                             headers: {
@@ -212,20 +349,57 @@ templ SignIn() {
                             })
                         });
 
+                        debugLog('Resposta do backend para login normal', {
+                            status: response.status,
+                            ok: response.ok
+                        });
+
                         if (!response.ok) {
-                            throw new Error(await response.text());
+                            const errorText = await response.text();
+                            debugLog('❌ Erro no backend durante login normal', { error: errorText });
+                            throw new Error(errorText);
                         }
 
+                        debugLog('✅ Login normal processado com sucesso pelo backend');
                         showMessage("Login realizado com sucesso!", "success");
-                        setTimeout(() => window.location.href = "/", 2000);
+                        setTimeout(() => {
+                            debugLog('Redirecionando para home...');
+                            window.location.href = "/";
+                        }, 2000);
+
                     } catch (error) {
-                        console.error("Erro no login:", error);
+                        debugLog('❌ ERRO GERAL NO LOGIN POR EMAIL', {
+                            code: error.code,
+                            message: error.message,
+                            stack: error.stack
+                        });
                         showMessage(parseAuthError(error), "error");
                     }
                 });
+            } else {
+                debugLog('❌ Formulário de login não encontrado no DOM');
             }
-            // Expor handleProviderLogin globalmente
+
+            // Expor funções globalmente
             window.handleProviderLogin = handleProviderLogin;
+            
+            // Expor função de debug para uso manual no console
+            window.debugAuth = {
+                getCurrentUser: () => auth.currentUser,
+                getDebugInfo: () => ({
+                    isLoggedIn: !!auth.currentUser,
+                    user: auth.currentUser,
+                    providers: Object.keys(providers),
+                    debugMode: DEBUG_MODE
+                }),
+                toggleDebug: () => {
+                    window.DEBUG_MODE = !DEBUG_MODE;
+                    debugLog(`Debug mode ${DEBUG_MODE ? 'ativado' : 'desativado'}`);
+                }
+            };
+
+            debugLog('🚀 Sistema de autenticação inicializado completamente');
+            debugLog('💡 Use window.debugAuth no console para funções de debug');
         </script>
     </head>
     <body class="bg-gray-100 dark:bg-gray-900">

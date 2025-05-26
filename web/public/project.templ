@@ -33,67 +33,304 @@ templ Project() {
             const app = initializeApp(firebaseConfig);
             const auth = getAuth(app);
 
-            let currentUID = null;
+            class ProjectFormManager {
+                constructor() {
+                    this.uid = null;
+                    this.isSubmitting = false;
+                    this.init();
+                }
 
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    currentUID = user.uid;
-                    console.log("Usuário logado:", user.email);
-                } else {
-                    alert("Você precisa estar logado para enviar projetos.");
-                    window.location.href = "/signin"; // redirecione se necessário
+                init() {
+                    this.handleAuth();
+                    this.prepareForm();
+                    this.prepareJSONValidation();
+                    this.prefillYear();
+                }
+
+                handleAuth() {
+                    onAuthStateChanged(auth, user => {
+                        if (user) {
+                            this.uid = user.uid;
+                            this.setStatus(`✅ Logado como: ${user.email}`, 'success');
+                            this.toggleForm(true);
+                            console.log('✅ Usuário logado:', {
+                                uid: user.uid,
+                                email: user.email,
+                                displayName: user.displayName,
+                                photoURL: user.photoURL || 'Nenhuma foto de perfil disponível'
+                            });
+                        } else {
+                            this.uid = null;
+                            this.setStatus('❌ Não autenticado - Redirecionando...', 'error');
+                            this.toggleForm(false);
+                            console.log('❌ Nenhum usuário logado');
+                            setTimeout(() => location.href = "/signin", 2000);
+                        }
+                    });
+                }
+
+                prefillYear() {
+                    const year = document.getElementById("year");
+                    if (year && !year.value) year.value = new Date().getFullYear();
+                }
+
+                prepareForm() {
+                    const form = document.getElementById('project-form');
+                    if (form) {
+                        form.addEventListener('submit', e => this.submitHandler(e));
+                    }
+                }
+
+                prepareJSONValidation() {
+                    ['ods', 'members'].forEach(id => {
+                        const field = document.getElementById(id);
+                        if (!field) return;
+
+                        field.addEventListener('input', () => field.classList.remove('json-error', 'json-valid'));
+                        field.addEventListener('blur', () => {
+                            try {
+                                const val = field.value ? JSON.parse(field.value) : [];
+                                if (!Array.isArray(val)) throw new Error();
+                                field.classList.add('json-valid');
+                            } catch {
+                                field.classList.add('json-error');
+                                field.title = 'Deve ser um array JSON válido';
+                            }
+                        });
+                    });
+                }
+
+                async submitHandler(e) {
+                    e.preventDefault();
+                    if (this.isSubmitting) return;
+
+                    if (!this.uid || !auth.currentUser) {
+                        this.showError('Usuário não autenticado. Por favor, faça login novamente.');
+                        setTimeout(() => location.href = "/signin", 2000);
+                        return;
+                    }
+
+                    this.isSubmitting = true;
+                    this.setSubmitButton(true);
+
+                    try {
+                        const data = this.collectData();
+                        console.log('📤 Dados a serem enviados:', data);
+                        
+                        // Validação dos dados
+                        const errors = this.validate(data);
+                        if (errors.length) {
+                            throw new Error(errors.join('\n'));
+                        }
+
+                        // Obter token de autenticação
+                        const idToken = await auth.currentUser.getIdToken(true);
+                        console.log('🔑 Token de autenticação obtido');
+
+                        // Enviar para o backend
+                        const response = await fetch('/api/project', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'Authorization': `Bearer ${idToken}`
+                            },
+                            body: JSON.stringify(data)
+                        });
+
+                        if (!response.ok) {
+                            const errorData = await response.json().catch(() => ({}));
+                            throw new Error(errorData.message || `Erro do servidor: ${response.status}`);
+                        }
+
+                        const result = await response.json();
+                        console.log('✅ Resposta do servidor:', result);
+                        this.handleSuccess(result);
+                    } catch (err) {
+                        console.error('❌ Erro ao enviar projeto:', err);
+                        this.handleError(err.message || 'Erro ao enviar o projeto. Verifique sua conexão ou tente novamente.');
+                    } finally {
+                        this.isSubmitting = false;
+                        this.setSubmitButton(false);
+                    }
+                }
+
+                collectData() {
+                    const val = id => document.getElementById(id)?.value.trim() || '';
+                    const num = id => {
+                        const value = val(id).replace(/\./g, '').replace(',', '.');
+                        return parseFloat(value) || 0;
+                    };
+                    const bool = id => document.getElementById(id)?.checked || false;
+                    const parse = id => {
+                        const raw = val(id);
+                        try {
+                            return raw ? JSON.parse(raw) : [];
+                        } catch {
+                            return [];
+                        }
+                    };
+
+                    return {
+                        title: val('title'),
+                        year: parseInt(val('year')) || new Date().getFullYear(),
+                        location: val('location'),
+                        target_audience: val('target_audience'),
+                        details: val('details'),
+                        impact: val('impact'),
+                        methodology: val('methodology'),
+                        course: val('course') === 'Outro' ? val('other_course') : val('course'),
+                        area: val('area'),
+                        complexity: val('complexity'),
+                        status: val('status') || 'active',
+                        icon: val('icon'),
+                        budget: num('budget'),
+                        materials: val('materials'),
+                        partnerships: val('partnerships'),
+                        ods: parse('ods'),
+                        member_emails: parse('members'),
+                        terms_accepted: bool('terms'),
+                        public_data: bool('public_data'),
+                        created_at: val('created-at'),
+                        updated_at: val('updated-at'),
+                        owner_id: this.uid
+                    };
+                }
+
+                validate(data) {
+                    const req = ['title', 'year', 'location', 'target_audience', 'details', 'impact', 'methodology', 'course', 'area', 'complexity', 'materials', 'partnerships'];
+                    const errors = req.filter(f => !data[f]).map(f => `Campo obrigatório: ${f}`);
+                    if (data.year < 2000 || data.year > new Date().getFullYear() + 5) errors.push('Ano inválido');
+                    if (data.budget < 0) errors.push('Orçamento não pode ser negativo');
+                    if (!data.terms_accepted) errors.push('É necessário aceitar os termos');
+                    if (!data.ods.length) errors.push('Selecione pelo menos um ODS');
+                    if (!data.member_emails.length) errors.push('Adicione pelo menos um membro');
+                    return errors;
+                }
+
+                handleSuccess(result) {
+                    this.setStatus('🎉 Projeto criado com sucesso!', 'success');
+                    
+                    // Mostrar seção de resultado
+                    const resultContainer = document.getElementById('result-container');
+                    resultContainer.classList.remove('hidden');
+                    
+                    // Preencher dados do resultado
+                    this.populateResultSection(result);
+                    
+                    // Resetar formulário
+                    this.resetForm();
+                    
+                    // Notificação
+                    this.showNotification(result);
+                }
+
+                populateResultSection(result) {
+                    // Helper para formatar valores
+                    const formatValue = (value) => value || 'N/A';
+                    const formatArray = (arr) => Array.isArray(arr) && arr.length ? arr.join(', ') : 'N/A';
+                    const formatBoolean = (value) => value ? 'Sim' : 'Não';
+                    const formatCurrency = (value) => value ? `R$ ${value.toFixed(2).replace('.', ',')}` : 'N/A';
+
+                    // Mapear campos para preencher
+                    const fields = {
+                        'result-title': result.title,
+                        'result-year': result.year,
+                        'result-location': result.location,
+                        'result-target_audience': result.target_audience,
+                        'result-status': result.status,
+                        'result-icon': result.icon,
+                        'result-details': result.details,
+                        'result-impact': result.impact,
+                        'result-methodology': result.methodology,
+                        'result-course': result.course,
+                        'result-area': result.area,
+                        'result-complexity': result.complexity,
+                        'result-budget': formatCurrency(result.budget),
+                        'result-materials': result.materials,
+                        'result-partnerships': result.partnerships,
+                        'result-ods': formatArray(result.ods),
+                        'result-member_emails': formatArray(result.member_emails),
+                        'result-terms_accepted': formatBoolean(result.terms_accepted),
+                        'result-public_data': formatBoolean(result.public_data)
+                    };
+
+                    // Preencher cada campo
+                    Object.entries(fields).forEach(([id, value]) => {
+                        const element = document.getElementById(id);
+                        if (element) element.textContent = formatValue(value);
+                    });
+                }
+
+                resetForm() {
+                    const form = document.getElementById('project-form');
+                    form?.reset();
+                    this.prefillYear();
+                    document.getElementById('members-container').innerHTML = '';
+                    document.getElementById('members').value = '';
+                    document.getElementById('ods').value = '';
+                    document.querySelectorAll('.ods-checkbox').forEach(cb => cb.checked = false);
+                    document.getElementById('other-course-container').classList.add('hidden');
+                }
+
+                showNotification(result) {
+                    if ('Notification' in window && Notification.permission === 'granted') {
+                        new Notification('Projeto criado!', {
+                            body: `${result.title || 'Projeto'} foi criado com sucesso.`,
+                            icon: result.icon || '/favicon.ico'
+                        });
+                    }
+                }
+
+                handleError(message) {
+                    console.error('❌ Erro:', message);
+                    this.setStatus(`❌ ${message}`, 'error');
+                    this.showError(message);
+                }
+
+                setStatus(msg, type) {
+                    const el = document.getElementById('auth-status');
+                    if (el) {
+                        el.textContent = msg;
+                        el.className = `status ${type}`;
+                    }
+                }
+
+                setSubmitButton(loading) {
+                    const btn = document.getElementById('submit-btn');
+                    if (btn) {
+                        btn.disabled = loading;
+                        btn.textContent = loading ? '⏳ Enviando...' : '🚀 Enviar Projeto';
+                    }
+                }
+
+                toggleForm(enable) {
+                    const form = document.getElementById('project-form');
+                    if (form) {
+                        form.querySelectorAll('input, textarea, select, button').forEach(el => {
+                            el.disabled = !enable;
+                        });
+                    }
+                }
+
+                showError(msg) {
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'fixed top-4 right-4 bg-red-500 text-white p-4 rounded-lg shadow-lg z-50';
+                    errorDiv.textContent = msg;
+                    document.body.appendChild(errorDiv);
+                    setTimeout(() => errorDiv.remove(), 5000);
+                }
+            }
+
+            // Inicializar quando o DOM estiver pronto
+            document.addEventListener('DOMContentLoaded', () => {
+                new ProjectFormManager();
+                
+                // Solicitar permissão para notificações
+                if ('Notification' in window && Notification.permission === 'default') {
+                    Notification.requestPermission();
                 }
             });
-
-            window.enviarProjeto = async function (event) {
-            event.preventDefault();
-
-            if (!currentUID) {
-                alert("UID do usuário não disponível.");
-                return;
-            }
-
-            const projectData = {
-                title: document.getElementById("title").value,
-                year: parseInt(document.getElementById("year").value),
-                location: document.getElementById("location").value,
-                target_audience: document.getElementById("target_audience").value,
-                details: document.getElementById("details").value,
-                impact: document.getElementById("impact").value,
-                methodology: document.getElementById("methodology").value,
-                icon: document.getElementById("icon").value,
-                status: document.getElementById("status").value,
-                course: document.getElementById("course").value,
-                area: document.getElementById("area").value,
-                complexity: document.getElementById("complexity").value,
-                ods: JSON.parse(document.getElementById("ods").value || "[]"),
-                budget: parseFloat(document.getElementById("budget").value),
-                materials: document.getElementById("materials").value,
-                partnerships: document.getElementById("partnerships").value,
-                terms_accepted: document.getElementById("terms").checked,
-                public_data: document.getElementById("public_data").checked,
-                member_emails: JSON.parse(document.getElementById("members").value || "[]")
-            };
-
-            try {
-                const response = await fetch("/api/project/", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-User-UID": currentUID
-                },
-                    body: JSON.stringify(projectData)
-                });
-                if (!response.ok) {
-                    const msg = await response.text();
-                    alert("Erro: " + msg);
-                } else {
-                    alert("Projeto criado com sucesso!");
-                }
-                } catch (erro) {
-                    alert("Erro ao enviar: " + erro);
-                }
-            }
         </script>
     </head>
     <body class="bg-gray-100 dark:bg-gray-900 min-h-screen flex flex-col">
@@ -390,60 +627,170 @@ templ Project() {
                     </section>
                     <!-- Seção de Resultado -->
                     <section id="result-container" class="hidden">
-                        <div class="text-center py-8">
-                            <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 dark:bg-green-900">
-                                <svg class="h-10 w-10 text-green-600 dark:text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                </svg>
+                        <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl border-l-4 border-green mx-auto max-w-4xl">
+                            <div class="text-center mb-6">
+                                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 dark:bg-green-900">
+                                    <svg class="h-8 w-8 text-green-600 dark:text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </div>
+                                <h2 class="mt-4 text-2xl font-bold text-green dark:text-green-300">Projeto Cadastrado com Sucesso!</h2>
+                                <p class="mt-2 text-md text-gray-600 dark:text-gray-300">Seu projeto foi registrado em nosso sistema.</p>
                             </div>
-                            <h2 class="mt-4 text-3xl font-bold text-green-600 dark:text-green-300">Projeto Cadastrado com Sucesso!</h2>
-                            <p class="mt-2 text-lg text-gray-600 dark:text-gray-300">Seu projeto foi registrado em nosso sistema.</p>
-                            <div class="mt-8 bg-gray-50 dark:bg-gray-700 rounded-lg p-6 text-left">
-                                <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Resumo do Projeto</h3>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Título</p>
-                                        <p id="result-title" class="text-lg font-medium text-gray-900 dark:text-white"></p>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Ano</p>
-                                        <p id="result-year" class="text-lg font-medium text-gray-900 dark:text-white"></p>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Status</p>
-                                        <p id="result-status" class="text-lg font-medium text-gray-900 dark:text-white"></p>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Código do Projeto</p>
-                                        <p id="result-id" class="text-lg font-medium text-gray-900 dark:text-white"></p>
+                            <div class="space-y-6">
+                                <!-- Basic Information -->
+                                <div>
+                                    <h3 class="text-lg font-bold text-green mb-4 flex items-center gap-3">
+                                        <span class="text-xl">📋</span> Informações Básicas
+                                    </h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Título</p>
+                                            <p id="result-title" class="text-md text-gray-900 dark:text-white">N/A</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Ano</p>
+                                            <p id="result-year" class="text-md text-gray-900 dark:text-white">N/A</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Localização</p>
+                                            <p id="result-location" class="text-md text-gray-900 dark:text-white">N/A</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Público-Alvo</p>
+                                            <p id="result-target_audience" class="text-md text-gray-900 dark:text-white">N/A</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Status</p>
+                                            <p id="result-status" class="text-md text-gray-900 dark:text-white">N/A</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Ícone</p>
+                                            <p id="result-icon" class="text-md text-gray-900 dark:text-white">N/A</p>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="mt-6">
-                                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Próximos Passos</p>
-                                    <ul class="mt-2 space-y-2">
+                                <!-- Project Details -->
+                                <div>
+                                    <h3 class="text-lg font-bold text-green mb-4 flex items-center gap-3">
+                                        <span class="text-xl">✨</span> Detalhes do Projeto
+                                    </h3>
+                                    <div class="space-y-4">
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Descrição</p>
+                                            <p id="result-details" class="text-md text-gray-900 dark:text-white">N/A</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Impacto Esperado</p>
+                                            <p id="result-impact" class="text-md text-gray-900 dark:text-white">N/A</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Metodologia</p>
+                                            <p id="result-methodology" class="text-md text-gray-900 dark:text-white">N/A</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Classification -->
+                                <div>
+                                    <h3 class="text-lg font-bold text-green mb-4 flex items-center gap-3">
+                                        <span class="text-xl">🏷️</span> Classificação
+                                    </h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Curso</p>
+                                            <p id="result-course" class="text-md text-gray-900 dark:text-white">N/A</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Área de Atuação</p>
+                                            <p id="result-area" class="text-md text-gray-900 dark:text-white">N/A</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Complexidade</p>
+                                            <p id="result-complexity" class="text-md text-gray-900 dark:text-white">N/A</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Resources -->
+                                <div>
+                                    <h3 class="text-lg font-bold text-green mb-4 flex items-center gap-3">
+                                        <span class="text-xl">💼</span> Recursos
+                                    </h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Orçamento (R$)</p>
+                                            <p id="result-budget" class="text-md text-gray-900 dark:text-white">N/A</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Materiais</p>
+                                            <p id="result-materials" class="text-md text-gray-900 dark:text-white">N/A</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Parcerias</p>
+                                            <p id="result-partnerships" class="text-md text-gray-900 dark:text-white">N/A</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- ODS and Members -->
+                                <div>
+                                    <h3 class="text-lg font-bold text-green mb-4 flex items-center gap-3">
+                                        <span class="text-xl">🌎</span> ODS e Membros
+                                    </h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">ODS Relacionados</p>
+                                            <p id="result-ods" class="text-md text-gray-900 dark:text-white">N/A</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Membros</p>
+                                            <p id="result-member_emails" class="text-md text-gray-900 dark:text-white">N/A</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Terms -->
+                                <div>
+                                    <h3 class="text-lg font-bold text-green mb-4 flex items-center gap-3">
+                                        <span class="text-xl">📜</span> Termos
+                                    </h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Termos Aceitos</p>
+                                            <p id="result-terms_accepted" class="text-md text-gray-900 dark:text-white">N/A</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Dados Públicos</p>
+                                            <p id="result-public_data" class="text-md text-gray-900 dark:text-white">N/A</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Next Steps -->
+                                <div>
+                                    <h3 class="text-lg font-bold text-green mb-4 flex items-center gap-3">
+                                        <span class="text-xl">🚀</span> Próximos Passos
+                                    </h3>
+                                    <ul class="space-y-2">
                                         <li class="flex items-start">
-                                            <span class="flex-shrink-0 text-green-500">•</span>
-                                            <span class="ml-2 text-gray-700 dark:text-gray-300">Você receberá um e-mail de confirmação</span>
+                                            <span class="flex-shrink-0 text-green">•</span>
+                                            <span class="ml-2 text-md text-gray-700 dark:text-gray-300">Você receberá um e-mail de confirmação</span>
                                         </li>
                                         <li class="flex items-start">
-                                            <span class="flex-shrink-0 text-green-500">•</span>
-                                            <span class="ml-2 text-gray-700 dark:text-gray-300">Acompanhe o progresso na área de projetos</span>
+                                            <span class="flex-shrink-0 text-green">•</span>
+                                            <span class="ml-2 text-md text-gray-700 dark:text-gray-300">Acompanhe o progresso na área de projetos</span>
                                         </li>
                                         <li class="flex items-start">
-                                            <span class="flex-shrink-0 text-green-500">•</span>
-                                            <span class="ml-2 text-gray-700 dark:text-gray-300">Adicione mais detalhes quando necessário</span>
+                                            <span class="flex-shrink-0 text-green">•</span>
+                                            <span class="ml-2 text-md text-gray-700 dark:text-gray-300">Adicione mais detalhes quando necessário</span>
                                         </li>
                                     </ul>
                                 </div>
                             </div>
-                            <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4">
-                                <button onclick="window.location.href='/projects/new'" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2">
+                            <div class="mt-6 flex flex-col sm:flex-row justify-center gap-4">
+                                <button onclick="window.location.href='/projects/new'" class="px-6 py-3 bg-blue text-white rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                     </svg>
                                     Novo Projeto
                                 </button>
-                                <button onclick="window.location.href='/projects'" class="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition flex items-center justify-center gap-2">
+                                <button onclick="window.location.href='/projects'" class="px-6 py-3 bg-purple text-white rounded-lg hover:bg-purple-700 transition flex items-center justify-center gap-2">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                                     </svg>
@@ -452,6 +799,7 @@ templ Project() {
                             </div>
                         </div>
                     </section>
+                    <div id="auth-status" class="status text-center mb-4 text-lg"></div>
                     <!-- Datas (automáticas) -->
                     <input type="hidden" name="created_at" id="created-at">
                     <input type="hidden" name="updated_at" id="updated-at">
@@ -463,7 +811,7 @@ templ Project() {
                             <span class="animate-pulse">🗑️</span> Limpar Campos
                         </button>
                         <!-- Botão salvar -->
-                        <button type="submit"
+                        <button type="submit" id="submit-btn"
                             class="px-6 py-3 bg-green text-gray-100 font-medium rounded-lg transition-all duration-300 ease-in-out hover:bg-green/2 hover:scale-105 hover:ring-4 hover:ring-green/10 flex items-center justify-center gap-2 text-lg shadow-md">
                             <span class="animate-bounce">💾</span> Salvar Projeto
                         </button>
@@ -665,49 +1013,6 @@ templ Project() {
                     document.body.appendChild(modal);
                 }
             };
-
-            // Manipulação do formulário tradicional
-            document.getElementById('project-form').addEventListener('submit', async function(e) {
-                e.preventDefault();
-                
-                try {
-                    // Converter campos necessários (como o orçamento)
-                    const budgetInput = document.getElementById('budget');
-                    if (budgetInput.value) {
-                        budgetInput.value = budgetInput.value.replace(/\./g, '').replace(',', '.');
-                    }
-                    
-                    // Enviar o formulário via fetch
-                    const formData = new FormData(this);
-                    const response = await fetch(this.action, {
-                        method: 'POST',
-                        body: formData
-                    });
-                    
-                    if (!response.ok) throw new Error('Erro no servidor');
-                    
-                    const data = await response.json();
-                    
-                    // Preencher os dados do resultado
-                    document.getElementById('result-title').textContent = data.title || 'Não informado';
-                    document.getElementById('result-year').textContent = data.year || 'Não informado';
-                    document.getElementById('result-status').textContent = 
-                        data.status === 'active' ? 'Ativo' : 
-                        data.status === 'completed' ? 'Concluído' : 'Arquivado';
-                    document.getElementById('result-id').textContent = data.id || 'Não disponível';
-                    
-                    // Mostrar resultado e esconder formulário
-                    this.style.display = 'none';
-                    document.getElementById('result-container').classList.remove('hidden');
-                    
-                    // Rolagem suave para o topo
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                    
-                } catch (error) {
-                    console.error('Erro:', error);
-                    alert('Ocorreu um erro ao enviar o formulário. Por favor, tente novamente.');
-                }
-            });
         </script>
     </body>
     </html>
