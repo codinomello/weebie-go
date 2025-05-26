@@ -3,14 +3,14 @@ package private
 import (
     "time"
 
-    "github.com/codinomello/weebie-go/web/components"
+    components "github.com/codinomello/weebie-go/web/components"
     "github.com/codinomello/weebie-go/api/models"
 )
 
 type User *models.User
 
 templ Profile(user User) {
-    <html lang="pt-BR">
+    <html lang="pt-BR" class="scroll-smooth">
     <head>
         <!-- Meta Tags -->
         @components.Meta()
@@ -76,10 +76,11 @@ templ Profile(user User) {
             console.log('💡 Use window.checkAuth() no console para verificar o usuário');
         </script>
     </head>
-    <body class="bg-gray-100 dark:bg-gray-900">
+    <body class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 text-gray-900 dark:text-gray-100 transition-colors duration-300">
         <!-- Navegação  -->
         @components.Nav("Meu Perfil", "house_with_garden.png")
         
+        <section>
         <!-- Conteúdo Principal -->
         <div class="container mx-auto px-4 py-8">
             <div class="flex flex-col md:flex-row gap-8">
@@ -128,7 +129,7 @@ templ Profile(user User) {
                             }
                             
                             <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
-                                <button class="w-full bg-blue text-white py-2 rounded-lg hover:bg-blue/80 transition flex items-center justify-center gap-2">
+                                <button class="w-full bg-blue text-white py-2 rounded-lg hover:bg-blue/80 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2">
                                     <span>✏️</span> Editar Perfil
                                 </button>
                             </div>
@@ -273,6 +274,7 @@ templ Profile(user User) {
                 </div>
             </div>
         </div>
+        </section>
         <!-- Footer -->
         @components.FooterMain()
     </body>
