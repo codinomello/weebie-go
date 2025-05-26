@@ -98,10 +98,12 @@ templ Profile(user User) {
                             <div>
                                 <h4 class="font-semibold text-sm text-gray-500 dark:text-gray-400">Gênero</h4>
                                 <p class="dark:text-gray-300">
-                                    if user.Sex == 'M' {
+                                    if user.Sex == "male" {
                                         Masculino
-                                    } else if user.Sex == 'F' {
+                                    } else if user.Sex == "female" {
                                         Feminino
+                                    } else if user.Sex == "other" {
+                                        Outro
                                     } else {
                                         Não informado
                                     }

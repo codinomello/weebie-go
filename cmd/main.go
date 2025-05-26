@@ -65,9 +65,10 @@ func main() {
 	userController := controllers.NewUserController(userRepository)
 	projectController := controllers.NewProjectController(projectRepository, userRepository, memberRepository)
 	memberController := controllers.NewMemberController(memberRepository)
+	odsController := controllers.NewODSController()
 
 	// Criação do roteador de servidores HTTP
-	router := routes.SetupRoutes(authController, userController, projectController, memberController)
+	router := routes.SetupRoutes(authController, userController, projectController, memberController, odsController)
 
 	// Porta principal do servidor HTTP
 	port := os.Getenv("PORT")
@@ -91,14 +92,8 @@ func main() {
 	// Goroutine para iniciar o servidor
 	go func() {
 		log.Println("🚀 servidor pronto para receber requisições!")
-		log.Println("📋 endpoints disponíveis:")
-		log.Println(" ➕ POST   /api/users/verify")
-		// log.Println(" ➕ POST   /api/users/signup")
-		// log.Println(" ➕ POST   /api/users/signin")
-		// log.Println(" ➕ POST   /api/users/signout")
-		// log.Println(" 🔍 GET    /api/users/{uid}")
-		// log.Println(" ✏️  PUT    /api/users/{uid}")
-		// log.Println(" 🗑️  DELETE /api/users/{uid}")
+		// log.Println("📋 endpoints disponíveis:")
+		routes.LogAvailableRoutes()
 		log.Printf("🌐 servidor iniciado em: http://localhost:%s", port)
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("❌ erro ao inicializar servidor: %v", err)

@@ -307,23 +307,28 @@ func Profile(user User) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if user.Sex == 'M' {
+		if user.Sex == "male" {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "Masculino")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-		} else if user.Sex == 'F' {
+		} else if user.Sex == "female" {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "Feminino")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
+		} else if user.Sex == "other" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "Outro")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "Não informado")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "Não informado")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "</p></div><div><h4 class=\"font-semibold text-sm text-gray-500 dark:text-gray-400\">Idade</h4><p class=\"dark:text-gray-300\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "</p></div><div><h4 class=\"font-semibold text-sm text-gray-500 dark:text-gray-400\">Idade</h4><p class=\"dark:text-gray-300\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -331,23 +336,23 @@ func Profile(user User) templ.Component {
 			var templ_7745c5c3_Var17 string
 			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(user.Age)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/private/profile.templ`, Line: 115, Col: 50}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/private/profile.templ`, Line: 117, Col: 50}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, " anos")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, " anos")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "Não informada")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "Não informada")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</p></div><div><h4 class=\"font-semibold text-sm text-gray-500 dark:text-gray-400\">CPF</h4><p class=\"dark:text-gray-300\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "</p></div><div><h4 class=\"font-semibold text-sm text-gray-500 dark:text-gray-400\">CPF</h4><p class=\"dark:text-gray-300\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -355,19 +360,19 @@ func Profile(user User) templ.Component {
 			var templ_7745c5c3_Var18 string
 			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(formatCPF(user.CPF))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/private/profile.templ`, Line: 126, Col: 61}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/private/profile.templ`, Line: 128, Col: 61}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "Não informado")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "Não informado")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "</p></div><div><h4 class=\"font-semibold text-sm text-gray-500 dark:text-gray-400\">RG</h4><p class=\"dark:text-gray-300\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "</p></div><div><h4 class=\"font-semibold text-sm text-gray-500 dark:text-gray-400\">RG</h4><p class=\"dark:text-gray-300\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -375,47 +380,47 @@ func Profile(user User) templ.Component {
 			var templ_7745c5c3_Var19 string
 			templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(user.RG)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/private/profile.templ`, Line: 137, Col: 49}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/private/profile.templ`, Line: 139, Col: 49}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "Não informado")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "Não informado")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "</p></div><div><h4 class=\"font-semibold text-sm text-gray-500 dark:text-gray-400\">Termos Aceitos</h4><p class=\"dark:text-gray-300\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "</p></div><div><h4 class=\"font-semibold text-sm text-gray-500 dark:text-gray-400\">Termos Aceitos</h4><p class=\"dark:text-gray-300\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if user.Terms {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "<span class=\"text-green\">✓ Sim</span>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "<span class=\"text-green\">✓ Sim</span>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "<span class=\"text-red\">✗ Não</span>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "<span class=\"text-red\">✗ Não</span>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "</p></div></div></div><!-- Seção de Atividades --><div class=\"bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8\"><div class=\"flex justify-between items-center mb-6\"><h3 class=\"text-xl font-bold text-orange dark:text-golden\">Minhas Atividades</h3><div class=\"flex gap-2\"><button class=\"text-sm bg-blue text-white px-3 py-1 rounded hover:bg-blue/80 transition\">Projetos</button> <button class=\"text-sm border border-gray-300 px-3 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition\">Contribuições</button></div></div><div class=\"space-y-4\"><!-- Exemplo de atividade --><div class=\"p-4 border rounded-lg hover:shadow-md transition\"><div class=\"flex items-start gap-3\"><div class=\"text-blue text-xl\">🌱</div><div><h4 class=\"font-semibold dark:text-gray-200\">Você criou um novo projeto</h4><p class=\"text-sm text-gray-500 dark:text-gray-400\">Horta Comunitária - 3 dias atrás</p><p class=\"mt-2 text-sm dark:text-gray-300\">Projeto de cultivo coletivo iniciado no bairro Jardim das Flores</p></div></div></div><!-- Adicione mais atividades conforme necessário --></div></div><!-- Seção de Segurança --><div class=\"bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6\"><h3 class=\"text-xl font-bold text-orange dark:text-golden mb-6\">Segurança da Conta</h3><div class=\"space-y-4\"><div class=\"flex justify-between items-center p-4 border rounded-lg\"><div><h4 class=\"font-semibold dark:text-gray-200\">Alterar Senha</h4><p class=\"text-sm text-gray-500 dark:text-gray-400\">Última alteração: ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "</p></div></div></div><!-- Seção de Atividades --><div class=\"bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8\"><div class=\"flex justify-between items-center mb-6\"><h3 class=\"text-xl font-bold text-orange dark:text-golden\">Minhas Atividades</h3><div class=\"flex gap-2\"><button class=\"text-sm bg-blue text-white px-3 py-1 rounded hover:bg-blue/80 transition\">Projetos</button> <button class=\"text-sm border border-gray-300 px-3 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition\">Contribuições</button></div></div><div class=\"space-y-4\"><!-- Exemplo de atividade --><div class=\"p-4 border rounded-lg hover:shadow-md transition\"><div class=\"flex items-start gap-3\"><div class=\"text-blue text-xl\">🌱</div><div><h4 class=\"font-semibold dark:text-gray-200\">Você criou um novo projeto</h4><p class=\"text-sm text-gray-500 dark:text-gray-400\">Horta Comunitária - 3 dias atrás</p><p class=\"mt-2 text-sm dark:text-gray-300\">Projeto de cultivo coletivo iniciado no bairro Jardim das Flores</p></div></div></div><!-- Adicione mais atividades conforme necessário --></div></div><!-- Seção de Segurança --><div class=\"bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6\"><h3 class=\"text-xl font-bold text-orange dark:text-golden mb-6\">Segurança da Conta</h3><div class=\"space-y-4\"><div class=\"flex justify-between items-center p-4 border rounded-lg\"><div><h4 class=\"font-semibold dark:text-gray-200\">Alterar Senha</h4><p class=\"text-sm text-gray-500 dark:text-gray-400\">Última alteração: ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var20 string
 		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(formatDate(user.UpdatedAt))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/private/profile.templ`, Line: 196, Col: 137}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/private/profile.templ`, Line: 198, Col: 137}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "</p></div><button class=\"text-blue hover:underline\">Alterar</button></div><div class=\"flex justify-between items-center p-4 border rounded-lg\"><div><h4 class=\"font-semibold dark:text-gray-200\">Sessões Ativas</h4><p class=\"text-sm text-gray-500 dark:text-gray-400\">Dispositivos com acesso à sua conta</p></div><button class=\"text-blue hover:underline\">Gerenciar</button></div><div class=\"p-4 border border-red/20 rounded-lg bg-red/5\"><h4 class=\"font-semibold text-red dark:text-red/80 mb-2\">Encerrar Conta</h4><p class=\"text-sm text-gray-500 dark:text-gray-400 mb-3\">Esta ação é irreversível. Todos os seus dados serão removidos permanentemente.</p><button class=\"text-sm border border-red text-red px-3 py-1 rounded hover:bg-red/10 transition\">Encerrar minha conta</button></div></div></div></div></div></div><!-- Footer -->")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "</p></div><button class=\"text-blue hover:underline\">Alterar</button></div><div class=\"flex justify-between items-center p-4 border rounded-lg\"><div><h4 class=\"font-semibold dark:text-gray-200\">Sessões Ativas</h4><p class=\"text-sm text-gray-500 dark:text-gray-400\">Dispositivos com acesso à sua conta</p></div><button class=\"text-blue hover:underline\">Gerenciar</button></div><div class=\"p-4 border border-red/20 rounded-lg bg-red/5\"><h4 class=\"font-semibold text-red dark:text-red/80 mb-2\">Encerrar Conta</h4><p class=\"text-sm text-gray-500 dark:text-gray-400 mb-3\">Esta ação é irreversível. Todos os seus dados serão removidos permanentemente.</p><button class=\"text-sm border border-red text-red px-3 py-1 rounded hover:bg-red/10 transition\">Encerrar minha conta</button></div></div></div></div></div></div><!-- Footer -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -423,7 +428,7 @@ func Profile(user User) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 42, "</body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "</body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

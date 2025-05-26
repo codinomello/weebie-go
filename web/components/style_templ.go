@@ -66,4 +66,33 @@ func StyleToggleTheme() templ.Component {
 	})
 }
 
+func StyleAnimations() templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var3 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var3 == nil {
+			templ_7745c5c3_Var3 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<style>\r\n        @keyframes fadeIn {\r\n            from { opacity: 0; }\r\n            to { opacity: 1; }\r\n        }\r\n\r\n        @keyframes slideUp {\r\n            from { \r\n                opacity: 0;\r\n                transform: translateY(20px);\r\n            }\r\n            to { \r\n                opacity: 1;\r\n                transform: translateY(0);\r\n            }\r\n        }\r\n\r\n        @keyframes float {\r\n            0%, 100% { transform: translateY(0); }\r\n            50% { transform: translateY(-10px); }\r\n        }\r\n\r\n        @keyframes bounceSlow {\r\n            0%, 100% { transform: translateY(0); }\r\n            50% { transform: translateY(-15px); }\r\n        }\r\n\r\n        @keyframes pingOnce {\r\n            0% { transform: scale(1); opacity: 0.7; }\r\n            100% { transform: scale(1.5); opacity: 0; }\r\n        }\r\n\r\n        .animate-fadeIn { animation: fadeIn 1s ease-out; }\r\n        .animate-slideUp { animation: slideUp 0.8s ease-out forwards; }\r\n        .animate-float { animation: float 3s ease-in-out infinite; }\r\n        .animate-bounceSlow { animation: bounceSlow 3s ease-in-out infinite; }\r\n        .animate-pingOnce { animation: pingOnce 0.6s ease-out; }\r\n\r\n        .delay-100 { animation-delay: 0.1s; }\r\n        .delay-200 { animation-delay: 0.2s; }\r\n\r\n        /* Efeito de digitação */\r\n        .typing-effect {\r\n            border-right: 2px solid;\r\n            white-space: nowrap;\r\n            overflow: hidden;\r\n            animation: \r\n                typing 3.5s steps(40, end),\r\n                blink-caret 0.75s step-end infinite;\r\n        }\r\n\r\n        @keyframes typing {\r\n            from { width: 0 }\r\n            to { width: 100% }\r\n        }\r\n\r\n        @keyframes blink-caret {\r\n            from, to { border-color: transparent }\r\n            50% { border-color: orange; }\r\n        }\r\n    </style>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
 var _ = templruntime.GeneratedTemplate

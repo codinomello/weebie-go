@@ -6,16 +6,19 @@ import (
 	"github.com/codinomello/weebie-go/api/controllers"
 )
 
+// AuthHandler é o manipulador de autenticação
 type AuthHandler struct {
 	AuthController *controllers.AuthController
 }
 
+// NewAuthHandler cria um novo AuthHandler
 func NewAuthHandler(authCtrl *controllers.AuthController) *AuthHandler {
 	return &AuthHandler{
 		AuthController: authCtrl,
 	}
 }
 
+// RegisterUser registra um novo usuário
 func (h *AuthHandler) RegisterUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
@@ -26,7 +29,7 @@ func (h *AuthHandler) RegisterUser() http.HandlerFunc {
 	}
 }
 
-// Login com Firebase ID Token (recomendado)
+// LoginWithToken autentica o usuário com um token de autenticação
 func (h *AuthHandler) LoginWithToken() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
@@ -37,6 +40,18 @@ func (h *AuthHandler) LoginWithToken() http.HandlerFunc {
 	}
 }
 
+// LoginWithSocial autentica o usuário com um token social
+func (h *AuthHandler) LoginWithSocial() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
+			return
+		}
+		h.AuthController.LoginWithSocial(w, r)
+	}
+}
+
+// CreateToken cria um novo token de autenticação para o usuário
 func (h *AuthHandler) CreateToken() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
@@ -47,6 +62,7 @@ func (h *AuthHandler) CreateToken() http.HandlerFunc {
 	}
 }
 
+// VerifyToken verifica o token de autenticação do usuário
 func (h *AuthHandler) VerifyToken() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
@@ -57,6 +73,7 @@ func (h *AuthHandler) VerifyToken() http.HandlerFunc {
 	}
 }
 
+// RevokeToken revoga o token de autenticação do usuário
 func (h *AuthHandler) RevokeSession() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
@@ -67,6 +84,7 @@ func (h *AuthHandler) RevokeSession() http.HandlerFunc {
 	}
 }
 
+// RefreshToken atualiza o token de autenticação do usuário
 func (h *AuthHandler) RefreshToken() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {

@@ -23,13 +23,13 @@ templ SignUp() {
             
             // Configuração do Firebase para o app web
             const firebaseConfig = {
-            apiKey: "AIzaSyAI0Tc7GssKwWwtVdrz6OaK6KFACx58N5U",
-            authDomain: "weebie-go.firebaseapp.com",
-            projectId: "weebie-go",
-            storageBucket: "weebie-go.appspot.com",
-            messagingSenderId: "321509944065",
-            appId: "1:321509944065:web:199a546b7055f461ec4900",
-            measurementId: "G-S5CG0CLRVS"
+                apiKey: "AIzaSyAI0Tc7GssKwWwtVdrz6OaK6KFACx58N5U",
+                authDomain: "weebie-go.firebaseapp.com",
+                projectId: "weebie-go",
+                storageBucket: "weebie-go.appspot.com",
+                messagingSenderId: "321509944065",
+                appId: "1:321509944065:web:199a546b7055f461ec4900",
+                measurementId: "G-S5CG0CLRVS"
             };
 
             // Inicializando o Firebase
@@ -40,141 +40,123 @@ templ SignUp() {
 
             // Listener para envio do formulário
             signupForm?.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            
-            // Obtendo dados do formulário
-            const formData = new FormData(signupForm);
-            const userData = Object.fromEntries(formData.entries());
-            
-            // Validação básica
-            if (!userData.email || !userData.password) {
-                showMessage("Por favor, preencha e-mail e senha", "error");
-                return;
-            }
-
-            if (!userData.name || !userData.age || !userData.cpf || !userData.rg) {
-                showMessage("Por favor, preencha todos os campos obrigatórios", "error");
-                return;
-            }
-
-            try {
-                // Cria usuário com Firebase Auth
-                const userCredential = await createUserWithEmailAndPassword(
-                    auth,
-                    userData.email,
-                    userData.password
-                );
-                
-                // Obtém o token de ID do Firebase
-                const idToken = await userCredential.user.getIdToken();
-                
-                // Prepara os dados completos do usuário
-                const completeUserData = {
-                    // Dados básicos
-                    name: userData.name,
-                    email: userData.email,
-                    phone: userData.phone,
-                    age: parseInt(userData.age) || 0,
-                    cpf: userData.cpf,
-                    rg: userData.rg,
-                    sex: userData.sex,
-                    
-                    // Endereço
-                    cep: userData.cep,
-                    address: userData.address,
-                    number: userData.number,
-                    complement: userData.complement || "",
-                    neighborhood: userData.neighborhood,
-                    city: userData.city,
-                    state: userData.state,
-                    
-                    // Autenticação
-                    password: userData.password,
-                    id_token: idToken,
-                    uid: userCredential.user.uid,
-                    role: "user",
-                    status: "active"
-                };
-
-                console.log("Enviando dados:", completeUserData);
-
-                // Envia dados para o backend
-                const response = await fetch("/api/auth/register", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(completeUserData)
-                });
-
-                const responseData = await response.text();
-                console.log("Resposta do servidor:", responseData);
-
-                if (!response.ok) {
-                // Se o backend falhar, remove o usuário do Firebase
-                await userCredential.user.delete();
-                
-                let errorMessage;
+                e.preventDefault();
+                // Obtendo dados do formulário
+                const formData = new FormData(signupForm);
+                const userData = Object.fromEntries(formData.entries());
+                // Validação básica
+                if (!userData.email || !userData.password) {
+                    showMessage("Por favor, preencha e-mail e senha", "error");
+                    return;
+                }
+                if (!userData.name || !userData.age || !userData.cpf || !userData.rg) {
+                    showMessage("Por favor, preencha todos os campos obrigatórios", "error");
+                    return;
+                }
                 try {
-                    const errorData = JSON.parse(responseData);
-                    errorMessage = errorData.message || responseData;
-                } catch {
-                    errorMessage = responseData;
-                }
-                
-                throw new Error(errorMessage);
-                }
+                    // Cria usuário com Firebase Auth
+                    const userCredential = await createUserWithEmailAndPassword(
+                        auth,
+                        userData.email,
+                        userData.password
+                    );
+                    // Obtém o token de ID do Firebase
+                    const idToken = await userCredential.user.getIdToken();
+                    // Prepara os dados completos do usuário
+                    const completeUserData = {
+                        // Dados básicos
+                        name: userData.name,
+                        email: userData.email,
+                        phone: userData.phone,
+                        age: parseInt(userData.age) || 0,
+                        cpf: userData.cpf,
+                        rg: userData.rg,
+                        sex: userData.sex,
+                        // Endereço
+                        cep: userData.cep,
+                        address: userData.address,
+                        number: userData.number,
+                        complement: userData.complement || "",
+                        neighborhood: userData.neighborhood,
+                        city: userData.city,
+                        state: userData.state,
+                        // Autenticação
+                        password: userData.password,
+                        id_token: idToken,
+                        uid: userCredential.user.uid,
+                        role: "user",
+                        status: "active"
+                    };
+                    console.log("Enviando dados:", completeUserData);
+                    // Envia dados para o backend
+                    const response = await fetch("/api/auth/register", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(completeUserData)
+                    });
+                    const responseData = await response.text();
+                    console.log("Resposta do servidor:", responseData);
+                    if (!response.ok) {
+                        // Se o backend falhar, remove o usuário do Firebase
+                        await userCredential.user.delete();
+                        let errorMessage;
+                        try {
+                            const errorData = JSON.parse(responseData);
+                            errorMessage = errorData.message || responseData;
+                        } catch {
+                            errorMessage = responseData;
+                        }
+                        throw new Error(errorMessage);
+                    }
 
-                // Sucesso - redireciona
-                showMessage("Cadastro realizado com sucesso!", "success");
-                setTimeout(() => window.location.href = "/signin", 2000);
-                
-            } catch (error) {
-                console.error("Erro no cadastro:", error);
-                showMessage(parseAuthError(error), "error");
-            }
+                    // Sucesso - redireciona
+                    showMessage("Cadastro realizado com sucesso!", "success");
+                    setTimeout(() => window.location.href = "/signin", 2000);
+                } catch (error) {
+                    console.error("Erro no cadastro:", error);
+                    showMessage(parseAuthError(error), "error");
+                }
             });
-
             // Função auxiliar para tratar erros de autenticação
             function parseAuthError(error) {
-            if (error.code) {
-                switch (error.code) {
-                case 'auth/email-already-in-use':
-                    return 'Este e-mail já está cadastrado.';
-                case 'auth/invalid-email':
-                    return 'E-mail inválido.';
-                case 'auth/weak-password':
-                    return 'Senha muito fraca (mínimo 6 caracteres).';
-                case 'auth/operation-not-allowed':
-                    return 'Operação não permitida.';
-                default:
-                    return `Erro: ${error.message}`;
+                if (error.code) {
+                    switch (error.code) {
+                    case 'auth/email-already-in-use':
+                        return 'Este e-mail já está cadastrado.';
+                    case 'auth/invalid-email':
+                        return 'E-mail inválido.';
+                    case 'auth/weak-password':
+                        return 'Senha muito fraca (mínimo 6 caracteres).';
+                    case 'auth/operation-not-allowed':
+                        return 'Operação não permitida.';
+                    default:
+                        return `Erro: ${error.message}`;
+                    }
                 }
+                return error.message || 'Ocorreu um erro desconhecido.';
             }
-            return error.message || 'Ocorreu um erro desconhecido.';
-            }
-
             // Função para exibir mensagens
             function showMessage(message, type) {
-            const authResult = document.getElementById("auth-result");
-            if (!authResult) return;
-
-            authResult.innerHTML = `
-                <div class="p-3 mb-4 text-sm rounded-lg ${
-                type === 'success' 
-                    ? 'bg-green-100 text-green-700 dark:bg-green-200 dark:text-green-800' 
-                    : 'bg-red-100 text-red-700 dark:bg-red-200 dark:text-red-800'
-                }">
-                ${message}
-                </div>
-            `;
-            authResult.classList.remove("hidden");
+                const authResult = document.getElementById("auth-result");
+                if (!authResult) return;
+                authResult.innerHTML = `
+                    <div class="p-3 mb-4 text-sm rounded-lg ${
+                    type === 'success' 
+                        ? 'bg-green-100 text-green-700 dark:bg-green-200 dark:text-green-800' 
+                        : 'bg-red-100 text-red-700 dark:bg-red-200 dark:text-red-800'
+                    }">
+                    ${message}
+                    </div>
+                `;
+                authResult.classList.remove("hidden");
             }
         </script>
     </head>
     <body class="bg-gray-100 dark:bg-gray-900">
         <!-- Header -->
-        @components.Nav("Weebie", "art.png")
+        @components.Nav("Inscreva-se", "art.png")
         <!-- Formulário de Login/Cadastro -->
         <main class="flex-grow flex items-center justify-center p-4 pt-8">
             <div class="w-full max-w-xl">

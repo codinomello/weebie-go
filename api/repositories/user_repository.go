@@ -43,7 +43,7 @@ func (r *MongoDBUserRepository) CreateUser(ctx context.Context, user *models.Use
 	}
 	user.DeletedAt = nil
 
-	log.Printf("Inserindo usuário no MongoDB: UID=%s, Email=%s", user.UID, user.Email)
+	log.Printf("⛏ inserindo usuário no MongoDB: UID=%s, Email=%s", user.UID, user.Email)
 
 	result, err := r.UsersCollection.InsertOne(ctx, user)
 	if err != nil {
@@ -68,8 +68,7 @@ func (r *MongoDBUserRepository) GetUserByUID(ctx context.Context, uid string) (*
 			{"deleted_at": bson.M{"$exists": false}},
 		},
 	}
-
-	log.Printf("Buscando usuário por UID: %s", uid)
+	log.Printf("🔍 buscando usuário por UID: %s", uid)
 
 	err := r.UsersCollection.FindOne(ctx, filter).Decode(&user)
 	if err != nil {
@@ -81,7 +80,7 @@ func (r *MongoDBUserRepository) GetUserByUID(ctx context.Context, uid string) (*
 		return nil, err
 	}
 
-	log.Printf("Usuário encontrado: %s", user.Email)
+	log.Printf("✨ usuário encontrado: %s", user.Email)
 	return &user, nil
 }
 
@@ -146,7 +145,7 @@ func (r *MongoDBUserRepository) UpdateUser(ctx context.Context, uid string, upda
 	if updateData.RG != "" {
 		setFields["rg"] = updateData.RG
 	}
-	if updateData.Sex != ' ' && updateData.Sex != '\x00' {
+	if updateData.Sex != "" {
 		setFields["sex"] = updateData.Sex
 	}
 	if updateData.Role != "" {

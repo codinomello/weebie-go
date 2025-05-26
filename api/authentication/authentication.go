@@ -20,7 +20,7 @@ import (
 // AuthService define a interface para operações de autenticação
 type AuthService interface {
 	Initialize() (*auth.Client, error)
-	VerifyIDToken(idToken string) (*auth.Token, error)
+	VerifyToken(idToken string) (*auth.Token, error)
 	GenerateFirebaseUID() (string, error)
 	GetUser(uid string) (*auth.UserRecord, error)
 	GetUserByEmail(email string) (*auth.UserRecord, error)
@@ -69,7 +69,7 @@ func (fa *FirebaseAuthentication) Initialize() (*auth.Client, error) {
 }
 
 // Verifica um token de ID do Firebase
-func (fa *FirebaseAuthentication) VerifyIDToken(idToken string) (*auth.Token, error) {
+func (fa *FirebaseAuthentication) VerifyToken(idToken string) (*auth.Token, error) {
 	token, err := fa.Client.VerifyIDToken(context.Background(), idToken)
 	if err != nil {
 		return nil, errors.Wrap(err, "falha ao verificar token")
@@ -206,7 +206,7 @@ func (fa *FirebaseAuthentication) CreateDefaultAdmin(db *mongo.Database) error {
 		Address:   "Endereço Administrativo",
 		CPF:       "000.000.000-00",
 		RG:        "00.000.000-0",
-		Sex:       'M',
+		Sex:       "male",
 		Role:      "admin",
 		Status:    "active",
 		CreatedAt: time.Now(),
@@ -224,6 +224,6 @@ func (fa *FirebaseAuthentication) CreateDefaultAdmin(db *mongo.Database) error {
 		log.Printf("aviso: falha ao definir claims: %v\n", err)
 	}
 
-	log.Println("usuário admin criado com sucesso")
+	log.Println("🎫 usuário admin criado com sucesso")
 	return nil
 }

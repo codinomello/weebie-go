@@ -5,15 +5,20 @@ import components "github.com/codinomello/weebie-go/web/components"
 templ Ods() {
     <html lang="pt-BR">
     <head>
+        <!-- Metadados -->
         @components.Meta()
+        <!-- Título e descrição -->
         @components.Title("Weebie - Objetivos de Desenvolvimento Sustentável")
+        <!-- Scripts -->
         @components.ScriptHead()
+        <!-- Estilos -->
         @components.StyleHead()
+        <!-- Links e Favicon -->
         @components.Link("house_with_garden.png")
     </head>
     <body class="bg-gray-100 dark:bg-gray-900 min-h-screen flex flex-col">
-        @components.Nav("ODS - Objetivos de Desenvolvimento Sustentável", "earth_globe.png")
-        
+        <!-- Barra de navegação -->
+        @components.Nav("Objetivos de Desenvolvimento Sustentável", "earth_globe.png")
         <main class="flex-grow container mx-auto px-4 py-8">
             <div class="text-center mb-12">
                 <h1 class="text-4xl font-bold text-blue dark:text-blue-300 mb-4">
@@ -23,15 +28,13 @@ templ Ods() {
                     Os 17 Objetivos de Desenvolvimento Sustentável (ODS) da ONU para transformar nosso mundo
                 </p>
             </div>
-
-            <!-- Loading state -->
+            <!-- Estado de carregamento -->
             <div id="loading" class="flex justify-center py-12">
                 <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue"></div>
             </div>
-
-            <!-- ODS Grid -->
+            <!-- Grid de ODS -->
             <div id="ods-grid" class="hidden grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                <!-- ODS cards will be inserted here by JavaScript -->
+                <!-- Os cards dos ODS serão inseridos aqui pelo JavaScript -->
             </div>
 
             <!-- Modal para detalhes do ODS -->
@@ -48,7 +51,6 @@ templ Ods() {
                             </svg>
                         </button>
                     </div>
-                    
                     <div class="flex flex-col md:flex-row gap-6">
                         <div class="flex-1 flex flex-col items-center">
                             <img id="ods-modal-image" src="" alt="" class="w-full max-w-xs rounded-lg mb-4">
@@ -71,7 +73,7 @@ templ Ods() {
                 </div>
             </div>
         </main>
-        <!-- Footer -->
+        <!-- Rodapé -->
         @components.FooterMain()
         <script>
             document.addEventListener('DOMContentLoaded', () => {
