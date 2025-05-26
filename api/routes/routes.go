@@ -30,12 +30,14 @@ func SetupRoutes(
 	userCtrl *controllers.UserController,
 	projectCtrl *controllers.ProjectController,
 	memberCtrl *controllers.MemberController,
+	odsCtrl *controllers.ODSController,
 ) http.Handler {
 	// Inicializa handlers
 	authHandler := handlers.NewAuthHandler(authCtrl)
 	userHandler := handlers.NewUserHandler(userCtrl)
 	projectHandler := handlers.NewProjectHandler(projectCtrl)
 	//memberHandler := handlers.NewMemberHandler(memberCtrl)
+	odsHandler := handlers.NewODSHandler(odsCtrl)
 
 	// Cria router principal
 	mainRouter := http.NewServeMux()
@@ -90,12 +92,15 @@ func SetupRoutes(
 
 	// 2.2 Rotas protegidas
 	protectedRouter := http.NewServeMux()
+
+	// Rotas de usuários
 	protectedRouter.HandleFunc("/user/{uid}", MethodSwitch{
 		Get:    userHandler.GetUser(),
 		Put:    userHandler.UpdateUser(),
 		Delete: userHandler.DeleteUser(),
 	}.ServeHTTP)
 
+	// Rotas de projetos
 	protectedRouter.HandleFunc("/project/{uid}", MethodSwitch{
 		Get:    projectHandler.GetProject(),
 		Post:   projectHandler.CreateProject(),
@@ -103,8 +108,14 @@ func SetupRoutes(
 		Delete: projectHandler.DeleteProject(),
 	}.ServeHTTP)
 
+	// Rotas de membros
 	protectedRouter.HandleFunc("/member/{uid}", MethodSwitch{
-		//Get: memberHandler.GetMember(),
+		// Get: memberHandler.GetMember(),
+	}.ServeHTTP)
+
+	// Rotas de ODS
+	protectedRouter.HandleFunc("/ods/", MethodSwitch{
+		Get: odsHandler.GetAllODS(),
 	}.ServeHTTP)
 
 	// Aplica middleware de autenticação nas rotas protegidas
@@ -115,6 +126,7 @@ func SetupRoutes(
 	apiRouter.Handle("/user/", http.StripPrefix("/user", protectedWithJSON))
 	apiRouter.Handle("/project/", http.StripPrefix("/project", protectedWithJSON))
 	apiRouter.Handle("/member/", http.StripPrefix("/member", protectedWithJSON))
+	apiRouter.Handle("/ods/", http.StripPrefix("/ods", protectedWithJSON))
 
 	// 3. Monta estrutura final de roteamento
 	mainRouter.Handle("/", staticRouter)

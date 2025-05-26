@@ -2,49 +2,72 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
+	"strconv"
+	"strings"
+
+	"github.com/codinomello/weebie-go/api/controllers"
 )
 
-// Exemplo de estrutura de dados para o endpoint /api/ods
-type ODS struct {
-	Number      int      `json:"number"`
-	Title       string   `json:"title"`
-	Description string   `json:"description"`
-	Emoji       string   `json:"emoji"`
-	ImageURL    string   `json:"image_url"`
-	Targets     []string `json:"targets"`
+type ODSHandler struct {
+	ODSController *controllers.ODSController
 }
 
-// Exemplo de handler para /api/ods
-func HandleGetODSList(w http.ResponseWriter, r *http.Request) {
-	odsList := []ODS{
-		{
-			Number:      1,
-			Title:       "Erradicação da Pobreza",
-			Description: "Acabar com a pobreza em todas as suas formas, em todos os lugares",
-			Emoji:       "❌",
-			ImageURL:    "/images/assets/ods/1.jpg",
-			Targets: []string{
-				"Até 2030, erradicar a pobreza extrema para todas as pessoas em todos os lugares",
-				"Implementar sistemas de proteção social adequados",
-			},
-		},
-		// Adicione os outros 16 ODS aqui
+func NewODSHandler(ODSCtrl *controllers.ODSController) *ODSHandler {
+	return &ODSHandler{ODSController: ODSCtrl}
+}
+
+// GetAllODS HTTP GET /api/ods
+func (h *ODSHandler) GetAllODS() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			respondWithError(w, http.StatusMethodNotAllowed, "Método não permitido")
+			return
+		}
+		odsList := h.ODSController.GetAllODS()
+		respondWithJSON(w, http.StatusOK, odsList)
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(odsList)
 }
 
-// Exemplo de handler para /api/ods/{number}
-func HandleGetODSDetails(w http.ResponseWriter, r *http.Request) {
-	// Extrair number da URL
-	//vars := mux.Vars(r)
-	//odsNumber := vars["number"]
+// GetODSByNumberHandler HTTP GET /api/ods/{number}
+func (h *ODSHandler) GetODSByNumberHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		respondWithError(w, http.StatusMethodNotAllowed, "Método não permitido")
+		return
+	}
 
-	// Buscar ODS específico (implemente sua lógica aqui)
-	var ods ODS
+	number, err := extractODSNumber(r.URL.Path)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, err.Error())
+		return
+	}
 
+	ods, err := h.ODSController.GetODSByNumber(number)
+	if err != nil {
+		respondWithError(w, http.StatusNotFound, "ODS não encontrada")
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, ods)
+}
+
+// --- Helpers ---
+func extractODSNumber(path string) (int, error) {
+	parts := strings.Split(path, "/")
+	if len(parts) < 4 {
+		return 0, errors.New("URL inválida")
+	}
+	return strconv.Atoi(parts[3])
+}
+
+func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(ods)
+	w.WriteHeader(code)
+	json.NewEncoder(w).Encode(payload)
+}
+
+func respondWithError(w http.ResponseWriter, code int, message string) {
+	respondWithJSON(w, code, map[string]string{"error": message})
 }
