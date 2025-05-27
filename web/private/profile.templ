@@ -7,9 +7,7 @@ import (
     "github.com/codinomello/weebie-go/api/models"
 )
 
-type User *models.User
-
-templ Profile(user User) {
+templ Profile(user *models.User) {
     <html lang="pt-BR" class="scroll-smooth">
     <head>
         <!-- Meta Tags -->

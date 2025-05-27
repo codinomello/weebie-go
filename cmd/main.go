@@ -66,9 +66,10 @@ func main() {
 	projectController := controllers.NewProjectController(projectRepository, userRepository, memberRepository)
 	memberController := controllers.NewMemberController(memberRepository)
 	odsController := controllers.NewODSController()
+	profileController := controllers.NewProfileController(userRepository)
 
 	// Criação do roteador de servidores HTTP
-	router := routes.SetupRoutes(authController, userController, projectController, memberController, odsController)
+	router := routes.SetupRoutes(authController, userController, projectController, memberController, odsController, profileController)
 
 	// Porta principal do servidor HTTP
 	port := os.Getenv("PORT")

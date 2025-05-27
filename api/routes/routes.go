@@ -31,11 +31,13 @@ func SetupRoutes(
 	projectCtrl *controllers.ProjectController,
 	memberCtrl *controllers.MemberController,
 	odsCtrl *controllers.ODSController,
+	profileCtrl *controllers.ProfileController,
 ) http.Handler {
 	// Inicializa handlers
 	authHandler := handlers.NewAuthHandler(authCtrl)
 	userHandler := handlers.NewUserHandler(userCtrl)
 	projectHandler := handlers.NewProjectHandler(projectCtrl)
+	templHandler := handlers.NewTemplHandler(profileCtrl)
 	// memberHandler := handlers.NewMemberHandler(memberCtrl)
 	// odsHandler := handlers.NewODSHandler(odsCtrl)
 
@@ -45,7 +47,7 @@ func SetupRoutes(
 	// 1. Rotas estáticas (HTML e arquivos)
 	staticRouter := http.NewServeMux()
 	handlers.HandleTemplPublicRoutes(staticRouter)
-	handlers.HandleTemplPrivateRoutes(staticRouter)
+	templHandler.HandleTemplPrivateRoutes(staticRouter) // Corrija para usar o método do handler
 
 	// Serve arquivos estáticos (imagens e JS)
 	imagesFileServer := http.FileServer(http.Dir("../images"))
@@ -89,7 +91,6 @@ func SetupRoutes(
 	// 2.2 Rotas protegidas - COM autenticação
 	protectedRouter := http.NewServeMux()
 
-	// CORREÇÃO: Registrar rotas de projetos corretamente
 	// Rota para criar projeto (POST /api/project)
 	protectedRouter.HandleFunc("/project", HTTPMethod{
 		Post: projectHandler.CreateProject(),
@@ -116,14 +117,14 @@ func SetupRoutes(
 	}.ServeHTTP)
 
 	// Rotas de membros
-	protectedRouter.HandleFunc("/member/{uid}", HTTPMethod{
-		// Get: memberHandler.GetMember(),
-	}.ServeHTTP)
+	// protectedRouter.HandleFunc("/member/{uid}", HTTPMethod{
+	// 	Get: memberHandler.GetMember(),
+	// }.ServeHTTP)
 
 	// Rotas de ODS
-	protectedRouter.HandleFunc("/ods", HTTPMethod{
-		// Get: odsHandler.GetAllODS(),
-	}.ServeHTTP)
+	// protectedRouter.HandleFunc("/ods", HTTPMethod{
+	// 	Get: odsHandler.GetAllODS(),
+	// }.ServeHTTP)
 
 	// CORREÇÃO: Aplicar middlewares na ordem correta
 	protectedWithAuth := middleware.AuthMiddleware(protectedRouter)
@@ -138,8 +139,8 @@ func SetupRoutes(
 	apiRouter.Handle("/project/", protectedWithJSON)
 	apiRouter.Handle("/user", protectedWithJSON)
 	apiRouter.Handle("/user/", protectedWithJSON)
-	apiRouter.Handle("/member/", protectedWithJSON)
-	apiRouter.Handle("/ods", protectedWithJSON)
+	// apiRouter.Handle("/member/", protectedWithJSON)
+	// apiRouter.Handle("/ods", protectedWithJSON)
 
 	// 4. Monta estrutura final de roteamento
 	mainRouter.Handle("/", staticRouter)

@@ -4,40 +4,22 @@ import (
 	"net/http"
 
 	"github.com/a-h/templ"
-	"github.com/codinomello/weebie-go/api/models"
+	"github.com/codinomello/weebie-go/api/controllers"
 	"github.com/codinomello/weebie-go/web/private"
 	"github.com/codinomello/weebie-go/web/public"
 )
 
-// type TemplHandler struct {
-// 	// Controllers
-// 	ProfileController *controllers.ProfileController
-// 	ODSController     *controllers.ODSController
+// Estrutura para o TemplHandler
+type TemplHandler struct {
+	ProfileController *controllers.ProfileController
+	// Outros campos, se necessário
+}
 
-// 	// Repositories
-// 	UserRepository        repositories.UserRepository
-// 	ProjectRepository     repositories.ProjectRepository
-// 	AuthenticationService *authentication.FirebaseAuthentication
-
-// 	// Base de dados
-// 	DB any // Use o tipo real do seu DB, por exemplo *sql.DB ou *gorm.DB
-// }
-
-// func NewTemplHandler(
-// 	userRepo repositories.UserRepository,
-// 	projectRepo repositories.ProjectRepository,
-// 	authService *authentication.FirebaseAuthentication,
-// 	db , // Use o tipo real do seu DB
-// ) *TemplHandler {
-// 	return &TemplHandler{
-// 		ProfileController:     controllers.NewProfileController(userRepo),
-// 		ODSController:         controllers.NewODSController(),
-// 		UserRepository:        userRepo,
-// 		ProjectRepository:     projectRepo,
-// 		AuthenticationService: authService,
-// 		DB:                    db,
-// 	}
-// }
+func NewTemplHandler(profileCtrl *controllers.ProfileController) *TemplHandler {
+	return &TemplHandler{
+		ProfileController: profileCtrl,
+	}
+}
 
 // Template para renderizar os templates
 func HandleTemplTemplate(template templ.Component, w http.ResponseWriter, r *http.Request) error {
@@ -116,17 +98,24 @@ func HandleTemplOds(w http.ResponseWriter, r *http.Request) error {
 
 /* Privados */
 
-func HandleTemplPrivateRoutes(router *http.ServeMux) {
+func (th *TemplHandler) HandleTemplPrivateRoutes(router *http.ServeMux) {
 	// Serve o template profile.templ
-	SetupRoutesTemplate(router, "/profile", HandleTemplProfile)
+	SetupRoutesTemplate(router, "/profile", th.HandleTemplProfile)
 
 	// Serve o template dashboard.templ
 	SetupRoutesTemplate(router, "/dashboard", HandleTemplDashboard)
 }
 
-func HandleTemplProfile(w http.ResponseWriter, r *http.Request) error {
-	var user *models.User
-	// Renderiza o template profile.templ com o usuário autenticado
+func (th *TemplHandler) HandleTemplProfile(w http.ResponseWriter, r *http.Request) error {
+	profileHandler := NewProfileHandler(th.ProfileController)
+	user, err := profileHandler.ProfilePage(w, r)
+	if err != nil {
+		return err
+	}
+	err = private.Profile(user).Render(r.Context(), w)
+	if err != nil {
+		http.Error(w, "Erro ao renderizar página", http.StatusInternalServerError)
+	}
 	return HandleTemplTemplate(private.Profile(user), w, r)
 }
 
