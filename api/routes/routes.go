@@ -54,10 +54,12 @@ func SetupRoutes(
 	scriptsFileServer := http.FileServer(http.Dir("../scripts"))
 	staticRouter.Handle("/scripts/", http.StripPrefix("/scripts/", scriptsFileServer))
 
-	// 2. Rotas de autenticação (/api/auth)
+	// 2. Rotas de API (/api)
+	apiRouter := http.NewServeMux()
+
+	// 2.1 Rotas de autenticação (/api/auth) - SEM autenticação
 	authRouter := http.NewServeMux()
 
-	// Registrar rotas de autenticação diretamente no authRouter
 	authRouter.HandleFunc("/register", HTTPMethod{
 		Post: authHandler.RegisterUser(),
 	}.ServeHTTP)
@@ -80,32 +82,37 @@ func SetupRoutes(
 		Post: authHandler.RefreshToken(),
 	}.ServeHTTP)
 
-	// Aplica middlewares às rotas de autenticação (CORS e JSON apenas)
+	// Aplica middlewares às rotas de autenticação
 	authWithMiddlewares := middleware.CORS(authRouter)
 	authWithMiddlewares = middleware.JSONContentType(authWithMiddlewares)
 
-	// 2.1 Rotas de API
-	apiRouter := http.NewServeMux()
-
-	// Monta as rotas de auth no apiRouter
-	apiRouter.Handle("/auth/", http.StripPrefix("/auth", authWithMiddlewares))
-
-	// 2.2 Rotas protegidas
+	// 2.2 Rotas protegidas - COM autenticação
 	protectedRouter := http.NewServeMux()
 
+	// CORREÇÃO: Registrar rotas de projetos corretamente
+	// Rota para criar projeto (POST /api/project)
+	protectedRouter.HandleFunc("/project", HTTPMethod{
+		Post: projectHandler.CreateProject(),
+		Get:  projectHandler.GetProject(), // Para listar projetos
+	}.ServeHTTP)
+
+	// Rota para operações com ID específico (GET/PUT/DELETE /api/project/{id})
+	protectedRouter.HandleFunc("/project/{id}", HTTPMethod{
+		Get:    projectHandler.GetProject(),
+		Put:    projectHandler.UpdateProject(),
+		Delete: projectHandler.DeleteProject(),
+	}.ServeHTTP)
+
 	// Rotas de usuários
+	protectedRouter.HandleFunc("/user", HTTPMethod{
+		Get:  userHandler.GetUser(),
+		Post: userHandler.UpdateUser(), // Para criar/atualizar perfil
+	}.ServeHTTP)
+
 	protectedRouter.HandleFunc("/user/{uid}", HTTPMethod{
 		Get:    userHandler.GetUser(),
 		Put:    userHandler.UpdateUser(),
 		Delete: userHandler.DeleteUser(),
-	}.ServeHTTP)
-
-	// Rotas de projetos
-	protectedRouter.HandleFunc("/project", HTTPMethod{
-		Get:    projectHandler.GetProject(),
-		Post:   projectHandler.CreateProject(),
-		Put:    projectHandler.UpdateProject(),
-		Delete: projectHandler.DeleteProject(),
 	}.ServeHTTP)
 
 	// Rotas de membros
@@ -114,29 +121,54 @@ func SetupRoutes(
 	}.ServeHTTP)
 
 	// Rotas de ODS
-	protectedRouter.HandleFunc("/ods/", HTTPMethod{
+	protectedRouter.HandleFunc("/ods", HTTPMethod{
 		// Get: odsHandler.GetAllODS(),
 	}.ServeHTTP)
 
-	// Aplica middleware de autenticação nas rotas protegidas
+	// CORREÇÃO: Aplicar middlewares na ordem correta
 	protectedWithAuth := middleware.AuthMiddleware(protectedRouter)
 	protectedWithCORS := middleware.CORS(protectedWithAuth)
 	protectedWithJSON := middleware.JSONContentType(protectedWithCORS)
 
-	apiRouter.Handle("/user/", http.StripPrefix("/user", protectedWithJSON))
-	apiRouter.Handle("/project/", http.StripPrefix("/project", protectedWithJSON))
-	apiRouter.Handle("/member/", http.StripPrefix("/member", protectedWithJSON))
-	apiRouter.Handle("/ods/", http.StripPrefix("/ods", protectedWithJSON))
+	// 3. Monta as rotas no apiRouter
+	apiRouter.Handle("/auth/", http.StripPrefix("/auth", authWithMiddlewares))
 
-	// 3. Monta estrutura final de roteamento
+	// CORREÇÃO: Registrar rotas protegidas sem StripPrefix adicional
+	apiRouter.Handle("/project", protectedWithJSON)
+	apiRouter.Handle("/project/", protectedWithJSON)
+	apiRouter.Handle("/user", protectedWithJSON)
+	apiRouter.Handle("/user/", protectedWithJSON)
+	apiRouter.Handle("/member/", protectedWithJSON)
+	apiRouter.Handle("/ods", protectedWithJSON)
+
+	// 4. Monta estrutura final de roteamento
 	mainRouter.Handle("/", staticRouter)
 	mainRouter.Handle("/api/", http.StripPrefix("/api", apiRouter))
+	mainRouter.HandleFunc("/debug", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"message": "Server is running", "path": "` + r.URL.Path + `"}`))
+	})
 
 	// Aplica middleware de logging global
 	return middleware.LoggingMiddleware(mainRouter)
 }
 
 func (m HTTPMethod) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// CORREÇÃO: Definir Content-Type como JSON por padrão para APIs
+	w.Header().Set("Content-Type", "application/json")
+
+	// Adicionar headers CORS aqui também como backup
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+	// Handle preflight requests
+	if r.Method == http.MethodOptions {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
 	switch r.Method {
 	case http.MethodGet:
 		if m.Get != nil {
@@ -159,12 +191,16 @@ func (m HTTPMethod) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	http.Error(w, "Método não permitido", http.StatusMethodNotAllowed)
+
+	w.WriteHeader(http.StatusMethodNotAllowed)
+	w.Write([]byte(`{"error": "Método não permitido", "method": "` + r.Method + `", "path": "` + r.URL.Path + `"}`))
 }
 
 func LogAvailableRoutes() {
+	log.Println("💫 Rotas disponíveis:")
+
 	// Rotas de autenticação (/api/auth)
-	log.Println("💫 rotas disponíveis:")
+	log.Println("🔓 Rotas de autenticação:")
 	log.Println(" ➕ POST   /api/auth/register") // Registrar novo usuário
 	log.Println(" ➕ POST   /api/auth/login")    // Login com token Firebase
 	log.Println(" ➕ POST   /api/auth/social")   // Login social (Google/GitHub)
@@ -173,17 +209,23 @@ func LogAvailableRoutes() {
 	log.Println(" ❌ DELETE /api/auth/session")  // Revogar sessão (logout)
 	log.Println(" 🔄 POST   /api/auth/refresh")  // Refresh token
 
-	// Rotas protegidas de usuários (/api/user)
-	log.Println(" 🔍 GET    /api/user/{uid}")   // Obter usuário
+	// Rotas protegidas
+	log.Println("🔒 Rotas protegidas:")
+
+	// Usuários
+	log.Println(" 🔍 GET    /api/user")         // Obter usuário atual
+	log.Println(" 🔍 GET    /api/user/{uid}")   // Obter usuário por UID
 	log.Println(" ✏️  PUT    /api/user/{uid}") // Atualizar usuário
 	log.Println(" ❌ DELETE /api/user/{uid}")   // Deletar usuário
 
-	// Rotas protegidas de projetos (/api/project)
-	log.Println(" 🔍 GET    /api/project/{uid}")   // Obter projeto
-	log.Println(" ➕ POST   /api/project/{uid}")   // Criar projeto
-	log.Println(" ✏️  PUT    /api/project/{uid}") // Atualizar projeto
-	log.Println(" ❌ DELETE /api/project/{uid}")   // Deletar projeto
+	// Projetos - CORRIGIDO
+	log.Println(" 🔍 GET    /api/project")        // Listar projetos do usuário
+	log.Println(" ➕ POST   /api/project")        // Criar projeto
+	log.Println(" 🔍 GET    /api/project/{id}")   // Obter projeto por ID
+	log.Println(" ✏️  PUT    /api/project/{id}") // Atualizar projeto
+	log.Println(" ❌ DELETE /api/project/{id}")   // Deletar projeto
 
-	// Rotas protegidas de membros (/api/member)
-	log.Println(" 🔍 GET    /api/member/{uid}") // Obter membro (comentado no código)
+	// Outros
+	log.Println(" 🔍 GET    /api/member/{uid}") // Obter membro
+	log.Println(" 🔍 GET    /api/ods")          // Obter todos os ODS
 }

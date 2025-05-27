@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -90,6 +91,7 @@ func (c *ProjectController) CreateProject(w http.ResponseWriter, r *http.Request
 	// Decodifica JSON do corpo da requisição para a struct CreateProjectRequest
 	var req models.CreateProjectRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		log.Printf("❌ Erro ao decodificar JSON: %v", err) // <-- adicione isso
 		http.Error(w, fmt.Sprintf("Erro ao decodificar JSON: %v", err), http.StatusBadRequest)
 		return
 	}
