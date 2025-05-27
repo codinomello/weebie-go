@@ -40,7 +40,22 @@ type FirebaseAuthentication struct {
 
 // Cria uma nova instância do serviço de autenticação
 func NewFirebaseAuthentication() *FirebaseAuthentication {
-	return &FirebaseAuthentication{}
+	opt := option.WithCredentialsFile(os.Getenv("FIREBASE_CREDENTIALS"))
+	app, err := firebase.NewApp(context.Background(), nil, opt)
+	if err != nil {
+		log.Fatalf("Erro ao inicializar Firebase: %v", err)
+		return nil
+	}
+
+	client, err := app.Auth(context.Background())
+	if err != nil {
+		log.Fatalf("Erro ao criar client de autenticação: %v", err)
+		return nil
+	}
+
+	return &FirebaseAuthentication{
+		Client: client,
+	}
 }
 
 // Inicializa o cliente Firebase
