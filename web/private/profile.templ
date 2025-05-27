@@ -2,14 +2,11 @@ package private
 
 import (
     "time"
-
-    components "github.com/codinomello/weebie-go/web/components"
     "github.com/codinomello/weebie-go/api/models"
+    "github.com/codinomello/weebie-go/web/components"
 )
 
-type User *models.User
-
-templ Profile(user User) {
+templ Profile(user *models.User) {
     <html lang="pt-BR" class="scroll-smooth">
     <head>
         <!-- Meta Tags -->
@@ -88,17 +85,17 @@ templ Profile(user User) {
                 <div class="w-full md:w-80">
                     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 sticky top-6">
                         <div class="text-center mb-6">
-                            <div class="w-24 h-24 mx-auto rounded-full bg-blue/10 flex items-center justify-center text-4xl mb-3">
+                            <div class="w-24 h-24 mx-auto rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-4xl mb-3 text-orange-500 dark:text-orange-300">
                                 { getUserInitial(user.Name) }
                             </div>
-                            <h2 class="text-xl font-bold text-orange dark:text-golden">{ user.Name }</h2>
+                            <h2 class="text-xl font-bold text-orange-600 dark:text-orange-300">{ user.Name }</h2>
                             <p class="text-gray-500 dark:text-gray-400 text-sm">{ user.Role }</p>
                             
                             <div class="mt-4 flex justify-center gap-2">
-                                <span class="bg-green/10 text-green dark:bg-green/20 dark:text-green/80 px-3 py-1 rounded-full text-xs">
+                                <span class="bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200 px-3 py-1 rounded-full text-xs">
                                     { user.Status }
                                 </span>
-                                <span class="bg-blue/10 text-blue dark:bg-blue/20 dark:text-blue/80 px-3 py-1 rounded-full text-xs">
+                                <span class="bg-orange-100 dark:bg-orange-900/20 text-orange-800 dark:text-orange-200 px-3 py-1 rounded-full text-xs">
                                     Membro desde { formatDate(user.CreatedAt) }
                                 </span>
                             </div>
@@ -129,7 +126,7 @@ templ Profile(user User) {
                             }
                             
                             <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
-                                <button class="w-full bg-blue text-white py-2 rounded-lg hover:bg-blue/80 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2">
+                                <button class="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-2 rounded-lg hover:opacity-90 transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02] flex items-center justify-center gap-2">
                                     <span>✏️</span> Editar Perfil
                                 </button>
                             </div>
@@ -141,15 +138,15 @@ templ Profile(user User) {
                 <div class="flex-1">
                     <!-- Seção de Informações Pessoais -->
                     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
-                        <h3 class="text-xl font-bold text-orange dark:text-golden mb-6">Informações Pessoais</h3>
+                        <h3 class="text-xl font-bold text-orange-600 dark:text-orange-300 mb-6">Informações Pessoais</h3>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
+                            <div class="p-3 rounded-lg hover:bg-orange-50 dark:hover:bg-gray-700/50 transition">
                                 <h4 class="font-semibold text-sm text-gray-500 dark:text-gray-400">Nome Completo</h4>
                                 <p class="dark:text-gray-300">{ user.Name }</p>
                             </div>
                             
-                            <div>
+                            <div class="p-3 rounded-lg hover:bg-orange-50 dark:hover:bg-gray-700/50 transition">
                                 <h4 class="font-semibold text-sm text-gray-500 dark:text-gray-400">Gênero</h4>
                                 <p class="dark:text-gray-300">
                                     if user.Sex == "male" {
@@ -164,7 +161,7 @@ templ Profile(user User) {
                                 </p>
                             </div>
                             
-                            <div>
+                            <div class="p-3 rounded-lg hover:bg-orange-50 dark:hover:bg-gray-700/50 transition">
                                 <h4 class="font-semibold text-sm text-gray-500 dark:text-gray-400">Idade</h4>
                                 <p class="dark:text-gray-300">
                                     if user.Age > 0 {
@@ -175,7 +172,7 @@ templ Profile(user User) {
                                 </p>
                             </div>
                             
-                            <div>
+                            <div class="p-3 rounded-lg hover:bg-orange-50 dark:hover:bg-gray-700/50 transition">
                                 <h4 class="font-semibold text-sm text-gray-500 dark:text-gray-400">CPF</h4>
                                 <p class="dark:text-gray-300">
                                     if user.CPF != "" {
@@ -186,7 +183,7 @@ templ Profile(user User) {
                                 </p>
                             </div>
                             
-                            <div>
+                            <div class="p-3 rounded-lg hover:bg-orange-50 dark:hover:bg-gray-700/50 transition">
                                 <h4 class="font-semibold text-sm text-gray-500 dark:text-gray-400">RG</h4>
                                 <p class="dark:text-gray-300">
                                     if user.RG != "" {
@@ -197,13 +194,13 @@ templ Profile(user User) {
                                 </p>
                             </div>
                             
-                            <div>
+                            <div class="p-3 rounded-lg hover:bg-orange-50 dark:hover:bg-gray-700/50 transition">
                                 <h4 class="font-semibold text-sm text-gray-500 dark:text-gray-400">Termos Aceitos</h4>
                                 <p class="dark:text-gray-300">
                                     if user.Terms {
-                                        <span class="text-green">✓ Sim</span>
+                                        <span class="text-green-600 dark:text-green-400">✓ Sim</span>
                                     } else {
-                                        <span class="text-red">✗ Não</span>
+                                        <span class="text-red-600 dark:text-red-400">✗ Não</span>
                                     }
                                 </p>
                             </div>
@@ -213,9 +210,9 @@ templ Profile(user User) {
                     <!-- Seção de Atividades -->
                     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
                         <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-xl font-bold text-orange dark:text-golden">Minhas Atividades</h3>
+                            <h3 class="text-xl font-bold text-orange-600 dark:text-orange-300">Minhas Atividades</h3>
                             <div class="flex gap-2">
-                                <button class="text-sm bg-blue text-white px-3 py-1 rounded hover:bg-blue/80 transition">
+                                <button class="text-sm bg-gradient-to-r from-orange-500 to-yellow-500 text-white px-3 py-1 rounded hover:opacity-90 transition">
                                     Projetos
                                 </button>
                                 <button class="text-sm border border-gray-300 px-3 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition">
@@ -226,9 +223,9 @@ templ Profile(user User) {
                         
                         <div class="space-y-4">
                             <!-- Exemplo de atividade -->
-                            <div class="p-4 border rounded-lg hover:shadow-md transition">
+                            <div class="p-4 border rounded-lg hover:shadow-md transition bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-gray-700/50 dark:to-gray-700/30">
                                 <div class="flex items-start gap-3">
-                                    <div class="text-blue text-xl">🌱</div>
+                                    <div class="text-yellow-500 text-xl">🌱</div>
                                     <div>
                                         <h4 class="font-semibold dark:text-gray-200">Você criou um novo projeto</h4>
                                         <p class="text-sm text-gray-500 dark:text-gray-400">Horta Comunitária - 3 dias atrás</p>
@@ -237,35 +234,45 @@ templ Profile(user User) {
                                 </div>
                             </div>
                             
-                            <!-- Adicione mais atividades conforme necessário -->
+                            <!-- Atividade 2 -->
+                            <div class="p-4 border rounded-lg hover:shadow-md transition bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-gray-700/50 dark:to-gray-700/30">
+                                <div class="flex items-start gap-3">
+                                    <div class="text-red-500 text-xl">❤️</div>
+                                    <div>
+                                        <h4 class="font-semibold dark:text-gray-200">Doação realizada</h4>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Campanha de Inverno - 1 semana atrás</p>
+                                        <p class="mt-2 text-sm dark:text-gray-300">Você contribuiu com 5 cobertores para a campanha</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
                     <!-- Seção de Segurança -->
                     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-                        <h3 class="text-xl font-bold text-orange dark:text-golden mb-6">Segurança da Conta</h3>
+                        <h3 class="text-xl font-bold text-orange-600 dark:text-orange-300 mb-6">Segurança da Conta</h3>
                         
                         <div class="space-y-4">
-                            <div class="flex justify-between items-center p-4 border rounded-lg">
+                            <div class="flex justify-between items-center p-4 border rounded-lg hover:bg-orange-50 dark:hover:bg-gray-700/50 transition">
                                 <div>
                                     <h4 class="font-semibold dark:text-gray-200">Alterar Senha</h4>
                                     <p class="text-sm text-gray-500 dark:text-gray-400">Última alteração: { formatDate(user.UpdatedAt) }</p>
                                 </div>
-                                <button class="text-blue hover:underline">Alterar</button>
+                                <button class="text-orange-600 dark:text-orange-300 hover:underline font-medium">Alterar</button>
                             </div>
                             
-                            <div class="flex justify-between items-center p-4 border rounded-lg">
+                            <div class="flex justify-between items-center p-4 border rounded-lg hover:bg-orange-50 dark:hover:bg-gray-700/50 transition">
                                 <div>
                                     <h4 class="font-semibold dark:text-gray-200">Sessões Ativas</h4>
                                     <p class="text-sm text-gray-500 dark:text-gray-400">Dispositivos com acesso à sua conta</p>
                                 </div>
-                                <button class="text-blue hover:underline">Gerenciar</button>
+                                <button class="text-orange-600 dark:text-orange-300 hover:underline font-medium">Gerenciar</button>
                             </div>
                             
-                            <div class="p-4 border border-red/20 rounded-lg bg-red/5">
-                                <h4 class="font-semibold text-red dark:text-red/80 mb-2">Encerrar Conta</h4>
+                            <div class="p-4 border border-red-200 rounded-lg bg-red-50 dark:border-red-900/50 dark:bg-red-900/10">
+                                <h4 class="font-semibold text-red-600 dark:text-red-400 mb-2">Encerrar Conta</h4>
                                 <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">Esta ação é irreversível. Todos os seus dados serão removidos permanentemente.</p>
-                                <button class="text-sm border border-red text-red px-3 py-1 rounded hover:bg-red/10 transition">
+                                <button class="text-sm border border-red-600 text-red-600 dark:border-red-400 dark:text-red-400 px-3 py-1 rounded hover:bg-red-100 dark:hover:bg-red-900/20 transition">
                                     Encerrar minha conta
                                 </button>
                             </div>
@@ -281,7 +288,7 @@ templ Profile(user User) {
     </html>
 }
 
-// Funções auxiliares (implementar no seu backend)
+// Funções auxiliares
 func getUserInitial(name string) string {
     if len(name) > 0 {
         return string(name[0])
