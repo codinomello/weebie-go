@@ -31,24 +31,24 @@ func ProjectCard(title string, description string, status string, progress int, 
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl hover:-translate-y-1\"><!-- Cabeçalho com Imagem --><div class=\"h-48 bg-gradient-to-br from-green/30 to-blue/30 relative\"><!-- Imagem de placeholder - pode ser substituída por uma imagem real --><div class=\"w-full h-full bg-gradient-to-r from-green-100 to-blue-100 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center\"><span class=\"text-5xl opacity-30\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"bg-white dark:bg-gray-900 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-800 transition-all duration-300 hover:shadow-md hover:border-gray-200 dark:hover:border-gray-700 group\"><!-- Cabeçalho com Imagem Minimalista --><div class=\"h-40 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 relative flex items-center justify-center\"><!-- Ícone centralizado maior e mais sutil --><span class=\"text-6xl opacity-20 group-hover:opacity-30 transition-opacity duration-300\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(getProjectIcon(categories[0]))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/custom/project_card.templ`, Line: 11, Col: 81}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/custom/project_card.templ`, Line: 10, Col: 132}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</span></div><!-- Badge de Status -->")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</span><!-- Badge de Status mais discreto -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var3 = []any{"absolute top-0 right-0 m-3 text-white px-3 py-1 rounded-full text-sm font-medium " + getStatusColorClass(status)}
+		var templ_7745c5c3_Var3 = []any{"absolute top-3 right-3 m-0 text-xs px-2 py-1 rounded-md font-semibold backdrop-blur-sm " + getStatusColorClass(status)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var3...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -73,221 +73,206 @@ func ProjectCard(title string, description string, status string, progress int, 
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(getStatusText(status))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/custom/project_card.templ`, Line: 16, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/custom/project_card.templ`, Line: 14, Col: 39}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div></div><!-- Corpo do Card --><div class=\"p-5\"><div class=\"flex justify-between items-start mb-4\"><h3 class=\"text-xl font-bold text-gray-900 dark:text-white\"><span class=\"mr-2\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div></div><!-- Corpo do Card mais compacto --><div class=\"p-4\"><!-- Título e Estrelas em linha única --><div class=\"flex justify-between items-center mb-3\"><h3 class=\"text-lg font-semibold text-gray-900 dark:text-white truncate\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var6 string
-		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(getCategoryIcon(categories[0]))
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/custom/project_card.templ`, Line: 24, Col: 71}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/custom/project_card.templ`, Line: 23, Col: 27}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</span> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</h3><!-- Sistema de Estrelas simplificado --><button class=\"star-button flex items-center gap-1 text-sm text-gray-400 hover:text-yellow-400 transition-colors\" data-starred=\"false\" hx-post=\"/projects/star\" hx-swap=\"none\"><svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z\"></path></svg> <span class=\"star-count text-xs font-medium\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var7 string
-		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(title)
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(stars)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/custom/project_card.templ`, Line: 25, Col: 27}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/custom/project_card.templ`, Line: 36, Col: 72}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</h3><!-- Sistema de Estrelas --><button class=\"star-button flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400 hover:text-golden\" data-starred=\"false\" hx-post=\"/projects/star\" hx-swap=\"none\"><svg class=\"w-5 h-5\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z\"></path></svg> <span class=\"star-count\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</span></button></div><!-- Tags mais compactas --><div class=\"flex flex-wrap gap-1.5 mb-3\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var8 string
-		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(stars)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/custom/project_card.templ`, Line: 38, Col: 52}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
+		var templ_7745c5c3_Var8 = []any{"px-1.5 py-0.5 rounded-md text-[10px] uppercase tracking-wider font-medium " + getCategoryColorClass(categories[0])}
+		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var8...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</span></button></div><!-- Tags --><div class=\"flex flex-wrap gap-2 mb-4\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<span class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		for _, category := range categories {
-			var templ_7745c5c3_Var9 = []any{"px-2 py-1 rounded-full text-xs " + getCategoryColorClass(category)}
-			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var9...)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<span class=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var10 string
-			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var9).String())
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/custom/project_card.templ`, Line: 1, Col: 0}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\">")
+		var templ_7745c5c3_Var9 string
+		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var8).String())
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/custom/project_card.templ`, Line: 1, Col: 0}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var10 string
+		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(categories[0])
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/custom/project_card.templ`, Line: 43, Col: 35}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</span> ")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		for _, odsNumber := range ods {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<span class=\"bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400 px-1.5 py-0.5 rounded-md text-[10px] font-medium\">ODS ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var11 string
-			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(category)
+			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(odsNumber)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/custom/project_card.templ`, Line: 46, Col: 35}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/custom/project_card.templ`, Line: 47, Col: 39}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</span> ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</span>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		for _, odsNumber := range ods {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<span class=\"bg-orange/10 text-orange dark:bg-orange/20 dark:text-orange/80 px-2 py-1 rounded-full text-xs\">ODS ")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var12 string
-			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(odsNumber)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/custom/project_card.templ`, Line: 51, Col: 40}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</span>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</div><!-- Descrição --><p class=\"text-gray-600 dark:text-gray-400 mb-4 line-clamp-2\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div><!-- Descrição mais compacta --><p class=\"text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-2\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var13 string
-		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(description)
+		var templ_7745c5c3_Var12 string
+		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(description)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/custom/project_card.templ`, Line: 58, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/custom/project_card.templ`, Line: 54, Col: 29}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</p><!-- Barra de Progresso --><div class=\"mb-4\"><div class=\"flex items-center justify-between text-sm mb-1\"><span class=\"text-orange dark:text-golden font-medium\">Progresso:</span> ")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var14 = []any{"font-medium " + getProgressColorClass(progress)}
-		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var14...)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</p><!-- Barra de Progresso mais fina --><div class=\"mb-3\"><div class=\"flex items-center justify-between text-xs mb-1\"><span class=\"text-gray-500 dark:text-gray-400\">Progresso</span> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<span class=\"")
+		var templ_7745c5c3_Var13 = []any{"font-semibold " + getProgressColorClass(progress)}
+		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var13...)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<span class=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var14 string
+		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var13).String())
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/custom/project_card.templ`, Line: 1, Col: 0}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var15 string
-		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var14).String())
+		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(progress)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/custom/project_card.templ`, Line: 1, Col: 0}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/custom/project_card.templ`, Line: 61, Col: 97}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "%</span></div><div class=\"h-1 bg-gray-200 dark:bg-gray-800 rounded-full\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var16 string
-		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(progress)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/custom/project_card.templ`, Line: 65, Col: 95}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
+		var templ_7745c5c3_Var16 = []any{"h-1 rounded-full " + getProgressBarColorClass(progress)}
+		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var16...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "%</span></div><div class=\"h-2 bg-gray-200 dark:bg-gray-700 rounded-full\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<div class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var17 = []any{"h-2 rounded-full " + getProgressBarColorClass(progress)}
-		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var17...)
+		var templ_7745c5c3_Var17 string
+		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var16).String())
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/custom/project_card.templ`, Line: 1, Col: 0}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<div class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\" style=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var18 string
-		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var17).String())
+		templ_7745c5c3_Var18, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("width: " + fmt.Sprintf("%d", progress) + "%")
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/custom/project_card.templ`, Line: 1, Col: 0}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/custom/project_card.templ`, Line: 64, Col: 145}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\" style=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "\"></div></div></div><!-- Metadados em linha única --><div class=\"flex items-center justify-between text-xs text-gray-500 dark:text-gray-400\"><div class=\"flex items-center gap-1 truncate\"><svg class=\"w-3 h-3 flex-shrink-0\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z\"></path></svg> <span class=\"truncate\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var19 string
-		templ_7745c5c3_Var19, templ_7745c5c3_Err = templruntime.SanitizeStyleAttributeValues("width: " + fmt.Sprintf("%d", progress) + "%")
+		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(location)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/custom/project_card.templ`, Line: 68, Col: 145}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/custom/project_card.templ`, Line: 74, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\"></div></div></div><!-- Localização e Pessoas --><div class=\"flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-4\"><div class=\"flex items-center gap-1\"><svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z\"></path> <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M15 11a3 3 0 11-6 0 3 3 0 016 0z\"></path></svg> <span>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</span></div><div class=\"flex items-center gap-1\"><svg class=\"w-3 h-3\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z\"></path></svg> <span>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var20 string
-		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(location)
+		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(participants)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/custom/project_card.templ`, Line: 79, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/custom/project_card.templ`, Line: 80, Col: 40}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</span></div><div class=\"flex items-center gap-1\"><svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z\"></path></svg> <span>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var21 string
-		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(participants)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/custom/project_card.templ`, Line: 85, Col: 40}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, " participantes</span></div></div><!-- Botões de Ação --><div class=\"flex space-x-2\"><button class=\"flex-1 py-2 bg-green text-white rounded-lg hover:bg-green/80 transition flex items-center justify-center gap-2\" hx-post=\"/projects/join\" hx-swap=\"none\"><svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z\"></path></svg> Participar</button> <button class=\"flex-1 py-2 bg-blue text-white rounded-lg hover:bg-blue/80 transition flex items-center justify-center gap-2\" hx-get=\"/projects/comments\" hx-target=\"#comments-modal\"><svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z\"></path></svg> Comentar</button> <button class=\"w-10 h-10 flex items-center justify-center bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition\" hx-post=\"/projects/share\" hx-swap=\"none\"><svg class=\"w-5 h-5\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z\"></path></svg></button></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</span></div></div><!-- Botões de Ação mais discretos --><div class=\"flex gap-2 mt-3\"><button class=\"flex-1 py-1.5 bg-gray-900 text-white text-xs font-medium rounded-lg hover:bg-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 transition flex items-center justify-center gap-1\" hx-post=\"/projects/join\" hx-swap=\"none\"><svg class=\"w-3 h-3\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z\"></path></svg> Participar</button> <button class=\"w-8 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition\" hx-get=\"/projects/comments\" hx-target=\"#comments-modal\" title=\"Comentar\"><svg class=\"w-4 h-4\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z\"></path></svg></button></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -295,17 +280,17 @@ func ProjectCard(title string, description string, status string, progress int, 
 	})
 }
 
-// Funções auxiliares para estilização dinâmica
+// Funções auxiliares atualizadas para um visual mais minimalista
 func getStatusColorClass(status string) string {
 	switch status {
 	case "active":
-		return "bg-green/80 dark:bg-green/90"
+		return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
 	case "new":
-		return "bg-blue/80 dark:bg-blue/90"
+		return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400"
 	case "completed":
-		return "bg-purple/80 dark:bg-purple/90"
+		return "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400"
 	default:
-		return "bg-gray-500"
+		return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400"
 	}
 }
 
@@ -325,42 +310,43 @@ func getStatusText(status string) string {
 func getCategoryColorClass(category string) string {
 	switch category {
 	case "Meio Ambiente":
-		return "bg-green/10 text-green dark:bg-green/20 dark:text-green/80"
+		return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
 	case "Educação":
-		return "bg-blue/10 text-blue dark:bg-blue/20 dark:text-blue/80"
+		return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400"
 	case "Saúde":
-		return "bg-red/10 text-red dark:bg-red/20 dark:text-red/80"
+		return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
 	case "Tecnologia":
-		return "bg-purple/10 text-purple dark:bg-purple/20 dark:text-purple/80"
+		return "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400"
 	case "Cultura":
-		return "bg-yellow/10 text-yellow-600 dark:bg-yellow/20 dark:text-yellow-500"
+		return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
 	default:
-		return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
+		return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400"
 	}
 }
 
 func getProgressColorClass(progress int) string {
 	if progress >= 75 {
-		return "text-green dark:text-green-400"
+		return "text-green-600 dark:text-green-400"
 	} else if progress >= 50 {
-		return "text-blue dark:text-blue-400"
+		return "text-blue-600 dark:text-blue-400"
 	} else if progress >= 25 {
-		return "text-orange dark:text-orange-400"
+		return "text-orange-600 dark:text-orange-400"
 	}
-	return "text-red dark:text-red-400"
+	return "text-red-600 dark:text-red-400"
 }
 
 func getProgressBarColorClass(progress int) string {
 	if progress >= 75 {
-		return "bg-green"
+		return "bg-green-500"
 	} else if progress >= 50 {
-		return "bg-blue"
+		return "bg-blue-500"
 	} else if progress >= 25 {
-		return "bg-orange"
+		return "bg-orange-500"
 	}
-	return "bg-red"
+	return "bg-red-500"
 }
 
+// Ícones mantidos os mesmos
 func getProjectIcon(category string) string {
 	switch category {
 	case "Meio Ambiente":
@@ -375,27 +361,6 @@ func getProjectIcon(category string) string {
 		return "🎭"
 	default:
 		return "🌟"
-	}
-}
-
-func getCategoryIcon(category string) string {
-	switch category {
-	case "Meio Ambiente":
-		return "🌿"
-	case "Educação":
-		return "🎓"
-	case "Saúde":
-		return "❤️"
-	case "Tecnologia":
-		return "🤖"
-	case "Cultura":
-		return "🎨"
-	case "Agricultura":
-		return "🚜"
-	case "Social":
-		return "👥"
-	default:
-		return "✨"
 	}
 }
 
